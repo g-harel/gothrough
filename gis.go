@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"unicode"
 
@@ -17,8 +16,14 @@ import (
 
 var root = path.Join(os.Getenv("GOROOT"), "src")
 
-// var root = "/home/g-harel/Documents/dev/gis/main"
-var pattern = regexp.MustCompile("^type [A-Z][A-Za-z]* interface ?{")
+type Interface struct {
+	ImportPath string
+	Name       string
+}
+
+func (i *Interface) String() string {
+	return fmt.Sprintf("import \"%v\"\n%v\n", i.ImportPath, i.Name)
+}
 
 func List() {
 	fmt.Println("looking in", root)
@@ -81,11 +86,15 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 				if typ, ok := spec.(*ast.TypeSpec); ok {
 					if _, ok := typ.Type.(*ast.InterfaceType); ok {
 						name := typ.Name.String()
-						imprt := strings.TrimPrefix(v.Path, root)
-						imprt = strings.TrimPrefix(imprt, "/")
-						imprt = strings.TrimSuffix(imprt, ".go")
+						imp := strings.TrimPrefix(path.Dir(v.Path), root)
+						imp = strings.TrimPrefix(imp, "/")
+						pkg := path.Base(imp)
 						if unicode.IsUpper([]rune(name)[0]) {
-							fmt.Println(imprt, name)
+							i := Interface{
+								ImportPath: imp,
+								Name:       fmt.Sprintf("%v.%v", pkg, name),
+							}
+							fmt.Println(i.String())
 						}
 					}
 				}
