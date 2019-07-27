@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 
@@ -10,8 +11,13 @@ import (
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
 
-	_, err := gis.Search(root)
+	interfaces, err := gis.Search(root)
 	if err != nil {
 		panic(err)
 	}
+
+	for _, ifc := range interfaces {
+		fmt.Println(ifc.String())
+	}
+	fmt.Println(len(interfaces))
 }
