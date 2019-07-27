@@ -10,69 +10,65 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
-var root = path.Join(os.Getenv("GOROOT"), "src")
-
 type Interface struct {
-	ImportPath string
-	Name       string
+	Name              string
+	PackageName       string
+	PackageImportPath string
 }
 
 func (i *Interface) String() string {
-	return fmt.Sprintf("import \"%v\"\n%v\n", i.ImportPath, i.Name)
+	return fmt.Sprintf("import \"%v\"\n%v.%v\n", i.PackageImportPath, i.PackageName, i.Name)
 }
 
-func List() {
-	fmt.Println("looking in", root)
-
+func Search(dir string) ([]Interface, error) {
 	fs := token.NewFileSet()
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+
+	err := filepath.Walk(dir, func(pathname string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
-		if !strings.HasSuffix(path, ".go") {
+		if !strings.HasSuffix(pathname, ".go") {
 			return nil
 		}
-		if strings.HasSuffix(path, "_test.go") {
+		if strings.HasSuffix(pathname, "_test.go") {
 			return nil
 		}
-		if strings.Contains(path, "internal/") {
+		if strings.Contains(pathname, "internal/") {
 			return nil
 		}
-		if strings.Contains(path, "vendor/") {
+		if strings.Contains(pathname, "vendor/") {
 			return nil
 		}
-		if strings.Contains(path, "testdata/") {
+		if strings.Contains(pathname, "testdata/") {
 			return nil
 		}
-		if strings.Contains(path, "testing/") {
+		if strings.Contains(pathname, "testing/") {
 			return nil
 		}
 
-		f, err := parser.ParseFile(fs, path, nil, parser.AllErrors)
+		f, err := parser.ParseFile(fs, pathname, nil, parser.AllErrors)
 		if err != nil {
 			return err
 		}
 
-		if 0 == 1 {
-			spew.Dump(path, f)
-		}
-
-		v := visitor{Path: path}
+		relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
+		relativePath = strings.TrimPrefix(relativePath, "/")
+		v := visitor{RelativePath: relativePath}
 		ast.Walk(v, f)
 
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("walk: %v", err)
 	}
+
+	return nil, nil
 }
 
 type visitor struct {
-	Path string
+	RelativePath string
 }
 
 func (v visitor) Visit(n ast.Node) ast.Visitor {
@@ -80,19 +76,18 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 		return nil
 	}
 
-	if decl, ok := n.(*ast.GenDecl); ok {
-		if decl.Tok == token.TYPE {
-			for _, spec := range decl.Specs {
-				if typ, ok := spec.(*ast.TypeSpec); ok {
-					if _, ok := typ.Type.(*ast.InterfaceType); ok {
-						name := typ.Name.String()
-						imp := strings.TrimPrefix(path.Dir(v.Path), root)
-						imp = strings.TrimPrefix(imp, "/")
-						pkg := path.Base(imp)
+	if typeDeclaration, ok := n.(*ast.GenDecl); ok {
+		if typeDeclaration.Tok == token.TYPE {
+			for _, spec := range typeDeclaration.Specs {
+				if interfaceSpec, ok := spec.(*ast.TypeSpec); ok {
+					if _, ok := interfaceSpec.Type.(*ast.InterfaceType); ok {
+						name := interfaceSpec.Name.String()
+						packageName := path.Base(v.RelativePath)
 						if unicode.IsUpper([]rune(name)[0]) {
 							i := Interface{
-								ImportPath: imp,
-								Name:       fmt.Sprintf("%v.%v", pkg, name),
+								Name:              name,
+								PackageName:       packageName,
+								PackageImportPath: v.RelativePath,
 							}
 							fmt.Println(i.String())
 						}

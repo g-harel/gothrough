@@ -1,12 +1,17 @@
 package main
 
 import (
+	"os"
+	"path"
+
 	"github.com/g-harel/gis"
 )
 
-type Test interface{}
-type cool struct{}
-
 func main() {
-	gis.List()
+	root := path.Join(os.Getenv("GOROOT"), "src")
+
+	_, err := gis.Search(root)
+	if err != nil {
+		panic(err)
+	}
 }
