@@ -7,13 +7,14 @@ import (
 // Interface represents the location of a discovered interface.
 type Interface struct {
 	Name              string
+	Description       string
 	PackageName       string
 	PackageImportPath string
 }
 
 // String returns a string representation of the interface.
 func (i *Interface) String() string {
-	return fmt.Sprintf("import \"%v\"\n%v.%v\n", i.PackageImportPath, i.PackageName, i.Name)
+	return fmt.Sprintf("import \"%v\"\n%v%v.%v\n", i.PackageImportPath, i.Description, i.PackageName, i.Name)
 }
 
 // Equals compares Interfaces to determine if they are equal.

@@ -29,6 +29,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 						if unicode.IsUpper([]rune(name)[0]) {
 							v.InterfaceHandler(Interface{
 								Name:              name,
+								Description:       typeDeclaration.Doc.Text(),
 								PackageName:       packageName,
 								PackageImportPath: v.RelativePath,
 							})

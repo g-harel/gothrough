@@ -58,7 +58,7 @@ func extract(dir string, in []string) ([]Interface, error) {
 	fs := token.NewFileSet()
 	out := []Interface{}
 	for _, pathname := range in {
-		f, err := parser.ParseFile(fs, pathname, nil, parser.AllErrors)
+		f, err := parser.ParseFile(fs, pathname, nil, parser.ParseComments)
 		if err != nil {
 			return nil, fmt.Errorf("parse file: %v", err)
 		}
