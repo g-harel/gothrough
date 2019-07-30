@@ -1,7 +1,9 @@
 package gis
 
 import (
+	"bytes"
 	"go/ast"
+	"go/printer"
 	"go/token"
 	"path"
 	"unicode"
@@ -27,9 +29,12 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 						name := interfaceSpec.Name.String()
 						packageName := path.Base(v.RelativePath)
 						if unicode.IsUpper([]rune(name)[0]) {
+							buf := bytes.NewBufferString("")
+							fset := token.NewFileSet()
+							printer.Fprint(buf, fset, n)
 							v.InterfaceHandler(Interface{
 								Name:              name,
-								Description:       typeDeclaration.Doc.Text(),
+								Body:              buf.String(),
 								PackageName:       packageName,
 								PackageImportPath: v.RelativePath,
 							})
