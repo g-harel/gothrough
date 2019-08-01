@@ -10,11 +10,13 @@ type Interface struct {
 	Body              string
 	PackageName       string
 	PackageImportPath string
+	SourceFile        string
+	SourceLine        int
 }
 
 // String returns a string representation of the interface.
 func (i *Interface) String() string {
-	return fmt.Sprintf("import \"%v\"\n%v.%v\n%v\n", i.PackageImportPath, i.PackageName, i.Name, i.Body)
+	return fmt.Sprintf("%v:%v\nimport \"%v\"\n%v.%v\n%v\n", i.SourceFile, i.SourceLine, i.PackageImportPath, i.PackageName, i.Name, i.Body)
 }
 
 // Equals compares Interfaces to determine if they are equal.

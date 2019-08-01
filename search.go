@@ -67,6 +67,7 @@ func extract(dir string, in []string) ([]Interface, error) {
 		relativePath = strings.TrimPrefix(relativePath, "/")
 		ast.Walk(
 			visitor{
+				FileSet:      fs,
 				RelativePath: relativePath,
 				InterfaceHandler: func(i Interface) {
 					out = append(out, i)

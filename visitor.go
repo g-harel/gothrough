@@ -12,6 +12,7 @@ import (
 var _ ast.Visitor = visitor{}
 
 type visitor struct {
+	FileSet          *token.FileSet
 	RelativePath     string
 	InterfaceHandler func(Interface)
 }
@@ -32,11 +33,14 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 							buf := bytes.NewBufferString("")
 							fset := token.NewFileSet()
 							printer.Fprint(buf, fset, n)
+							pos := v.FileSet.Position(typeDeclaration.Pos())
 							v.InterfaceHandler(Interface{
 								Name:              name,
 								Body:              buf.String(),
 								PackageName:       packageName,
 								PackageImportPath: v.RelativePath,
+								SourceFile:        path.Base(pos.Filename),
+								SourceLine:        pos.Line,
 							})
 							return nil
 						}
