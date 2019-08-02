@@ -11,7 +11,7 @@ import (
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
 
-	interfaces, err := gis.Search(root)
+	interfaces, err := gis.Search(root, "Reader")
 	if err != nil {
 		panic(err)
 	}
