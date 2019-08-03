@@ -8,10 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
-
-	"github.com/blevesearch/bleve"
 )
 
 // Find writes all files in the given directory to the output.
@@ -83,7 +80,7 @@ func extract(dir string, in []string) ([]Interface, error) {
 }
 
 // Search finds interfaces in the given directory.
-func Search(dir, query string) ([]Interface, error) {
+func Search(dir, query string) ([]*Interface, error) {
 	findOut, err := find(dir)
 	if err != nil {
 		return nil, fmt.Errorf("find files: %v", err)
@@ -99,32 +96,10 @@ func Search(dir, query string) ([]Interface, error) {
 		return nil, fmt.Errorf("extract interfaces: %v", err)
 	}
 
-	mapping := bleve.NewIndexMapping()
-	index, err := bleve.New("example.bleve", mapping)
-
-	for i, ifc := range extractOut {
-		err := index.Index(strconv.Itoa(i), ifc)
-		if err != nil {
-			return nil, fmt.Errorf("index result: %v", err)
-		}
+	q := NewQuerier()
+	for _, i := range extractOut {
+		q.Write(i)
 	}
 
-	q := bleve.NewMatchQuery("text")
-	s := bleve.NewSearchRequest(q)
-	s.SortBy([]string{"_score"})
-	out, err := index.Search(s)
-	if err != nil {
-		return nil, fmt.Errorf("search: %v", err)
-	}
-
-	res := []Interface{}
-	for _, hit := range out.Hits {
-		i, err := strconv.Atoi(hit.ID)
-		if err != nil {
-			return nil, fmt.Errorf("read result: %v", err)
-		}
-		res = append(res, extractOut[i])
-	}
-
-	return res, nil
+	return q.Query(query), nil
 }

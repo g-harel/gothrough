@@ -14,9 +14,13 @@ type Interface struct {
 	SourceLine        int
 }
 
+func (i *Interface) Address() string {
+	return fmt.Sprintf("%v/%v:%v", i.PackageImportPath, i.SourceFile, i.SourceLine)
+}
+
 // String returns a string representation of the interface.
 func (i *Interface) String() string {
-	return fmt.Sprintf("%v:%v\nimport \"%v\"\n%v.%v\n%v\n", i.SourceFile, i.SourceLine, i.PackageImportPath, i.PackageName, i.Name, i.Body)
+	return fmt.Sprintf("%v\nimport \"%v\"\n%v.%v\n%v\n", i.Address(), i.PackageImportPath, i.PackageName, i.Name, i.Body)
 }
 
 // Equals compares Interfaces to determine if they are equal.
