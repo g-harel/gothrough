@@ -10,14 +10,17 @@ import (
 
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
+	query := "string"
 
-	interfaces, err := gis.Search(root, "Reader")
+	fmt.Printf(">> ROOT  = %v\n", root)
+	fmt.Printf(">> QUERY = %v\n", query)
+
+	interfaces, err := gis.Search(root, query)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, ifc := range interfaces {
-		fmt.Println(ifc.String())
+		fmt.Printf("%v %v (%v)\n", ifc.Name, ifc.Methods, ifc.Address())
 	}
-	fmt.Println(len(interfaces))
 }

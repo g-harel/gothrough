@@ -7,6 +7,7 @@ import (
 // Interface represents the location of a discovered interface.
 type Interface struct {
 	Name              string
+	Methods           []string
 	Body              string
 	PackageName       string
 	PackageImportPath string

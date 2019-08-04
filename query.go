@@ -35,6 +35,7 @@ func (q *Querier) createMapping(query string, m mappedValue) {
 			copy(q.mappings[query][:i], q.mappings[query][:i])
 			copy(q.mappings[query][i+1:], q.mappings[query][i:])
 			q.mappings[query][i] = m
+			break
 		}
 	}
 
@@ -54,9 +55,23 @@ func (q *Querier) Write(i Interface) {
 	q.createMapping(i.Name, mapping)
 
 	mapping.confidence = 7
-	q.createMapping(i.SourceFile, mapping)
+	q.createMapping(i.PackageName, mapping)
 
-	// TODO more mappings for import path, methods, etc.
+	mapping.confidence = 5
+	q.createMapping(strings.TrimSuffix(i.SourceFile, ".go"), mapping)
+
+	for _, method := range i.Methods {
+		mapping.confidence = 5
+		q.createMapping(method, mapping)
+	}
+
+	for _, part := range strings.Split(i.PackageImportPath, "/") {
+		if part == i.PackageName {
+			continue
+		}
+		mapping.confidence = 3
+		q.createMapping(part, mapping)
+	}
 }
 
 func (q *Querier) Query(query string) []*Interface {
