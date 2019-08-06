@@ -5,8 +5,9 @@ import (
 )
 
 type mappedValue struct {
-	id         string
-	index      int
+	id    string
+	index int
+	// TODO confidence as float
 	confidence int
 }
 
@@ -75,12 +76,27 @@ func (q *Querier) Write(i Interface) {
 }
 
 func (q *Querier) Query(query string) []*Interface {
+	// TODO multi-token search
 	query = strings.ToLower(query)
 
-	// TODO multi-toke search (combine confidences)
-	res := []*Interface{}
+	indexes := map[string]int{}
+	confidences := map[string]int{}
+
 	for _, m := range q.mappings[query] {
-		res = append(res, q.values[m.index])
+		indexes[m.id] = m.index
+		if _, ok := confidences[m.id]; !ok {
+			confidences[m.id] = 0
+		}
+		confidences[m.id] += m.confidence
 	}
+
+	// TODO sort by confidence
+	res := make([]*Interface, len(indexes))
+	i := 0
+	for _, index := range indexes {
+		res[i] = q.values[index]
+		i++
+	}
+
 	return res
 }
