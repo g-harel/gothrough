@@ -10,10 +10,11 @@ import (
 
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
-	query := "copy"
+	query := "read"
 
-	fmt.Printf(">> ROOT  = %v\n", root)
-	fmt.Printf(">> QUERY = %v\n", query)
+	fmt.Printf("ROOT=%v\n", root)
+	fmt.Printf("QUERY=%v\n", query)
+	fmt.Println("========")
 
 	interfaces, err := gis.Search(root, query)
 	if err != nil {

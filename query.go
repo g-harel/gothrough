@@ -1,14 +1,14 @@
 package gis
 
 import (
+	"sort"
 	"strings"
 )
 
 type mappedValue struct {
-	id    string
-	index int
-	// TODO confidence as float
-	confidence int
+	addr       string
+	index      int
+	confidence float32
 }
 
 type Querier struct {
@@ -32,10 +32,9 @@ func (q *Querier) createMapping(query string, m mappedValue) {
 
 	for i, currentMapping := range q.mappings[query] {
 		if currentMapping.confidence < m.confidence {
-			q.mappings[query] = make([]mappedValue, len(q.mappings[query])+1)
-			copy(q.mappings[query][:i], q.mappings[query][:i])
-			copy(q.mappings[query][i+1:], q.mappings[query][i:])
-			q.mappings[query][i] = m
+			temp := append(q.mappings[query][:i], m)
+			temp = append(temp, q.mappings[query][i:]...)
+			q.mappings[query] = temp
 			break
 		}
 	}
@@ -44,11 +43,13 @@ func (q *Querier) createMapping(query string, m mappedValue) {
 }
 
 func (q *Querier) Write(i Interface) {
+	// TODO break identifiers by camelCase
+
 	index := len(q.values)
 	q.values = append(q.values, &i)
 
 	mapping := mappedValue{
-		id:    i.Address(),
+		addr:  i.Address(),
 		index: index,
 	}
 
@@ -62,7 +63,8 @@ func (q *Querier) Write(i Interface) {
 	q.createMapping(strings.TrimSuffix(i.SourceFile, ".go"), mapping)
 
 	for _, method := range i.Methods {
-		mapping.confidence = 5
+		// Methods in larger interfaces are given lower confidence.
+		mapping.confidence = 4 + 3/float32(len(i.Methods))
 		q.createMapping(method, mapping)
 	}
 
@@ -80,23 +82,29 @@ func (q *Querier) Query(query string) []*Interface {
 	query = strings.ToLower(query)
 
 	indexes := map[string]int{}
-	confidences := map[string]int{}
+	confidences := map[string]float32{}
 
+	// Sum confidences for all matches.
 	for _, m := range q.mappings[query] {
-		indexes[m.id] = m.index
-		if _, ok := confidences[m.id]; !ok {
-			confidences[m.id] = 0
+		indexes[m.addr] = m.index
+		if _, ok := confidences[m.addr]; !ok {
+			confidences[m.addr] = 0
 		}
-		confidences[m.id] += m.confidence
+		confidences[m.addr] += m.confidence
 	}
 
-	// TODO sort by confidence
+	// Combine results into list without duplicates.
 	res := make([]*Interface, len(indexes))
 	i := 0
 	for _, index := range indexes {
 		res[i] = q.values[index]
 		i++
 	}
+
+	// Sort return value by decreasing confidence.
+	sort.Slice(res, func(i, j int) bool {
+		return confidences[res[i].Address()] > confidences[res[j].Address()]
+	})
 
 	return res
 }
