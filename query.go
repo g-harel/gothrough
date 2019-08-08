@@ -64,7 +64,7 @@ func (q *Querier) Write(i Interface) {
 
 	for _, method := range i.Methods {
 		// Methods in larger interfaces are given lower confidence.
-		mapping.confidence = 4 + 3/float32(len(i.Methods))
+		mapping.confidence = 5 + 2/float32(len(i.Methods))
 		q.createMapping(method, mapping)
 	}
 
@@ -78,19 +78,20 @@ func (q *Querier) Write(i Interface) {
 }
 
 func (q *Querier) Query(query string) []*Interface {
-	// TODO multi-token search
 	query = strings.ToLower(query)
 
 	indexes := map[string]int{}
 	confidences := map[string]float32{}
 
 	// Sum confidences for all matches.
-	for _, m := range q.mappings[query] {
-		indexes[m.addr] = m.index
-		if _, ok := confidences[m.addr]; !ok {
-			confidences[m.addr] = 0
+	for _, subQuery := range strings.Fields(query) {
+		for _, m := range q.mappings[subQuery] {
+			indexes[m.addr] = m.index
+			if _, ok := confidences[m.addr]; !ok {
+				confidences[m.addr] = 0
+			}
+			confidences[m.addr] += m.confidence
 		}
-		confidences[m.addr] += m.confidence
 	}
 
 	// Combine results into list without duplicates.
