@@ -10,7 +10,7 @@ import (
 
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
-	query := "read write"
+	query := "reader"
 
 	fmt.Printf("ROOT=%v\n", root)
 	fmt.Printf("QUERY=%v\n", query)
@@ -20,6 +20,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("========")
 
 	for _, ifc := range interfaces {
 		fmt.Printf("%v %v (%v)\n", ifc.Name, ifc.Methods, ifc.Address())

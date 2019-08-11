@@ -23,23 +23,14 @@ func NewQuerier() *Querier {
 	}
 }
 
-func (q *Querier) createMapping(query string, m mappedValue) {
-	query = strings.ToLower(query)
-
-	if len(q.mappings[query]) == 0 {
-		q.mappings[query] = []mappedValue{m}
-	}
-
-	for i, currentMapping := range q.mappings[query] {
-		if currentMapping.confidence < m.confidence {
-			temp := append(q.mappings[query][:i], m)
-			temp = append(temp, q.mappings[query][i:]...)
-			q.mappings[query] = temp
-			break
+func (q *Querier) createMappings(m mappedValue, queries ...string) {
+	for _, query := range queries {
+		query = strings.ToLower(query)
+		if len(q.mappings[query]) == 0 {
+			q.mappings[query] = []mappedValue{m}
 		}
+		q.mappings[query] = append(q.mappings[query], m)
 	}
-
-	q.mappings[query] = append(q.mappings[query], m)
 }
 
 func (q *Querier) Write(i Interface) {
@@ -54,27 +45,24 @@ func (q *Querier) Write(i Interface) {
 	}
 
 	mapping.confidence = 10
-	q.createMapping(i.Name, mapping)
+	q.createMappings(mapping, i.Name)
+
+	tokens := CamelSplit(i.Name)
+	mapping.confidence = 6 + 3/float32(len(tokens))
+	q.createMappings(mapping, tokens...)
 
 	mapping.confidence = 7
-	q.createMapping(i.PackageName, mapping)
+	q.createMappings(mapping, i.PackageName)
 
 	mapping.confidence = 5
-	q.createMapping(strings.TrimSuffix(i.SourceFile, ".go"), mapping)
+	q.createMappings(mapping, strings.TrimSuffix(i.SourceFile, ".go"))
 
-	for _, method := range i.Methods {
-		// Methods in larger interfaces are given lower confidence.
-		mapping.confidence = 5 + 2/float32(len(i.Methods))
-		q.createMapping(method, mapping)
-	}
+	// Methods in larger interfaces are given lower confidence.
+	mapping.confidence = 5 + 2/float32(len(i.Methods))
+	q.createMappings(mapping, i.Methods...)
 
-	for _, part := range strings.Split(i.PackageImportPath, "/") {
-		if part == i.PackageName {
-			continue
-		}
-		mapping.confidence = 3
-		q.createMapping(part, mapping)
-	}
+	mapping.confidence = 3
+	q.createMappings(mapping, strings.Split(i.PackageImportPath, "/")...)
 }
 
 func (q *Querier) Query(query string) []*Interface {
