@@ -34,8 +34,6 @@ func (q *Querier) createMappings(m mappedValue, queries ...string) {
 }
 
 func (q *Querier) Write(i Interface) {
-	// TODO break identifiers by camelCase
-
 	index := len(q.values)
 	q.values = append(q.values, &i)
 
@@ -44,23 +42,39 @@ func (q *Querier) Write(i Interface) {
 		index: index,
 	}
 
+	// Interface name.
 	mapping.confidence = 10
 	q.createMappings(mapping, i.Name)
 
+	// Interface name tokens.
 	tokens := CamelSplit(i.Name)
-	mapping.confidence = 6 + 3/float32(len(tokens))
-	q.createMappings(mapping, tokens...)
+	if len(tokens) > 1 {
+		mapping.confidence = 6 / float32(len(tokens))
+		q.createMappings(mapping, tokens...)
+	}
 
+	// Package name.
 	mapping.confidence = 7
 	q.createMappings(mapping, i.PackageName)
 
-	mapping.confidence = 5
+	// Source file name.
+	mapping.confidence = 2
 	q.createMappings(mapping, strings.TrimSuffix(i.SourceFile, ".go"))
 
-	// Methods in larger interfaces are given lower confidence.
-	mapping.confidence = 5 + 2/float32(len(i.Methods))
+	// Method names.
+	mapping.confidence = 5 / float32(len(i.Methods))
 	q.createMappings(mapping, i.Methods...)
 
+	// Method name tokens.
+	for _, methodName := range i.Methods {
+		tokens := CamelSplit(methodName)
+		if len(tokens) > 1 {
+			mapping.confidence = 4 / float32(len(i.Methods)) / float32(len(tokens))
+			q.createMappings(mapping, tokens...)
+		}
+	}
+
+	// Import path parts.
 	mapping.confidence = 3
 	q.createMappings(mapping, strings.Split(i.PackageImportPath, "/")...)
 }

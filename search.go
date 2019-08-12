@@ -70,7 +70,6 @@ func extract(dir string, in []string) ([]Interface, error) {
 				FileSet:      fs,
 				RelativePath: relativePath,
 				InterfaceHandler: func(i Interface) {
-					println(i.Name, i.Address())
 					out = append(out, i)
 				},
 			},

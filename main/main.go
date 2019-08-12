@@ -20,9 +20,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("========")
 
 	for _, ifc := range interfaces {
-		fmt.Printf("%v %v (%v)\n", ifc.Name, ifc.Methods, ifc.Address())
+		println(ifc.String())
 	}
 }
