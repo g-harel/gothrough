@@ -1,11 +1,11 @@
-package gis
+package camel
 
 import (
 	"unicode"
 )
 
-// CamelSplit breaks the camel cased input string into its tokens.
-func CamelSplit(str string) []string {
+// Split breaks the camel cased input string into its tokens.
+func Split(str string) []string {
 	tokens := []string{}
 	var lastRune rune
 

@@ -1,12 +1,12 @@
-package gis_test
+package camel_test
 
 import (
 	"testing"
 
-	"github.com/g-harel/gis"
+	"github.com/g-harel/gis/internal/camel"
 )
 
-func TestCamelSplit(t *testing.T) {
+func TestSplit(t *testing.T) {
 	tt := map[string]struct {
 		Input    string
 		Expected []string
@@ -39,7 +39,7 @@ func TestCamelSplit(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actual := gis.CamelSplit(tc.Input)
+			actual := camel.Split(tc.Input)
 			for i := range tc.Expected {
 				if len(tc.Expected) != len(actual) || tc.Expected[i] != actual[i] {
 					t.Fatalf("expected/actual do not match\n%v\n%v", tc.Expected, actual)

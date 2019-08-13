@@ -9,6 +9,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/g-harel/gis/internal/interfaces"
 )
 
 // Find writes all files in the given directory to the output.
@@ -54,9 +56,9 @@ func filter(in []string) ([]string, error) {
 }
 
 // Extract parses the file and walks the AST to extract interfaces.
-func extract(dir string, in []string) ([]Interface, error) {
+func extract(dir string, in []string) ([]*interfaces.Interface, error) {
 	fs := token.NewFileSet()
-	out := []Interface{}
+	out := []*interfaces.Interface{}
 	for _, pathname := range in {
 		f, err := parser.ParseFile(fs, pathname, nil, parser.AllErrors)
 		if err != nil {
@@ -69,7 +71,7 @@ func extract(dir string, in []string) ([]Interface, error) {
 			visitor{
 				FileSet:      fs,
 				RelativePath: relativePath,
-				InterfaceHandler: func(i Interface) {
+				InterfaceHandler: func(i *interfaces.Interface) {
 					out = append(out, i)
 				},
 			},
@@ -80,7 +82,7 @@ func extract(dir string, in []string) ([]Interface, error) {
 }
 
 // Search finds interfaces in the given directory.
-func Search(dir, query string) ([]*Interface, error) {
+func Search(dir, query string) ([]*interfaces.Interface, error) {
 	findOut, err := find(dir)
 	if err != nil {
 		return nil, fmt.Errorf("find files: %v", err)

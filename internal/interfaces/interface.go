@@ -1,10 +1,10 @@
-package gis
+package interfaces
 
 import (
 	"fmt"
 )
 
-// Interface represents the location of a discovered interface.
+// Interface contains data about the location and shape of an interface.
 type Interface struct {
 	Name              string
 	Methods           []string
@@ -22,7 +22,10 @@ func (i *Interface) Address() string {
 // String returns a string representation of the interface.
 func (i *Interface) String() string {
 	return fmt.Sprintf("%v %v (%v)", i.Name, i.Methods, i.Address())
-	// return fmt.Sprintf("%v\nimport \"%v\"\n%v.%v\n%v\n", i.Address(), i.PackageImportPath, i.PackageName, i.Name, i.Body)
+}
+
+func (i *Interface) Pretty() string {
+	return fmt.Sprintf("%v\nimport \"%v\"\n%v.%v\n%v\n", i.Address(), i.PackageImportPath, i.PackageName, i.Name, i.Body)
 }
 
 // Equals compares Interfaces to determine if they are equal.

@@ -3,6 +3,9 @@ package gis
 import (
 	"sort"
 	"strings"
+
+	"github.com/g-harel/gis/internal/camel"
+	"github.com/g-harel/gis/internal/interfaces"
 )
 
 type mappedValue struct {
@@ -12,13 +15,13 @@ type mappedValue struct {
 }
 
 type Querier struct {
-	values   []*Interface
+	values   []*interfaces.Interface
 	mappings map[string][]mappedValue
 }
 
 func NewQuerier() *Querier {
 	return &Querier{
-		values:   []*Interface{},
+		values:   []*interfaces.Interface{},
 		mappings: map[string][]mappedValue{},
 	}
 }
@@ -33,21 +36,21 @@ func (q *Querier) createMappings(m mappedValue, queries ...string) {
 	}
 }
 
-func (q *Querier) Write(i Interface) {
+func (q *Querier) Write(i *interfaces.Interface) {
 	index := len(q.values)
-	q.values = append(q.values, &i)
+	q.values = append(q.values, i)
 
 	mapping := mappedValue{
 		addr:  i.Address(),
 		index: index,
 	}
 
-	// Interface name.
+	// interfaces.Interface name.
 	mapping.confidence = 10
 	q.createMappings(mapping, i.Name)
 
-	// Interface name tokens.
-	tokens := CamelSplit(i.Name)
+	// interfaces.Interface name tokens.
+	tokens := camel.Split(i.Name)
 	if len(tokens) > 1 {
 		mapping.confidence = 6 / float32(len(tokens))
 		q.createMappings(mapping, tokens...)
@@ -67,7 +70,7 @@ func (q *Querier) Write(i Interface) {
 
 	// Method name tokens.
 	for _, methodName := range i.Methods {
-		tokens := CamelSplit(methodName)
+		tokens := camel.Split(methodName)
 		if len(tokens) > 1 {
 			mapping.confidence = 4 / float32(len(i.Methods)) / float32(len(tokens))
 			q.createMappings(mapping, tokens...)
@@ -79,7 +82,7 @@ func (q *Querier) Write(i Interface) {
 	q.createMappings(mapping, strings.Split(i.PackageImportPath, "/")...)
 }
 
-func (q *Querier) Query(query string) []*Interface {
+func (q *Querier) Query(query string) []*interfaces.Interface {
 	query = strings.ToLower(query)
 
 	indexes := map[string]int{}
@@ -97,7 +100,7 @@ func (q *Querier) Query(query string) []*Interface {
 	}
 
 	// Combine results into list without duplicates.
-	res := make([]*Interface, len(indexes))
+	res := make([]*interfaces.Interface, len(indexes))
 	i := 0
 	for _, index := range indexes {
 		res[i] = q.values[index]
