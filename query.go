@@ -30,7 +30,7 @@ func (q *Querier) createMappings(m mappedValue, queries ...string) {
 	for _, query := range queries {
 		query = strings.ToLower(query)
 		if len(q.mappings[query]) == 0 {
-			q.mappings[query] = []mappedValue{m}
+			q.mappings[query] = []mappedValue{}
 		}
 		q.mappings[query] = append(q.mappings[query], m)
 	}

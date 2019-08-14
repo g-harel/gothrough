@@ -9,7 +9,7 @@ import (
 	"unicode"
 )
 
-func FromDecl(n ast.Node, relPath string, fset *token.FileSet) (*Interface, bool) {
+func FromNode(n ast.Node, relPath string, fset *token.FileSet) (*Interface, bool) {
 	if n == nil {
 		return nil, false
 	}

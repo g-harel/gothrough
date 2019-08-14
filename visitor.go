@@ -16,7 +16,7 @@ type visitor struct {
 }
 
 func (v visitor) Visit(n ast.Node) ast.Visitor {
-	i, ok := interfaces.FromDecl(n, v.RelativePath, v.FileSet)
+	i, ok := interfaces.FromNode(n, v.RelativePath, v.FileSet)
 	if ok {
 		v.InterfaceHandler(i)
 		return nil
