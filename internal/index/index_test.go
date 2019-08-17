@@ -2,6 +2,7 @@ package index_test
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/g-harel/gis/internal/index"
@@ -53,5 +54,42 @@ func TestIndex(t *testing.T) {
 		res := idx.Search(query)
 
 		testContentEqual(t, res, []int{ids[0]})
+	})
+
+	t.Run("should return matched values in order of confidence", func(t *testing.T) {
+		ids := []int{21, 82}
+		query := "matching_order_confidence"
+
+		idx := index.NewIndex()
+		idx.Index(ids[0], 100, query)
+		idx.Index(ids[1], 50, query)
+		res := idx.Search(query)
+
+		testContentEqual(t, res, ids)
+	})
+
+	t.Run("should accumulate confidence from multiple index calls", func(t *testing.T) {
+		ids := []int{81, 43}
+		query := "confidence_order_sum"
+
+		idx := index.NewIndex()
+		idx.Index(ids[0], 100, query)
+		idx.Index(ids[1], 60, query)
+		idx.Index(ids[1], 60, query)
+		res := idx.Search(query)
+
+		testContentEqual(t, res, []int{ids[1], ids[0]})
+	})
+
+	t.Run("should accumulate confidence from multiple query parts", func(t *testing.T) {
+		ids := []int{43, 91}
+		queries := []string{"query", "parts"}
+
+		idx := index.NewIndex()
+		idx.Index(ids[0], 60, queries...)
+		idx.Index(ids[1], 100, queries[0])
+		res := idx.Search(strings.Join(queries, " "))
+
+		testContentEqual(t, res, ids)
 	})
 }
