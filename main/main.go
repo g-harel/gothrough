@@ -16,7 +16,12 @@ func main() {
 	fmt.Printf("QUERY=%v\n", query)
 	fmt.Println("========")
 
-	interfaces, err := gis.Search(root, query)
+	idx, err := gis.NewSearchIndex(root)
+	if err != nil {
+		panic(err)
+	}
+
+	interfaces, err := idx.Search(query)
 	if err != nil {
 		panic(err)
 	}
