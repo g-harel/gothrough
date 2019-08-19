@@ -2,13 +2,17 @@ package gis
 
 import (
 	"fmt"
+	"go/ast"
+	"go/token"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/g-harel/gis/internal/camel"
 	"github.com/g-harel/gis/internal/index"
 	"github.com/g-harel/gis/internal/interfaces"
+	"github.com/g-harel/gis/internal/parse"
 )
 
 type SearchIndex struct {
@@ -86,4 +90,23 @@ func find(dir string) ([]string, error) {
 		return nil, fmt.Errorf("walk directory: %v", err)
 	}
 	return files, err
+}
+
+// Extract parses the file and walks the AST to extract interfaces.
+func extract(dir string, in []string) ([]*interfaces.Interface, error) {
+	out := []*interfaces.Interface{}
+	for _, pathname := range in {
+		parse.Visit(pathname, func(n ast.Node, fset *token.FileSet) bool {
+			relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
+			relativePath = strings.TrimPrefix(relativePath, "/")
+			ifc, ok := interfaces.FromNode(n, relativePath, fset)
+			if ok {
+				out = append(out, ifc)
+				return true
+			} else {
+				return false
+			}
+		})
+	}
+	return out, nil
 }
