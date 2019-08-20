@@ -27,8 +27,3 @@ func (i *Interface) String() string {
 func (i *Interface) Pretty() string {
 	return fmt.Sprintf("%v\nimport \"%v\"\n%v.%v\n%v\n", i.Address(), i.PackageImportPath, i.PackageName, i.Name, i.Body)
 }
-
-// Equals compares Interfaces to determine if they are equal.
-func (i *Interface) Equals(alt *Interface) bool {
-	return i.Name == alt.Name && i.PackageImportPath == i.PackageImportPath
-}

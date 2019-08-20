@@ -2,8 +2,6 @@ package gis
 
 import (
 	"fmt"
-	"go/ast"
-	"go/token"
 	"os"
 	"path"
 	"path/filepath"
@@ -21,18 +19,29 @@ type SearchIndex struct {
 }
 
 func NewSearchIndex(dir string) (*SearchIndex, error) {
-	indexedFiles, err := find(dir)
+	// Collect all interfaces in the provided directory.
+	si := &SearchIndex{interfaces: []*interfaces.Interface{}}
+	err := filepath.Walk(dir, func(pathname string, info os.FileInfo, err error) error {
+		if !info.IsDir() &&
+			strings.HasSuffix(pathname, ".go") &&
+			!strings.HasSuffix(pathname, "_test.go") &&
+			!strings.Contains(pathname, "internal/") &&
+			!strings.Contains(pathname, "vendor/") &&
+			!strings.Contains(pathname, "testdata/") &&
+			!strings.Contains(pathname, "testing/") {
+			relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
+			relativePath = strings.TrimPrefix(relativePath, "/")
+			parse.Visit(pathname, parse.Interface(relativePath, si.interfaces))
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, fmt.Errorf("find files: %v", err)
+		return nil, fmt.Errorf("walk directory: %v", err)
 	}
 
-	extractedInterfaces, err := extract(dir, indexedFiles)
-	if err != nil {
-		return nil, fmt.Errorf("extract interfaces: %v", err)
-	}
-
+	// Add the interfaces to the index with a confidence value.
 	idx := index.NewIndex()
-	for i, ifc := range extractedInterfaces {
+	for i, ifc := range si.interfaces {
 		nameTokens := camel.Split(ifc.Name)
 		methodNameTokens := []string{}
 		for _, methodName := range ifc.Methods {
@@ -54,10 +63,8 @@ func NewSearchIndex(dir string) (*SearchIndex, error) {
 		}
 	}
 
-	return &SearchIndex{
-		index:      idx,
-		interfaces: extractedInterfaces,
-	}, nil
+	si.index = idx
+	return si, nil
 }
 
 func (s *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
@@ -68,45 +75,4 @@ func (s *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
 	}
 
 	return res, nil
-}
-
-// Find writes all files in the given directory to the output.
-func find(dir string) ([]string, error) {
-	files := []string{}
-	err := filepath.Walk(dir, func(pathname string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			if strings.HasSuffix(pathname, ".go") &&
-				!strings.HasSuffix(pathname, "_test.go") &&
-				!strings.Contains(pathname, "internal/") &&
-				!strings.Contains(pathname, "vendor/") &&
-				!strings.Contains(pathname, "testdata/") &&
-				!strings.Contains(pathname, "testing/") {
-				files = append(files, pathname)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("walk directory: %v", err)
-	}
-	return files, err
-}
-
-// Extract parses the file and walks the AST to extract interfaces.
-func extract(dir string, in []string) ([]*interfaces.Interface, error) {
-	out := []*interfaces.Interface{}
-	for _, pathname := range in {
-		parse.Visit(pathname, func(n ast.Node, fset *token.FileSet) bool {
-			relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
-			relativePath = strings.TrimPrefix(relativePath, "/")
-			ifc, ok := interfaces.FromNode(n, relativePath, fset)
-			if ok {
-				out = append(out, ifc)
-				return true
-			} else {
-				return false
-			}
-		})
-	}
-	return out, nil
 }
