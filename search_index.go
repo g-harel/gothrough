@@ -31,7 +31,7 @@ func NewSearchIndex(dir string) (*SearchIndex, error) {
 			!strings.Contains(pathname, "testing/") {
 			relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
 			relativePath = strings.TrimPrefix(relativePath, "/")
-			parse.Visit(pathname, parse.Interface(relativePath, si.interfaces))
+			parse.Visit(pathname, parse.Interface(relativePath, &si.interfaces))
 		}
 		return nil
 	})

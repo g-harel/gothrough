@@ -11,7 +11,7 @@ import (
 	"github.com/g-harel/gis/internal/interfaces"
 )
 
-func Interface(relativePath string, target []*interfaces.Interface) Visitor {
+func Interface(relativePath string, target *[]*interfaces.Interface) Visitor {
 	return func(n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
@@ -44,7 +44,7 @@ func Interface(relativePath string, target []*interfaces.Interface) Visitor {
 									}
 								}
 
-								target = append(target, &interfaces.Interface{
+								*target = append(*target, &interfaces.Interface{
 									Name:              name,
 									Methods:           methods,
 									Body:              buf.String(),
