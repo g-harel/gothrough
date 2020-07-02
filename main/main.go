@@ -35,6 +35,6 @@ func main() {
 	fmt.Println("========")
 
 	for _, ifc := range interfaces {
-		println(ifc.String())
+		println(ifc.Pretty())
 	}
 }

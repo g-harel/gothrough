@@ -22,17 +22,30 @@ func NewSearchIndex(dir string) (*SearchIndex, error) {
 	// Collect all interfaces in the provided directory.
 	si := &SearchIndex{interfaces: []*interfaces.Interface{}}
 	err := filepath.Walk(dir, func(pathname string, info os.FileInfo, err error) error {
-		if !info.IsDir() &&
-			strings.HasSuffix(pathname, ".go") &&
-			!strings.HasSuffix(pathname, "_test.go") &&
-			!strings.Contains(pathname, "internal/") &&
-			!strings.Contains(pathname, "vendor/") &&
-			!strings.Contains(pathname, "testdata/") &&
-			!strings.Contains(pathname, "testing/") {
-			relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
-			relativePath = strings.TrimPrefix(relativePath, "/")
-			parse.Visit(pathname, parse.Interface(relativePath, &si.interfaces))
+		if info.IsDir() {
+			return nil
 		}
+		if !strings.HasSuffix(pathname, ".go") {
+			return nil
+		}
+		if strings.HasSuffix(pathname, "_test.go") {
+			return nil
+		}
+		if strings.Contains(pathname, "internal/") {
+			return nil
+		}
+		if strings.Contains(pathname, "vendor/") {
+			return nil
+		}
+		if strings.Contains(pathname, "testdata/") {
+			return nil
+		}
+		if strings.Contains(pathname, "testing/") {
+			return nil
+		}
+		relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
+		relativePath = strings.TrimPrefix(relativePath, "/")
+		parse.Visit(pathname, parse.NewInterfaceVisitor(relativePath, &si.interfaces))
 		return nil
 	})
 	if err != nil {
@@ -67,11 +80,11 @@ func NewSearchIndex(dir string) (*SearchIndex, error) {
 	return si, nil
 }
 
-func (s *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
-	searchResult := s.index.Search(query)
+func (si *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
+	searchResult := si.index.Search(query)
 	res := make([]*interfaces.Interface, len(searchResult))
 	for i, pos := range searchResult {
-		res[i] = s.interfaces[pos]
+		res[i] = si.interfaces[pos]
 	}
 
 	return res, nil

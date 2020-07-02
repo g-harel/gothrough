@@ -3,7 +3,7 @@ package parse
 import (
 	"bytes"
 	"go/ast"
-	"go/printer"
+	"go/format"
 	"go/token"
 	"path"
 	"unicode"
@@ -11,7 +11,8 @@ import (
 	"github.com/g-harel/gis/internal/interfaces"
 )
 
-func Interface(relativePath string, target *[]*interfaces.Interface) Visitor {
+// NewInterfaceVisitor creates a visitor that collects interfaces into the target array.
+func NewInterfaceVisitor(relativePath string, target *[]*interfaces.Interface) Visitor {
 	return func(n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
@@ -29,7 +30,7 @@ func Interface(relativePath string, target *[]*interfaces.Interface) Visitor {
 								// Render declaration as it appeared originally.
 								buf := bytes.NewBufferString("")
 								renderer := token.NewFileSet()
-								printer.Fprint(buf, renderer, n)
+								format.Node(buf, renderer, n)
 
 								// Collect declaration position (for filename and line number).
 								pos := fset.Position(typeDeclaration.Pos())
@@ -47,7 +48,7 @@ func Interface(relativePath string, target *[]*interfaces.Interface) Visitor {
 								*target = append(*target, &interfaces.Interface{
 									Name:              name,
 									Methods:           methods,
-									Body:              buf.String(),
+									Printed:           buf.String(),
 									PackageName:       packageName,
 									PackageImportPath: relativePath,
 									SourceFile:        path.Base(pos.Filename),

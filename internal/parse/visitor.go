@@ -7,6 +7,7 @@ import (
 	"go/token"
 )
 
+// Visitor is called for every node encountered while walking a file.
 type Visitor func(n ast.Node, fset *token.FileSet) (done bool)
 
 var _ ast.Visitor = visitor{}
@@ -20,11 +21,11 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 	done := v.visitFunc(n, v.fset)
 	if done {
 		return nil
-	} else {
-		return v
 	}
+	return v
 }
 
+// Visit walks the visitor on the provided file.
 func Visit(filepath string, v Visitor) error {
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, filepath, nil, parser.AllErrors)
