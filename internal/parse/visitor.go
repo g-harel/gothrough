@@ -8,17 +8,18 @@ import (
 )
 
 // Visitor is called for every node encountered while walking a file.
-type Visitor func(n ast.Node, fset *token.FileSet) (done bool)
+type Visitor func(filepath string, n ast.Node, fset *token.FileSet) (done bool)
 
 var _ ast.Visitor = visitor{}
 
 type visitor struct {
 	visitFunc Visitor
+	filepath  string
 	fset      *token.FileSet
 }
 
 func (v visitor) Visit(n ast.Node) ast.Visitor {
-	done := v.visitFunc(n, v.fset)
+	done := v.visitFunc(v.filepath, n, v.fset)
 	if done {
 		return nil
 	}
@@ -34,7 +35,7 @@ func Visit(filepath string, v Visitor) error {
 	}
 
 	ast.Walk(
-		visitor{v, fset},
+		visitor{v, filepath, fset},
 		file,
 	)
 

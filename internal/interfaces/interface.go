@@ -8,7 +8,7 @@ import (
 type Interface struct {
 	Name              string
 	Methods           []string
-	Printed              string
+	Printed           string
 	PackageName       string
 	PackageImportPath string
 	SourceFile        string

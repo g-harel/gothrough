@@ -6,14 +6,15 @@ import (
 	"go/format"
 	"go/token"
 	"path"
+	"strings"
 	"unicode"
 
 	"github.com/g-harel/gis/internal/interfaces"
 )
 
 // NewInterfaceVisitor creates a visitor that collects interfaces into the target array.
-func NewInterfaceVisitor(relativePath string, target *[]*interfaces.Interface) Visitor {
-	return func(n ast.Node, fset *token.FileSet) bool {
+func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
+	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
 		}
@@ -25,15 +26,18 @@ func NewInterfaceVisitor(relativePath string, target *[]*interfaces.Interface) V
 						if interfaceType, ok := interfaceSpec.Type.(*ast.InterfaceType); ok {
 							name := interfaceSpec.Name.String()
 							if unicode.IsUpper([]rune(name)[0]) {
-								packageName := path.Base(relativePath)
+								pathname, filename := path.Split(filepath)
+
+								// Attempt to detect source dir by looking for the closest "src" directory.
+								pathParts := strings.Split(path.Clean(pathname), "/src")
+								rootDir := path.Join(pathParts[:len(pathParts)-1]...) + "/src/"
+
+								relativePath := strings.TrimPrefix(path.Dir(filepath), rootDir)
 
 								// Render declaration as it appeared originally.
 								buf := bytes.NewBufferString("")
 								renderer := token.NewFileSet()
 								format.Node(buf, renderer, n)
-
-								// Collect declaration position (for filename and line number).
-								pos := fset.Position(typeDeclaration.Pos())
 
 								// Collect method names.
 								methods := []string{}
@@ -45,14 +49,14 @@ func NewInterfaceVisitor(relativePath string, target *[]*interfaces.Interface) V
 									}
 								}
 
-								*target = append(*target, &interfaces.Interface{
+								handler(interfaces.Interface{
 									Name:              name,
 									Methods:           methods,
 									Printed:           buf.String(),
-									PackageName:       packageName,
+									PackageName:       path.Base(relativePath),
 									PackageImportPath: relativePath,
-									SourceFile:        path.Base(pos.Filename),
-									SourceLine:        pos.Line,
+									SourceFile:        filename,
+									SourceLine:        fset.Position(typeDeclaration.Pos()).Line,
 								})
 								return true
 							}

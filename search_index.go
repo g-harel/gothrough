@@ -3,7 +3,6 @@ package gis
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -18,10 +17,10 @@ type SearchIndex struct {
 	interfaces []*interfaces.Interface
 }
 
-func NewSearchIndex(dir string) (*SearchIndex, error) {
+func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 	// Collect all interfaces in the provided directory.
 	si := &SearchIndex{interfaces: []*interfaces.Interface{}}
-	err := filepath.Walk(dir, func(pathname string, info os.FileInfo, err error) error {
+	err := filepath.Walk(rootDir, func(pathname string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -43,9 +42,9 @@ func NewSearchIndex(dir string) (*SearchIndex, error) {
 		if strings.Contains(pathname, "testing/") {
 			return nil
 		}
-		relativePath := strings.TrimPrefix(path.Dir(pathname), dir)
-		relativePath = strings.TrimPrefix(relativePath, "/")
-		parse.Visit(pathname, parse.NewInterfaceVisitor(relativePath, &si.interfaces))
+		parse.Visit(pathname, parse.NewInterfaceVisitor(func(ifc interfaces.Interface) {
+			si.interfaces = append(si.interfaces, &ifc)
+		}))
 		return nil
 	})
 	if err != nil {
