@@ -7,7 +7,7 @@ import (
 
 type mappedValue struct {
 	id         int
-	confidence int
+	confidence float32
 }
 
 // Index is a simple search index.
@@ -29,10 +29,16 @@ func NewIndex() *Index {
 func (idx *Index) Index(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
-		if len(idx.mappings[str]) == 0 {
-			idx.mappings[str] = []mappedValue{}
+		for i := 1; i <= len(str); i++ {
+			adjustedConfidence := float32(confidence) * (float32(i) / float32(len(str)))
+			// TODO test
+			for _, substr := range Substrings(str, i) {
+				if len(idx.mappings[substr]) == 0 {
+					idx.mappings[substr] = []mappedValue{}
+				}
+				idx.mappings[substr] = append(idx.mappings[substr], mappedValue{id, adjustedConfidence})
+			}
 		}
-		idx.mappings[str] = append(idx.mappings[str], mappedValue{id, confidence})
 	}
 }
 
@@ -42,8 +48,9 @@ func (idx *Index) Search(query string) []int {
 	query = strings.ToLower(query)
 
 	// Sum confidences from matching mappings.
-	confidences := map[int]int{}
+	confidences := map[int]float32{}
 	for _, subQuery := range strings.Fields(query) {
+		// TODO query substrings too (adjust for sub query length).
 		for _, m := range idx.mappings[subQuery] {
 			if _, ok := confidences[m.id]; !ok {
 				confidences[m.id] = 0

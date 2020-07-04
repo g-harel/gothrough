@@ -12,6 +12,7 @@ import (
 	"github.com/g-harel/gis/internal/parse"
 )
 
+// TODO serialize to file and create from it.
 type SearchIndex struct {
 	index      *index.Index
 	interfaces []*interfaces.Interface

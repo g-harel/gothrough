@@ -11,7 +11,7 @@ import (
 
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
-	query := "io reader"
+	query := "io reade"
 
 	fmt.Printf("ROOT=%v\n", root)
 	fmt.Printf("QUERY=%v\n", query)
