@@ -1,13 +1,14 @@
 package index
 
 import (
+	"math"
 	"sort"
 	"strings"
 )
 
 type mappedValue struct {
 	id         int
-	confidence float32
+	confidence float64
 }
 
 // Index is a simple search index.
@@ -30,7 +31,9 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {
-			adjustedConfidence := float32(confidence) * (float32(i) / float32(len(str)))
+			substringFraction := float64(i) / float64(len(str))
+			substringPenalty := 4.0
+			adjustedConfidence := float64(confidence) * math.Pow(substringFraction, substringPenalty)
 			// TODO test
 			for _, substr := range Substrings(str, i) {
 				if len(idx.mappings[substr]) == 0 {
@@ -44,18 +47,22 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 
 // Search searches for indexed values matching the query.
 // Results are ordered by descending order of confidence.
+// TODO give each sub-query similar weight.
 func (idx *Index) Search(query string) []int {
 	query = strings.ToLower(query)
 
 	// Sum confidences from matching mappings.
-	confidences := map[int]float32{}
+	confidences := map[int]float64{}
 	for _, subQuery := range strings.Fields(query) {
-		// TODO query substrings too (adjust for sub query length).
-		for _, m := range idx.mappings[subQuery] {
-			if _, ok := confidences[m.id]; !ok {
-				confidences[m.id] = 0
+		for i := 1; i <= len(subQuery); i++ {
+			for _, substr := range Substrings(subQuery, i) {
+				for _, m := range idx.mappings[substr] {
+					if _, ok := confidences[m.id]; !ok {
+						confidences[m.id] = 0
+					}
+					confidences[m.id] += m.confidence
+				}
 			}
-			confidences[m.id] += m.confidence
 		}
 	}
 

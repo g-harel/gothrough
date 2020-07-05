@@ -11,7 +11,7 @@ import (
 
 func main() {
 	root := path.Join(os.Getenv("GOROOT"), "src")
-	query := "io reade"
+	query := "ios read"
 
 	fmt.Printf("ROOT=%v\n", root)
 	fmt.Printf("QUERY=%v\n", query)
@@ -34,7 +34,7 @@ func main() {
 	fmt.Printf("Searched in %s\n", time.Since(searchStart))
 	fmt.Println("========")
 
-	for _, ifc := range interfaces {
+	for _, ifc := range interfaces[:16] {
 		println(ifc.String())
 	}
 }
