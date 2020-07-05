@@ -55,24 +55,31 @@ func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 	// Add the interfaces to the index with a confidence value.
 	idx := index.NewIndex()
 	for i, ifc := range si.interfaces {
+		// Index on interface name.
+		idx.Index(i, 120, ifc.Name)
 		nameTokens := camel.Split(ifc.Name)
+		if len(nameTokens) > 1 {
+			idx.Index(i, 160/len(nameTokens), nameTokens...)
+		}
+
+		// Index on package path and source file.
+		importPathParts := strings.Split(ifc.PackageImportPath, "/")
+		idx.Index(i, 120, ifc.PackageName)
+		idx.Index(i, 10, strings.TrimSuffix(ifc.SourceFile, ".go"))
+		if len(importPathParts) > 1 {
+			idx.Index(i, 20/len(importPathParts), importPathParts...)
+		}
+
+		// Index on interface methods.
 		methodNameTokens := []string{}
 		for _, methodName := range ifc.Methods {
 			methodNameTokens = append(methodNameTokens, camel.Split(methodName)...)
 		}
-
-		idx.Index(i, 100, ifc.Name)
-		idx.Index(i, 70, ifc.PackageName)
-		idx.Index(i, 20, strings.Split(ifc.PackageImportPath, "/")...)
-		idx.Index(i, 20, strings.TrimSuffix(ifc.SourceFile, ".go"))
-		if len(nameTokens) > 0 {
-			idx.Index(i, 60/len(nameTokens), nameTokens...)
-		}
 		if len(ifc.Methods) > 0 {
-			idx.Index(i, 50/len(ifc.Methods), ifc.Methods...)
+			idx.Index(i, 80/len(ifc.Methods), ifc.Methods...)
 		}
 		if len(methodNameTokens) > 0 {
-			idx.Index(i, 40/len(methodNameTokens), methodNameTokens...)
+			idx.Index(i, 80/len(methodNameTokens), methodNameTokens...)
 		}
 	}
 
