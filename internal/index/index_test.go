@@ -37,8 +37,8 @@ func TestIndex(t *testing.T) {
 		query := "multiple_indexed_values"
 
 		idx := index.NewIndex()
-		idx.Index(ids[0], 0, query)
-		idx.Index(ids[1], 0, query)
+		idx.Index(ids[0], 2, query)
+		idx.Index(ids[1], 1, query)
 		res := idx.Search(query)
 
 		testContentEqual(t, res, ids)
@@ -49,8 +49,8 @@ func TestIndex(t *testing.T) {
 		query := "only_matching"
 
 		idx := index.NewIndex()
-		idx.Index(ids[0], 0, query)
-		idx.Index(ids[1], 0, "_")
+		idx.Index(ids[0], 2, query)
+		idx.Index(ids[1], 1, "%")
 		res := idx.Search(query)
 
 		testContentEqual(t, res, []int{ids[0]})

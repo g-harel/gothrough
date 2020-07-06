@@ -40,6 +40,9 @@ func TestSplit(t *testing.T) {
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
 			actual := camel.Split(tc.Input)
+			if len(tc.Expected) != len(actual) {
+				t.Fatalf("expected/actual do not match\n%v\n%v", tc.Expected, actual)
+			}
 			for i := range tc.Expected {
 				if len(tc.Expected) != len(actual) || tc.Expected[i] != actual[i] {
 					t.Fatalf("expected/actual do not match\n%v\n%v", tc.Expected, actual)
