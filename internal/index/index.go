@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+// Penalty applied to confidence value when indexing substrings.
+// Refer to implementation for usage details.
+const substringPenalty = 4.0
+
 type mappedValue struct {
 	id         int
 	confidence float64
@@ -32,7 +36,6 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {
 			substringFraction := float64(i) / float64(len(str))
-			substringPenalty := 4.0
 			adjustedConfidence := float64(confidence) * math.Pow(substringFraction, substringPenalty)
 			// TODO test
 			for _, substr := range Substrings(str, i) {

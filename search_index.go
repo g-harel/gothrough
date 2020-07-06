@@ -12,12 +12,25 @@ import (
 	"github.com/g-harel/gis/internal/parse"
 )
 
+// Confidence values for interface info items.
+const (
+	interfaceNameVal           = 120
+	totalInterfaceNameTokenVal = 160
+	packageNameVal             = 120
+	sourceFileVal              = 10
+	totalImportPathPartVal     = 20
+	totalMethodNameVal         = 80
+	totalMethodNameTokenVal    = 80
+)
+
 // TODO serialize to file and create from it.
+
 type SearchIndex struct {
 	index      *index.Index
 	interfaces []*interfaces.Interface
 }
 
+// NewSearchIndex creates a searchable index of interfaces in the provided root directory.
 func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 	// Collect all interfaces in the provided directory.
 	si := &SearchIndex{interfaces: []*interfaces.Interface{}}
@@ -56,18 +69,18 @@ func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 	idx := index.NewIndex()
 	for i, ifc := range si.interfaces {
 		// Index on interface name.
-		idx.Index(i, 120, ifc.Name)
+		idx.Index(i, interfaceNameVal, ifc.Name)
 		nameTokens := camel.Split(ifc.Name)
 		if len(nameTokens) > 1 {
-			idx.Index(i, 160/len(nameTokens), nameTokens...)
+			idx.Index(i, totalInterfaceNameTokenVal/len(nameTokens), nameTokens...)
 		}
 
 		// Index on package path and source file.
 		importPathParts := strings.Split(ifc.PackageImportPath, "/")
-		idx.Index(i, 120, ifc.PackageName)
-		idx.Index(i, 10, strings.TrimSuffix(ifc.SourceFile, ".go"))
+		idx.Index(i, packageNameVal, ifc.PackageName)
+		idx.Index(i, sourceFileVal, strings.TrimSuffix(ifc.SourceFile, ".go"))
 		if len(importPathParts) > 1 {
-			idx.Index(i, 20/len(importPathParts), importPathParts...)
+			idx.Index(i, totalImportPathPartVal/len(importPathParts), importPathParts...)
 		}
 
 		// Index on interface methods.
@@ -76,10 +89,10 @@ func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 			methodNameTokens = append(methodNameTokens, camel.Split(methodName)...)
 		}
 		if len(ifc.Methods) > 0 {
-			idx.Index(i, 80/len(ifc.Methods), ifc.Methods...)
+			idx.Index(i, totalMethodNameVal/len(ifc.Methods), ifc.Methods...)
 		}
 		if len(methodNameTokens) > 0 {
-			idx.Index(i, 80/len(methodNameTokens), methodNameTokens...)
+			idx.Index(i, totalInterfaceNameTokenVal/len(methodNameTokens), methodNameTokens...)
 		}
 	}
 
@@ -87,6 +100,7 @@ func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 	return si, nil
 }
 
+// Search returns a interfaces that match the query in deacreasing order of confidence.
 func (si *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
 	searchResult := si.index.Search(query)
 	res := make([]*interfaces.Interface, len(searchResult))
