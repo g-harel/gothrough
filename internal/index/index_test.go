@@ -56,6 +56,19 @@ func TestIndex(t *testing.T) {
 		testContentEqual(t, res, []int{ids[0]})
 	})
 
+	t.Run("should return partially matching values", func(t *testing.T) {
+		ids := []int{98, 81}
+		query := "abc xy"
+
+		idx := index.NewIndex()
+		idx.Index(ids[0], 1, "ab")
+		idx.Index(ids[1], 1, "xyz")
+		idx.Index(123456, 0, "%")
+		res := idx.Search(query)
+
+		testContentEqual(t, res, ids)
+	})
+
 	t.Run("should return matched values in order of confidence", func(t *testing.T) {
 		ids := []int{21, 82}
 		query := "matching_order_confidence"

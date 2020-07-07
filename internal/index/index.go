@@ -37,7 +37,6 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 		for i := 1; i <= len(str); i++ {
 			substringFraction := float64(i) / float64(len(str))
 			adjustedConfidence := float64(confidence) * math.Pow(substringFraction, substringPenalty)
-			// TODO test
 			for _, substr := range Substrings(str, i) {
 				if len(idx.mappings[substr]) == 0 {
 					idx.mappings[substr] = []mappedValue{}
@@ -50,7 +49,6 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 
 // Search searches for indexed values matching the query.
 // Results are ordered by descending order of confidence.
-// TODO give each sub-query similar weight.
 func (idx *Index) Search(query string) []int {
 	query = strings.ToLower(query)
 
