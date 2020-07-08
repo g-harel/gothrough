@@ -11,12 +11,12 @@ import (
 const substringPenalty = 4.0
 
 type mappedValue struct {
-	id         int
-	confidence float64
+	ID         int
+	Confidence float64
 }
 
 // Index is a simple search index.
-// The indexed values are never stored, only the ID provided by the consumer of this package.
+// It does not store values, only the value's ID provided by the consumer of this package.
 // The IDs of all matching values are returned as the result of a search.
 type Index struct {
 	mappings map[string][]mappedValue
@@ -58,10 +58,10 @@ func (idx *Index) Search(query string) []int {
 		for i := 1; i <= len(subQuery); i++ {
 			for _, substr := range Substrings(subQuery, i) {
 				for _, m := range idx.mappings[substr] {
-					if _, ok := confidences[m.id]; !ok {
-						confidences[m.id] = 0
+					if _, ok := confidences[m.ID]; !ok {
+						confidences[m.ID] = 0
 					}
-					confidences[m.id] += m.confidence
+					confidences[m.ID] += m.Confidence
 				}
 			}
 		}
