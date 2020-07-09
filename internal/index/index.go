@@ -19,13 +19,13 @@ type mappedValue struct {
 // It does not store values, only the value's ID provided by the consumer of this package.
 // The IDs of all matching values are returned as the result of a search.
 type Index struct {
-	mappings map[string][]mappedValue
+	Mappings map[string][]mappedValue
 }
 
 // NewIndex creates a new index.
 func NewIndex() *Index {
 	return &Index{
-		mappings: map[string][]mappedValue{},
+		Mappings: map[string][]mappedValue{},
 	}
 }
 
@@ -38,10 +38,10 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 			substringFraction := float64(i) / float64(len(str))
 			adjustedConfidence := float64(confidence) * math.Pow(substringFraction, substringPenalty)
 			for _, substr := range Substrings(str, i) {
-				if len(idx.mappings[substr]) == 0 {
-					idx.mappings[substr] = []mappedValue{}
+				if len(idx.Mappings[substr]) == 0 {
+					idx.Mappings[substr] = []mappedValue{}
 				}
-				idx.mappings[substr] = append(idx.mappings[substr], mappedValue{id, adjustedConfidence})
+				idx.Mappings[substr] = append(idx.Mappings[substr], mappedValue{id, adjustedConfidence})
 			}
 		}
 	}
@@ -57,7 +57,7 @@ func (idx *Index) Search(query string) []int {
 	for _, subQuery := range strings.Fields(query) {
 		for i := 1; i <= len(subQuery); i++ {
 			for _, substr := range Substrings(subQuery, i) {
-				for _, m := range idx.mappings[substr] {
+				for _, m := range idx.Mappings[substr] {
 					if _, ok := confidences[m.ID]; !ok {
 						confidences[m.ID] = 0
 					}
