@@ -30,9 +30,9 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 
 								// Attempt to detect source dir by looking for the closest "src" directory.
 								pathParts := strings.Split(path.Clean(pathname), "/src")
-								rootDir := path.Join(pathParts[:len(pathParts)-1]...) + "/src/"
+								srcDir := path.Join(pathParts[:len(pathParts)-1]...) + "/src/"
 
-								relativePath := strings.TrimPrefix(path.Dir(filepath), rootDir)
+								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
 
 								// Render declaration as it appeared originally.
 								buf := bytes.NewBufferString("")

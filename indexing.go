@@ -23,16 +23,12 @@ const (
 	totalMethodNameTokenVal    = 80
 )
 
-type SearchIndex struct {
-	index      *index.Index
-	interfaces []*interfaces.Interface
-}
-
-// NewSearchIndex creates a searchable index of interfaces in the provided root directory.
-func NewSearchIndex(rootDir string) (*SearchIndex, error) {
+// NewSearchIndexFromSource creates a searchable index of interfaces in the provided src directory.
+// TODO make it possible to include golang.org/x/...
+func NewSearchIndexFromSource(srcDir string) (*SearchIndex, error) {
 	// Collect all interfaces in the provided directory.
 	si := &SearchIndex{interfaces: []*interfaces.Interface{}}
-	err := filepath.Walk(rootDir, func(pathname string, info os.FileInfo, err error) error {
+	err := filepath.Walk(srcDir, func(pathname string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -96,15 +92,4 @@ func NewSearchIndex(rootDir string) (*SearchIndex, error) {
 
 	si.index = idx
 	return si, nil
-}
-
-// Search returns a interfaces that match the query in deacreasing order of confidence.
-func (si *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
-	searchResult := si.index.Search(query)
-	res := make([]*interfaces.Interface, len(searchResult))
-	for i, pos := range searchResult {
-		res[i] = si.interfaces[pos]
-	}
-
-	return res, nil
 }
