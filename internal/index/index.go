@@ -1,14 +1,9 @@
 package index
 
 import (
-	"math"
 	"sort"
 	"strings"
 )
-
-// Penalty applied to confidence value when indexing substrings.
-// Refer to implementation for usage details.
-const substringPenalty = 4.0
 
 type mappedValue struct {
 	ID         int
@@ -36,7 +31,7 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {
 			substringFraction := float64(i) / float64(len(str))
-			adjustedConfidence := float64(confidence) * math.Pow(substringFraction, substringPenalty)
+			adjustedConfidence := float64(confidence) * substringFraction
 			for _, substr := range Substrings(str, i) {
 				if len(idx.Mappings[substr]) == 0 {
 					idx.Mappings[substr] = []mappedValue{}
@@ -56,12 +51,13 @@ func (idx *Index) Search(query string) []int {
 	confidences := map[int]float64{}
 	for _, subQuery := range strings.Fields(query) {
 		for i := 1; i <= len(subQuery); i++ {
+			substringFraction := float64(i) / float64(len(subQuery))
 			for _, substr := range Substrings(subQuery, i) {
 				for _, m := range idx.Mappings[substr] {
 					if _, ok := confidences[m.ID]; !ok {
 						confidences[m.ID] = 0
 					}
-					confidences[m.ID] += m.Confidence
+					confidences[m.ID] += m.Confidence * substringFraction
 				}
 			}
 		}
@@ -78,6 +74,13 @@ func (idx *Index) Search(query string) []int {
 	sort.Slice(ids, func(i, j int) bool {
 		return confidences[ids[i]] > confidences[ids[j]]
 	})
+
+	// TODO return scaled confidence value.
+	// for i, id := range ids {
+	// 	if i < 10 {
+	// 		fmt.Printf("%v\n", confidences[id])
+	// 	}
+	// }
 
 	return ids
 }
