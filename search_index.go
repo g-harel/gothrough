@@ -10,6 +10,13 @@ type SearchIndex struct {
 	interfaces []*interfaces.Interface
 }
 
+func NewSearchIndex() *SearchIndex {
+	return &SearchIndex{
+		index:      index.NewIndex(),
+		interfaces: []*interfaces.Interface{},
+	}
+}
+
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (si *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
 	searchResult := si.index.Search(query)

@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/g-harel/gis/internal/camel"
-	"github.com/g-harel/gis/internal/index"
 	"github.com/g-harel/gis/internal/interfaces"
 	"github.com/g-harel/gis/internal/parse"
 )
@@ -23,11 +22,12 @@ const (
 	totalMethodNameTokenVal    = 80
 )
 
-// NewSearchIndexFromSource creates a searchable index of interfaces in the provided src directory.
-// TODO make it possible to include golang.org/x/...
-func NewSearchIndexFromSource(srcDir string) (*SearchIndex, error) {
+// Include adds interfaces in the provided src directory to the index.
+func (si *SearchIndex) Include(srcDir string) error {
+	// Store current count to skip already-indexed interfaces.
+	startLength := len(si.interfaces)
+
 	// Collect all interfaces in the provided directory.
-	si := &SearchIndex{interfaces: []*interfaces.Interface{}}
 	err := filepath.Walk(srcDir, func(pathname string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
@@ -56,25 +56,26 @@ func NewSearchIndexFromSource(srcDir string) (*SearchIndex, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("walk directory: %v", err)
+		return fmt.Errorf("walk directory: %v", err)
 	}
 
-	// Add the interfaces to the index with a confidence value.
-	idx := index.NewIndex()
-	for i, ifc := range si.interfaces {
+	// Add the interfaces to the internal index with a confidence value.
+	for i, ifc := range si.interfaces[startLength:] {
+		id := i + startLength
+
 		// Index on interface name.
-		idx.Index(i, interfaceNameVal, ifc.Name)
+		si.index.Index(id, interfaceNameVal, ifc.Name)
 		nameTokens := camel.Split(ifc.Name)
 		if len(nameTokens) > 1 {
-			idx.Index(i, totalInterfaceNameTokenVal/len(nameTokens), nameTokens...)
+			si.index.Index(id, totalInterfaceNameTokenVal/len(nameTokens), nameTokens...)
 		}
 
 		// Index on package path and source file.
 		importPathParts := strings.Split(ifc.PackageImportPath, "/")
-		idx.Index(i, packageNameVal, ifc.PackageName)
-		idx.Index(i, sourceFileVal, strings.TrimSuffix(ifc.SourceFile, ".go"))
+		si.index.Index(id, packageNameVal, ifc.PackageName)
+		si.index.Index(id, sourceFileVal, strings.TrimSuffix(ifc.SourceFile, ".go"))
 		if len(importPathParts) > 1 {
-			idx.Index(i, totalImportPathPartVal/len(importPathParts), importPathParts...)
+			si.index.Index(i, totalImportPathPartVal/len(importPathParts), importPathParts...)
 		}
 
 		// Index on interface methods.
@@ -83,13 +84,12 @@ func NewSearchIndexFromSource(srcDir string) (*SearchIndex, error) {
 			methodNameTokens = append(methodNameTokens, camel.Split(methodName)...)
 		}
 		if len(ifc.Methods) > 0 {
-			idx.Index(i, totalMethodNameVal/len(ifc.Methods), ifc.Methods...)
+			si.index.Index(id, totalMethodNameVal/len(ifc.Methods), ifc.Methods...)
 		}
 		if len(methodNameTokens) > 0 {
-			idx.Index(i, totalInterfaceNameTokenVal/len(methodNameTokens), methodNameTokens...)
+			si.index.Index(id, totalInterfaceNameTokenVal/len(methodNameTokens), methodNameTokens...)
 		}
 	}
 
-	si.index = idx
-	return si, nil
+	return nil
 }
