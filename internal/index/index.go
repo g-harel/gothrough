@@ -1,3 +1,4 @@
+// TODO rename to string_index
 package index
 
 import (
@@ -5,7 +6,7 @@ import (
 	"strings"
 )
 
-type mappedValue struct {
+type Match struct {
 	ID         int
 	Confidence float64
 }
@@ -14,13 +15,13 @@ type mappedValue struct {
 // It does not store values, only the value's ID provided by the consumer of this package.
 // The IDs of all matching values are returned as the result of a search.
 type Index struct {
-	Mappings map[string][]mappedValue
+	Matches map[string][]Match
 }
 
 // NewIndex creates a new index.
 func NewIndex() *Index {
 	return &Index{
-		Mappings: map[string][]mappedValue{},
+		Matches: map[string][]Match{},
 	}
 }
 
@@ -33,10 +34,10 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 			substringFraction := float64(i) / float64(len(str))
 			adjustedConfidence := float64(confidence) * substringFraction
 			for _, substr := range Substrings(str, i) {
-				if len(idx.Mappings[substr]) == 0 {
-					idx.Mappings[substr] = []mappedValue{}
+				if len(idx.Matches[substr]) == 0 {
+					idx.Matches[substr] = []Match{}
 				}
-				idx.Mappings[substr] = append(idx.Mappings[substr], mappedValue{id, adjustedConfidence})
+				idx.Matches[substr] = append(idx.Matches[substr], Match{id, adjustedConfidence})
 			}
 		}
 	}
@@ -44,16 +45,16 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 
 // Search searches for indexed values matching the query.
 // Results are ordered by descending order of confidence.
-func (idx *Index) Search(query string) []int {
+func (idx *Index) Search(query string) []Match {
 	query = strings.ToLower(query)
 
-	// Sum confidences from matching mappings.
+	// Sum confidences from matches.
 	confidences := map[int]float64{}
 	for _, subQuery := range strings.Fields(query) {
 		for i := 1; i <= len(subQuery); i++ {
 			substringFraction := float64(i) / float64(len(subQuery))
 			for _, substr := range Substrings(subQuery, i) {
-				for _, m := range idx.Mappings[substr] {
+				for _, m := range idx.Matches[substr] {
 					if _, ok := confidences[m.ID]; !ok {
 						confidences[m.ID] = 0
 					}
@@ -64,23 +65,17 @@ func (idx *Index) Search(query string) []int {
 	}
 
 	// Collect matched IDs (no duplicates).
-	ids := make([]int, len(confidences))
-	i := 0
+	results := []Match{}
 	for id := range confidences {
-		ids[i] = id
-		i++
+		results = append(results, Match{
+			ID:         id,
+			Confidence: confidences[id],
+		})
 	}
 
-	sort.Slice(ids, func(i, j int) bool {
-		return confidences[ids[i]] > confidences[ids[j]]
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Confidence > results[j].Confidence
 	})
 
-	// TODO return scaled confidence value.
-	// for i, id := range ids {
-	// 	if i < 10 {
-	// 		fmt.Printf("%v\n", confidences[id])
-	// 	}
-	// }
-
-	return ids
+	return results
 }

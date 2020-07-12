@@ -20,10 +20,10 @@ func NewSearchIndex() *SearchIndex {
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (si *SearchIndex) Search(query string) ([]*interfaces.Interface, error) {
 	searchResult := si.index.Search(query)
-	res := make([]*interfaces.Interface, len(searchResult))
-	for i, pos := range searchResult {
-		res[i] = si.interfaces[pos]
+	results := make([]*interfaces.Interface, len(searchResult))
+	for i, result := range searchResult {
+		results[i] = si.interfaces[result.ID]
 	}
 
-	return res, nil
+	return results, nil
 }
