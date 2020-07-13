@@ -7,7 +7,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/g-harel/gis"
+	"github.com/g-harel/gis/internal/interface_index"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	fmt.Println("========")
 
 	indexTime := time.Now()
-	idx := gis.NewSearchIndex()
+	idx := interface_index.NewIndex()
 	err := idx.Include(root)
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ func main() {
 	fmt.Printf("Encoded in %s\n", time.Since(encodeTime))
 
 	decodeTime := time.Now()
-	idx, err = gis.NewSearchIndexFromBytes(&buf)
+	idx, err = interface_index.NewIndexFromBytes(&buf)
 	if err != nil {
 		panic(err)
 	}

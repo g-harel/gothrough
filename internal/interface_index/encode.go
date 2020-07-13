@@ -1,19 +1,19 @@
-package gis
+package interface_index
 
 import (
 	"encoding/gob"
 	"io"
 
-	"github.com/g-harel/gis/internal/index"
 	"github.com/g-harel/gis/internal/interfaces"
+	"github.com/g-harel/gis/internal/string_index"
 )
 
 type encodableSearchIndex struct {
-	Index      *index.Index
+	Index      *string_index.Index
 	Interfaces []*interfaces.Interface
 }
 
-func (si *SearchIndex) ToBytes(w io.Writer) error {
+func (si *Index) ToBytes(w io.Writer) error {
 	esi := encodableSearchIndex{
 		Index:      si.index,
 		Interfaces: si.interfaces,
@@ -28,7 +28,7 @@ func (si *SearchIndex) ToBytes(w io.Writer) error {
 	return nil
 }
 
-func NewSearchIndexFromBytes(r io.Reader) (*SearchIndex, error) {
+func NewIndexFromBytes(r io.Reader) (*Index, error) {
 	var esi encodableSearchIndex
 
 	dec := gob.NewDecoder(r)
@@ -37,7 +37,7 @@ func NewSearchIndexFromBytes(r io.Reader) (*SearchIndex, error) {
 		return nil, err
 	}
 
-	si := &SearchIndex{
+	si := &Index{
 		index:      esi.Index,
 		interfaces: esi.Interfaces,
 	}

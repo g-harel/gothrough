@@ -1,11 +1,11 @@
-package index_test
+package string_index_test
 
 import (
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/g-harel/gis/internal/index"
+	"github.com/g-harel/gis/internal/string_index"
 )
 
 // TODO util to index matches clearer.
@@ -21,7 +21,7 @@ func TestIndex(t *testing.T) {
 		id := 32
 		query := "return_indexed_value"
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(id, 0, query)
 		actual := idx.Search(query)
 
@@ -30,11 +30,11 @@ func TestIndex(t *testing.T) {
 	})
 
 	t.Run("should return multiple matching values", func(t *testing.T) {
-		matchA := index.Match{12, 0}
-		matchB := index.Match{78, 0}
+		matchA := string_index.Match{12, 0}
+		matchB := string_index.Match{78, 0}
 		query := "multiple_indexed_values"
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(matchA.ID, int(matchA.Confidence), query)
 		idx.Index(matchB.ID, int(matchB.Confidence), query)
 		actual := idx.Search(query)
@@ -45,11 +45,11 @@ func TestIndex(t *testing.T) {
 	})
 
 	t.Run("should only return matching values", func(t *testing.T) {
-		match := index.Match{54, 0}
-		not_match := index.Match{76, 0}
+		match := string_index.Match{54, 0}
+		not_match := string_index.Match{76, 0}
 		query := "only_matching"
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(match.ID, int(match.Confidence), query)
 		idx.Index(not_match.ID, int(not_match.Confidence), "%")
 		actual := idx.Search(query)
@@ -59,11 +59,11 @@ func TestIndex(t *testing.T) {
 	})
 
 	t.Run("should return partially matching values", func(t *testing.T) {
-		matchA := index.Match{98, 0}
-		matchB := index.Match{81, 0}
+		matchA := string_index.Match{98, 0}
+		matchB := string_index.Match{81, 0}
 		query := "abc xy"
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(matchA.ID, int(matchA.Confidence), "ab")
 		idx.Index(matchB.ID, int(matchB.Confidence), "xyz")
 		// TODO
@@ -76,11 +76,11 @@ func TestIndex(t *testing.T) {
 	})
 
 	t.Run("should return matched values in order of confidence", func(t *testing.T) {
-		matchA := index.Match{21, 50}
-		matchB := index.Match{82, 100}
+		matchA := string_index.Match{21, 50}
+		matchB := string_index.Match{82, 100}
 		query := "matching_order_confidence"
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(matchA.ID, int(matchA.Confidence), query)
 		idx.Index(matchB.ID, int(matchB.Confidence), query)
 		actual := idx.Search(query)
@@ -91,11 +91,11 @@ func TestIndex(t *testing.T) {
 	})
 
 	t.Run("should accumulate confidence from multiple index calls", func(t *testing.T) {
-		matchA := index.Match{81, 100}
-		matchB := index.Match{43, 60}
+		matchA := string_index.Match{81, 100}
+		matchB := string_index.Match{43, 60}
 		query := "confidence_order_sum"
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(matchA.ID, int(matchA.Confidence), query)
 		idx.Index(matchB.ID, int(matchB.Confidence), query)
 		idx.Index(matchB.ID, int(matchB.Confidence), query)
@@ -107,11 +107,11 @@ func TestIndex(t *testing.T) {
 	})
 
 	t.Run("should accumulate confidence from multiple query parts", func(t *testing.T) {
-		matchA := index.Match{43, 60}
-		matchB := index.Match{91, 100}
+		matchA := string_index.Match{43, 60}
+		matchB := string_index.Match{91, 100}
 		queries := []string{"query", "parts"}
 
-		idx := index.NewIndex()
+		idx := string_index.NewIndex()
 		idx.Index(matchA.ID, int(matchA.Confidence), queries...)
 		idx.Index(matchB.ID, int(matchB.Confidence), queries[0])
 		actual := idx.Search(strings.Join(queries, " "))

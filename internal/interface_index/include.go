@@ -1,4 +1,4 @@
-package gis
+package interface_index
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ const (
 )
 
 // Include adds interfaces in the provided src directory to the index.
-func (si *SearchIndex) Include(srcDir string) error {
+func (si *Index) Include(srcDir string) error {
 	// Store current count to skip already-indexed interfaces.
 	startLength := len(si.interfaces)
 

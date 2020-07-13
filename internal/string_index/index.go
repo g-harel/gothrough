@@ -1,5 +1,4 @@
-// TODO rename to string_index
-package index
+package string_index
 
 import (
 	"sort"
