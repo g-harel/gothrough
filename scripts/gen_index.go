@@ -1,77 +1,53 @@
 package main
 
 import (
-	"bytes"
+	"flag"
 	"fmt"
 	"os"
 	"path"
-	"time"
 
 	"github.com/g-harel/gis/internal/interface_index"
 )
 
+var dest = flag.String("dest", "", "output filename")
+
+func usageErr() {
+	fmt.Printf("Usage:\n  %s -dest=DEST_DIR SRC_DIR...\n", os.Args[0])
+	os.Exit(1)
+}
+
+func fatalErr(err error) {
+	fmt.Fprintf(os.Stderr, "fatal: %s", err)
+	os.Exit(1)
+}
+
 func main() {
-	// TODO make root and dest cli args.
-	root := path.Join(os.Getenv("GOROOT"), "src")
-	path := path.Join(os.Getenv("GOPATH"), "src")
-	dest := "./.index"
-	// TODO move query to different script + server.
-	query := "ios reder option"
+	flag.Parse()
 
-	fmt.Printf("ROOT=%v\n", root)
-	fmt.Printf("PATH=%v\n", path)
-	fmt.Printf("DEST=%v\n", dest)
-	fmt.Printf("QUERY=%v\n", query)
-	fmt.Println("========")
+	// Validate inputs.
+	if len(flag.Args()) == 0 || *dest == "" {
+		usageErr()
+	}
 
-	indexTime := time.Now()
+	// Create index.
 	idx := interface_index.NewIndex()
-	err := idx.Include(root)
-	if err != nil {
-		panic(err)
+	for _, dir := range flag.Args() {
+		err := idx.Include(path.Join(dir, "src"))
+		if err != nil {
+			fatalErr(err)
+		}
 	}
-	err = idx.Include(path)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Indexed in %s\n", time.Since(indexTime))
 
-	encodeTime := time.Now()
-	var buf bytes.Buffer
-	err = idx.ToBytes(&buf)
+	// Create output file.
+	f, err := os.Create(*dest)
 	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Encoded in %s\n", time.Since(encodeTime))
-
-	decodeTime := time.Now()
-	idx, err = interface_index.NewIndexFromBytes(&buf)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Decoded in %s\n", time.Since(decodeTime))
-
-	writeTime := time.Now()
-	f, err := os.Create(dest)
-	if err != nil {
-		panic(err)
+		fatalErr(err)
 	}
 	defer f.Close()
+
+	// Write index to ouput file.
 	err = idx.ToBytes(f)
 	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Written in %s\n", time.Since(writeTime))
-
-	searchStart := time.Now()
-	interfaces, err := idx.Search(query)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Queried in %s\n", time.Since(searchStart))
-	fmt.Println("========")
-
-	for _, ifc := range interfaces[:16] {
-		println(ifc.String())
+		fatalErr(err)
 	}
 }
