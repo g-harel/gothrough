@@ -38,14 +38,14 @@ func main() {
 			return
 		}
 
-		interfaces, err := idx.Search(query[0])
+		results, err := idx.Search(query[0])
 		if err != nil {
 			panic(err)
 		}
 
 		fmt.Fprintf(w, "%s\n========\n", query[0])
-		for _, ifc := range interfaces[:16] {
-			fmt.Fprintf(w, "%s\n", ifc.String())
+		for _, result := range results[:16] {
+			fmt.Fprintf(w, "%4.3f %s\n", result.Confidence, result.Interface.String())
 		}
 	})
 

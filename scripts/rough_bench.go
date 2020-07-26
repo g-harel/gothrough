@@ -62,14 +62,14 @@ func main() {
 	fmt.Printf("Written in %s\n", time.Since(writeTime))
 
 	searchStart := time.Now()
-	interfaces, err := idx.Search(query)
+	results, err := idx.Search(query)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Queried in %s\n", time.Since(searchStart))
 	fmt.Println("========")
 
-	for _, ifc := range interfaces[:16] {
-		println(ifc.String())
+	for _, result := range results[:16] {
+		println(result.Interface.String())
 	}
 }

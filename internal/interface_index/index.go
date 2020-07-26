@@ -10,6 +10,11 @@ type Index struct {
 	interfaces []*interfaces.Interface
 }
 
+type Result struct {
+	Interface  *interfaces.Interface
+	Confidence float64
+}
+
 func NewIndex() *Index {
 	return &Index{
 		index:      string_index.NewIndex(),
@@ -18,11 +23,19 @@ func NewIndex() *Index {
 }
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
-func (si *Index) Search(query string) ([]*interfaces.Interface, error) {
+func (si *Index) Search(query string) ([]*Result, error) {
 	searchResult := si.index.Search(query)
-	results := make([]*interfaces.Interface, len(searchResult))
+	if len(searchResult) == 0 {
+		return []*Result{}, nil
+	}
+
+	maxConfidence := searchResult[0].Confidence
+	results := make([]*Result, len(searchResult))
 	for i, result := range searchResult {
-		results[i] = si.interfaces[result.ID]
+		results[i] = &Result{
+			Interface:  si.interfaces[result.ID],
+			Confidence: result.Confidence / maxConfidence,
+		}
 	}
 
 	return results, nil
