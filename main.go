@@ -9,6 +9,7 @@ import (
 	"github.com/g-harel/gis/internal/interface_index"
 )
 
+// http://localhost:3000/?query=io%20reader
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -30,11 +31,19 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		interfaces, err := idx.Search("io reader")
+		query, ok := r.URL.Query()["query"]
+		if !ok || len(query) != 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "%d %s", http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
+			return
+		}
+
+		interfaces, err := idx.Search(query[0])
 		if err != nil {
 			panic(err)
 		}
 
+		fmt.Fprintf(w, "%s\n========\n", query[0])
 		for _, ifc := range interfaces[:16] {
 			fmt.Fprintf(w, "%s\n", ifc.String())
 		}
