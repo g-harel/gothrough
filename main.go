@@ -31,6 +31,8 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL.String())
+
 		query, ok := r.URL.Query()["query"]
 		if !ok || len(query) != 1 {
 			w.WriteHeader(http.StatusBadRequest)
@@ -44,7 +46,10 @@ func main() {
 		}
 
 		fmt.Fprintf(w, "%s\n========\n", query[0])
-		for _, result := range results[:16] {
+		if len(results) > 16 {
+			results = results[:16]
+		}
+		for _, result := range results {
 			fmt.Fprintf(w, "%4.3f %s\n", result.Confidence, result.Interface.String())
 		}
 	})

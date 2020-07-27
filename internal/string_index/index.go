@@ -1,6 +1,7 @@
 package string_index
 
 import (
+	"math"
 	"sort"
 	"strings"
 )
@@ -30,8 +31,8 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {
-			substringFraction := float64(i) / float64(len(str))
-			adjustedConfidence := float64(confidence) * substringFraction
+			adjustmentFactor := math.Pow(float64(i)/float64(len(str)), 2)
+			adjustedConfidence := float64(confidence) * adjustmentFactor
 			for _, substr := range Substrings(str, i) {
 				if len(idx.Matches[substr]) == 0 {
 					idx.Matches[substr] = []Match{}
@@ -51,13 +52,13 @@ func (idx *Index) Search(query string) []Match {
 	confidences := map[int]float64{}
 	for _, subQuery := range strings.Fields(query) {
 		for i := 1; i <= len(subQuery); i++ {
-			substringFraction := float64(i) / float64(len(subQuery))
+			adjustmentFactor := float64(i) / math.Pow(float64(len(subQuery)), 2)
 			for _, substr := range Substrings(subQuery, i) {
 				for _, m := range idx.Matches[substr] {
 					if _, ok := confidences[m.ID]; !ok {
 						confidences[m.ID] = 0
 					}
-					confidences[m.ID] += m.Confidence * substringFraction
+					confidences[m.ID] += m.Confidence * adjustmentFactor
 				}
 			}
 		}

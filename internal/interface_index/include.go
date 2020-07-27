@@ -14,7 +14,7 @@ import (
 // Confidence values for interface info items.
 const (
 	interfaceNameVal           = 120
-	totalInterfaceNameTokenVal = 160
+	totalInterfaceNameTokenVal = 120
 	packageNameVal             = 120
 	sourceFileVal              = 10
 	totalImportPathPartVal     = 20
@@ -87,7 +87,7 @@ func (si *Index) Include(srcDir string) error {
 			si.index.Index(id, totalMethodNameVal/len(ifc.Methods), ifc.Methods...)
 		}
 		if len(methodNameTokens) > 0 {
-			si.index.Index(id, totalInterfaceNameTokenVal/len(methodNameTokens), methodNameTokens...)
+			si.index.Index(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)
 		}
 	}
 
