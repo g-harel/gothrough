@@ -9,7 +9,7 @@ import (
 	"github.com/g-harel/gis/internal/interface_index"
 )
 
-var dest = flag.String("dest", "", "output filename")
+var dest = flag.String("dest", ".index", "output filename")
 
 func usageErr() {
 	fmt.Printf("Usage:\n  %s -dest=DEST_DIR SRC_DIR...\n", os.Args[0])
@@ -25,7 +25,7 @@ func main() {
 	flag.Parse()
 
 	// Validate inputs.
-	if len(flag.Args()) == 0 || *dest == "" {
+	if len(flag.Args()) == 0 {
 		usageErr()
 	}
 
