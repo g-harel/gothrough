@@ -79,12 +79,12 @@ func (si *Index) Include(srcDir string) error {
 		}
 
 		// Index on interface methods.
-		methodNameTokens := []string{}
-		for _, methodName := range ifc.Methods {
-			methodNameTokens = append(methodNameTokens, camel.Split(methodName)...)
+		for _, method := range ifc.Methods {
+			si.index.Index(id, totalMethodNameVal/len(ifc.Methods), method.Name)
 		}
-		if len(ifc.Methods) > 0 {
-			si.index.Index(id, totalMethodNameVal/len(ifc.Methods), ifc.Methods...)
+		methodNameTokens := []string{}
+		for _, method := range ifc.Methods {
+			methodNameTokens = append(methodNameTokens, camel.Split(method.Name)...)
 		}
 		if len(methodNameTokens) > 0 {
 			si.index.Index(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)

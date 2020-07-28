@@ -4,10 +4,16 @@ import (
 	"fmt"
 )
 
+type Method struct {
+	Name string
+	Docs string
+}
+
 // Interface contains data about the location and shape of an interface.
 type Interface struct {
 	Name              string
-	Methods           []string
+	Docs              string
+	Methods           []Method
 	Printed           string
 	PackageName       string
 	PackageImportPath string

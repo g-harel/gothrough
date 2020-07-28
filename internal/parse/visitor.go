@@ -29,7 +29,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 // Visit walks the visitor on the provided file.
 func Visit(filepath string, v Visitor) error {
 	fset := token.NewFileSet()
-	file, err := parser.ParseFile(fset, filepath, nil, parser.AllErrors)
+	file, err := parser.ParseFile(fset, filepath, nil, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parse file: %v", err)
 	}

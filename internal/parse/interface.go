@@ -40,17 +40,22 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 								format.Node(buf, renderer, n)
 
 								// Collect method names.
-								methods := []string{}
+								methods := []interfaces.Method{}
 								for _, method := range interfaceType.Methods.List {
 									for _, methodName := range method.Names {
 										if methodName.IsExported() {
-											methods = append(methods, methodName.String())
+											methods = append(methods, interfaces.Method{
+												Name: methodName.String(),
+												Docs: method.Doc.Text(),
+											})
 										}
 									}
 								}
 
+								// TODO fix printed version or extract method signatures.
 								handler(interfaces.Interface{
 									Name:              name,
+									Docs:              typeDeclaration.Doc.Text(),
 									Methods:           methods,
 									Printed:           buf.String(),
 									PackageName:       path.Base(relativePath),
