@@ -4,9 +4,21 @@ import (
 	"fmt"
 )
 
-type Method struct {
+type Argument struct {
 	Name string
-	Docs string
+	Type string
+}
+
+type ReturnValue struct {
+	Name string
+	Type string
+}
+
+type Method struct {
+	Name         string
+	Docs         string
+	Arguments    []Argument
+	ReturnValues []ReturnValue
 }
 
 // Interface contains data about the location and shape of an interface.
@@ -14,7 +26,6 @@ type Interface struct {
 	Name              string
 	Docs              string
 	Methods           []Method
-	Printed           string
 	PackageName       string
 	PackageImportPath string
 	SourceFile        string
@@ -28,10 +39,6 @@ func (i *Interface) Address() string {
 // String returns a string representation of the interface.
 func (i *Interface) String() string {
 	return fmt.Sprintf("%v %v (%v)", i.Name, i.Methods, i.Address())
-}
-
-func (i *Interface) Pretty() string {
-	return fmt.Sprintf("%v\npackage \"%v\"\n// %v\n%v\n", i.Address(), i.PackageImportPath, i.DocLink(), i.Printed)
 }
 
 func (i *Interface) DocLink() string {

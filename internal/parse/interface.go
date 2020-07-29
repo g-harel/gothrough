@@ -1,9 +1,7 @@
 package parse
 
 import (
-	"bytes"
 	"go/ast"
-	"go/format"
 	"go/token"
 	"path"
 	"strings"
@@ -34,12 +32,7 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 
 								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
 
-								// Render declaration as it appeared originally.
-								buf := bytes.NewBufferString("")
-								renderer := token.NewFileSet()
-								format.Node(buf, renderer, n)
-
-								// Collect method names.
+								// Collect methods.
 								methods := []interfaces.Method{}
 								for _, method := range interfaceType.Methods.List {
 									for _, methodName := range method.Names {
@@ -47,17 +40,16 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 											methods = append(methods, interfaces.Method{
 												Name: methodName.String(),
 												Docs: method.Doc.Text(),
+												// TODO fill in arguments and return values.
 											})
 										}
 									}
 								}
 
-								// TODO fix printed version or extract method signatures.
 								handler(interfaces.Interface{
 									Name:              name,
 									Docs:              typeDeclaration.Doc.Text(),
 									Methods:           methods,
-									Printed:           buf.String(),
 									PackageName:       path.Base(relativePath),
 									PackageImportPath: relativePath,
 									SourceFile:        filename,
