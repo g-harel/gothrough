@@ -1,7 +1,9 @@
 package parse
 
 import (
+	"bytes"
 	"go/ast"
+	"go/format"
 	"go/token"
 	"path"
 	"strings"
@@ -9,6 +11,13 @@ import (
 
 	"github.com/g-harel/gis/internal/interfaces"
 )
+
+func pretty(node interface{}) string {
+	buf := bytes.NewBufferString("")
+	renderer := token.NewFileSet()
+	format.Node(buf, renderer, node)
+	return buf.String()
+}
 
 // NewInterfaceVisitor creates a visitor that collects interfaces into the target array.
 func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
@@ -35,12 +44,38 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 								// Collect methods.
 								methods := []interfaces.Method{}
 								for _, method := range interfaceType.Methods.List {
+									arguments := []interfaces.Argument{}
+									returnValues := []interfaces.ReturnValue{}
+									if methodType, ok := method.Type.(*ast.FuncType); ok {
+										if methodType.Params != nil {
+											for _, param := range methodType.Params.List {
+												for _, paramNames := range param.Names {
+													arguments = append(arguments, interfaces.Argument{
+														Name: paramNames.Name,
+														Type: pretty(param.Type),
+													})
+												}
+											}
+										}
+										if methodType.Results != nil {
+											// TODO check that unnamed return values are captured
+											for _, returnValue := range methodType.Results.List {
+												for _, returnValueNames := range returnValue.Names {
+													returnValues = append(returnValues, interfaces.ReturnValue{
+														Name: returnValueNames.Name,
+														Type: pretty(returnValue.Type),
+													})
+												}
+											}
+										}
+									}
 									for _, methodName := range method.Names {
 										if methodName.IsExported() {
 											methods = append(methods, interfaces.Method{
-												Name: methodName.String(),
-												Docs: method.Doc.Text(),
-												// TODO fill in arguments and return values.
+												Name:         methodName.String(),
+												Docs:         method.Doc.Text(),
+												Arguments:    arguments,
+												ReturnValues: returnValues,
 											})
 										}
 									}

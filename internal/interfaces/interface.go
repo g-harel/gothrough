@@ -4,11 +4,13 @@ import (
 	"fmt"
 )
 
+// TODO add docs if available
 type Argument struct {
 	Name string
 	Type string
 }
 
+// TODO add docs if available
 type ReturnValue struct {
 	Name string
 	Type string
