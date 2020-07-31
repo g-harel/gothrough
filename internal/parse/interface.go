@@ -12,11 +12,27 @@ import (
 	"github.com/g-harel/gis/internal/interfaces"
 )
 
+// TODO make more utils and move somewhere else.
 func pretty(node interface{}) string {
 	buf := bytes.NewBufferString("")
 	renderer := token.NewFileSet()
 	format.Node(buf, renderer, node)
 	return buf.String()
+}
+
+func collectFields(fieldList *ast.FieldList) []interfaces.Field {
+	result := []interfaces.Field{}
+	if fieldList != nil {
+		for _, field := range fieldList.List {
+			for _, fieldNames := range field.Names {
+				result = append(result, interfaces.Field{
+					Name: fieldNames.Name,
+					Type: pretty(field.Type),
+				})
+			}
+		}
+	}
+	return result
 }
 
 // NewInterfaceVisitor creates a visitor that collects interfaces into the target array.
@@ -44,30 +60,12 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 								// Collect methods.
 								methods := []interfaces.Method{}
 								for _, method := range interfaceType.Methods.List {
-									arguments := []interfaces.Argument{}
-									returnValues := []interfaces.ReturnValue{}
+									arguments := []interfaces.Field{}
+									returnValues := []interfaces.Field{}
 									if methodType, ok := method.Type.(*ast.FuncType); ok {
-										if methodType.Params != nil {
-											for _, param := range methodType.Params.List {
-												for _, paramNames := range param.Names {
-													arguments = append(arguments, interfaces.Argument{
-														Name: paramNames.Name,
-														Type: pretty(param.Type),
-													})
-												}
-											}
-										}
-										if methodType.Results != nil {
-											// TODO check that unnamed return values are captured
-											for _, returnValue := range methodType.Results.List {
-												for _, returnValueNames := range returnValue.Names {
-													returnValues = append(returnValues, interfaces.ReturnValue{
-														Name: returnValueNames.Name,
-														Type: pretty(returnValue.Type),
-													})
-												}
-											}
-										}
+										arguments = collectFields(methodType.Params)
+										// TODO check that unnamed return values are captured
+										returnValues = collectFields(methodType.Results)
 									}
 									for _, methodName := range method.Names {
 										if methodName.IsExported() {

@@ -5,22 +5,17 @@ import (
 )
 
 // TODO add docs if available
-type Argument struct {
+type Field struct {
 	Name string
-	Type string
-}
-
-// TODO add docs if available
-type ReturnValue struct {
-	Name string
+	Docs string
 	Type string
 }
 
 type Method struct {
 	Name         string
 	Docs         string
-	Arguments    []Argument
-	ReturnValues []ReturnValue
+	Arguments    []Field
+	ReturnValues []Field
 }
 
 // Interface contains data about the location and shape of an interface.
