@@ -24,9 +24,18 @@ func collectFields(fieldList *ast.FieldList) []interfaces.Field {
 	result := []interfaces.Field{}
 	if fieldList != nil {
 		for _, field := range fieldList.List {
+			if len(field.Names) == 0 {
+				result = append(result, interfaces.Field{
+					Name: "",
+					Docs: field.Doc.Text(),
+					Type: pretty(field.Type),
+				})
+				continue
+			}
 			for _, fieldNames := range field.Names {
 				result = append(result, interfaces.Field{
 					Name: fieldNames.Name,
+					Docs: field.Doc.Text(),
 					Type: pretty(field.Type),
 				})
 			}
@@ -64,7 +73,6 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 									returnValues := []interfaces.Field{}
 									if methodType, ok := method.Type.(*ast.FuncType); ok {
 										arguments = collectFields(methodType.Params)
-										// TODO check that unnamed return values are captured
 										returnValues = collectFields(methodType.Results)
 									}
 									for _, methodName := range method.Names {
