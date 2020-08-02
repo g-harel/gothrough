@@ -70,6 +70,6 @@ func main() {
 	fmt.Println("========")
 
 	for _, result := range results[:16] {
-		println(result.Interface.String())
+		println(result.Interface.Pretty())
 	}
 }

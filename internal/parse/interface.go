@@ -67,6 +67,7 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
 
 								// Collect methods.
+								// TODO embedded interfaces (ex. https://golang.org/pkg/io/#ReadWriteSeeker)
 								methods := []interfaces.Method{}
 								for _, method := range interfaceType.Methods.List {
 									arguments := []interfaces.Field{}
