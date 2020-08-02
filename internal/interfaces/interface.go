@@ -20,9 +20,11 @@ type Method struct {
 
 // Interface contains data about the location and shape of an interface.
 type Interface struct {
-	Name              string
-	Docs              string
-	Methods           []Method
+	Name    string
+	Docs    string
+	Methods []Method
+	// TODO read + index + print
+	Embedded          []string
 	PackageName       string
 	PackageImportPath string
 	SourceFile        string
@@ -46,6 +48,7 @@ func (i *Interface) DocLink() string {
 func (i *Interface) Pretty() string {
 	methods := []string{}
 	for _, method := range i.Methods {
+		// Create pretty method arguments.
 		arguments := []string{}
 		for _, argument := range method.Arguments {
 			if argument.Name != "" {
@@ -54,7 +57,9 @@ func (i *Interface) Pretty() string {
 				arguments = append(arguments, argument.Type)
 			}
 		}
+		prettyArguments := strings.Join(arguments, ", ")
 
+		// Create pretty method return values.
 		returnValues := []string{}
 		for _, returnValue := range method.ReturnValues {
 			if returnValue.Name != "" {
@@ -63,16 +68,43 @@ func (i *Interface) Pretty() string {
 				returnValues = append(returnValues, returnValue.Type)
 			}
 		}
-
-		result := fmt.Sprintf("%v(%v)", method.Name, strings.Join(arguments, ", "))
+		prettyReturnValues := ""
 		if len(returnValues) > 1 {
-			result += fmt.Sprintf(" (%v)", strings.Join(returnValues, ", "))
+			prettyReturnValues = fmt.Sprintf(" (%v)", strings.Join(returnValues, ", "))
 		} else if len(returnValues) == 1 {
-			result += " " + returnValues[0]
+			prettyReturnValues = fmt.Sprintf(" %v", returnValues[0])
 		}
 
-		methods = append(methods, result)
+		methodDocs := ""
+		if method.Docs != "" {
+			// TODO docs printing helper that only shows if first line is a sentence.
+			methodDocs = "// " + strings.Split(method.Docs, "\n")[0] + "\n"
+		}
+
+		prettyMethod := fmt.Sprintf("%v%v(%v)%v", methodDocs, method.Name, prettyArguments, prettyReturnValues)
+
+		methods = append(methods, prettyMethod)
 	}
-	// TODO empty interfaces.
-	return fmt.Sprintf("type %v interface {\n\t%v\n}\n", i.Name, strings.Join(methods, "\n\t"))
+
+	interfaceDocs := ""
+	if i.Docs != "" {
+		interfaceDocs = "// " + strings.Split(i.Docs, "\n")[0] + "\n"
+	}
+
+	interfaceBody := ""
+	if len(i.Methods) > 0 {
+		allMethods := strings.Join(methods, "\n")
+		indentedMethods := prefixLines(allMethods, "\t")
+		interfaceBody = fmt.Sprintf("\n%v\n", indentedMethods)
+	}
+
+	return fmt.Sprintf("%vtype %v interface {%v}", interfaceDocs, i.Name, interfaceBody)
+}
+
+func prefixLines(s string, p string) string {
+	out := []string{}
+	for _, line := range strings.Split(s, "\n") {
+		out = append(out, p+line)
+	}
+	return strings.Join(out, "\n")
 }
