@@ -75,20 +75,9 @@ func (i *Interface) Pretty() string {
 			prettyReturnValues = fmt.Sprintf(" %v", returnValues[0])
 		}
 
-		methodDocs := ""
-		if method.Docs != "" {
-			// TODO docs printing helper that only shows if first line is a sentence.
-			methodDocs = "// " + strings.Split(method.Docs, "\n")[0] + "\n"
-		}
-
-		prettyMethod := fmt.Sprintf("%v%v(%v)%v", methodDocs, method.Name, prettyArguments, prettyReturnValues)
+		prettyMethod := fmt.Sprintf("%v%v(%v)%v", prettyDocsLine(method.Docs), method.Name, prettyArguments, prettyReturnValues)
 
 		methods = append(methods, prettyMethod)
-	}
-
-	interfaceDocs := ""
-	if i.Docs != "" {
-		interfaceDocs = "// " + strings.Split(i.Docs, "\n")[0] + "\n"
 	}
 
 	interfaceBody := ""
@@ -98,7 +87,25 @@ func (i *Interface) Pretty() string {
 		interfaceBody = fmt.Sprintf("\n%v\n", indentedMethods)
 	}
 
-	return fmt.Sprintf("%vtype %v interface {%v}", interfaceDocs, i.Name, interfaceBody)
+	return fmt.Sprintf("%vtype %v interface {%v}", prettyDocsLine(i.Docs), i.Name, interfaceBody)
+}
+
+func prettyDocsLine(docs string) string {
+	if docs == "" {
+		return ""
+	}
+
+	docLines := strings.Split(docs, "\n")
+	if len(docLines) < 1 {
+		return ""
+	}
+
+	docLine := docLines[0]
+	if !strings.HasSuffix(docLine, ".") {
+		return ""
+	}
+
+	return fmt.Sprintf("// %v\n", docLine)
 }
 
 func prefixLines(s string, p string) string {
