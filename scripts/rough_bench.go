@@ -15,6 +15,9 @@ func main() {
 	path := path.Join(os.Getenv("GOPATH"), "src")
 	dest := "./.index"
 	query := "ios reder option"
+	if len(os.Args) > 1 {
+		query = os.Args[1]
+	}
 
 	fmt.Printf("ROOT=%v\n", root)
 	fmt.Printf("PATH=%v\n", path)
