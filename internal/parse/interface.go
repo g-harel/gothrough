@@ -57,6 +57,7 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 					if interfaceSpec, ok := spec.(*ast.TypeSpec); ok {
 						if interfaceType, ok := interfaceSpec.Type.(*ast.InterfaceType); ok {
 							name := interfaceSpec.Name.String()
+							// Only parse public interfaces.
 							if unicode.IsUpper([]rune(name)[0]) {
 								pathname, filename := path.Split(filepath)
 
@@ -69,7 +70,13 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 								// Collect methods.
 								// TODO embedded interfaces (ex. https://golang.org/pkg/io/#ReadWriteSeeker)
 								methods := []interfaces.Method{}
+								embedded := []string{}
 								for _, method := range interfaceType.Methods.List {
+									if identType, ok := method.Type.(*ast.Ident); ok {
+										// TODO docs?
+										embedded = append(embedded, identType.Name)
+									}
+
 									arguments := []interfaces.Field{}
 									returnValues := []interfaces.Field{}
 									if methodType, ok := method.Type.(*ast.FuncType); ok {
@@ -91,6 +98,7 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 								handler(interfaces.Interface{
 									Name:              name,
 									Docs:              typeDeclaration.Doc.Text(),
+									Embedded:          embedded,
 									Methods:           methods,
 									PackageName:       path.Base(relativePath),
 									PackageImportPath: relativePath,

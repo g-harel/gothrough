@@ -20,11 +20,11 @@ type Method struct {
 
 // Interface contains data about the location and shape of an interface.
 type Interface struct {
-	Name    string
-	Docs    string
-	Methods []Method
-	// TODO read + index + print
+	Name string
+	Docs string
+	// TODO index
 	Embedded          []string
+	Methods           []Method
 	PackageName       string
 	PackageImportPath string
 	SourceFile        string
@@ -44,7 +44,6 @@ func (i *Interface) DocLink() string {
 	return fmt.Sprintf("https://golang.org/pkg/%v#%v", i.PackageImportPath, i.Name)
 }
 
-// TODO docs
 func (i *Interface) Pretty() string {
 	methods := []string{}
 	for _, method := range i.Methods {
@@ -81,10 +80,12 @@ func (i *Interface) Pretty() string {
 	}
 
 	interfaceBody := ""
-	if len(i.Methods) > 0 {
+	if len(i.Methods) > 0 || len(i.Embedded) > 0 {
+		allEmbedded := strings.Join(i.Embedded, "\n")
 		allMethods := strings.Join(methods, "\n")
-		indentedMethods := prefixLines(allMethods, "\t")
-		interfaceBody = fmt.Sprintf("\n%v\n", indentedMethods)
+		allBody := strings.TrimSpace(allEmbedded + "\n" + allMethods)
+		indentedBody := prefixLines(allBody, "\t")
+		interfaceBody = fmt.Sprintf("\n%v\n", indentedBody)
 	}
 
 	return fmt.Sprintf("%vtype %v interface {%v}", prettyDocsLine(i.Docs), i.Name, interfaceBody)
@@ -100,6 +101,7 @@ func prettyDocsLine(docs string) string {
 		return ""
 	}
 
+	// TODO use entire first sentence even when broken up if first word matches name.
 	docLine := docLines[0]
 	if !strings.HasSuffix(docLine, ".") {
 		return ""
