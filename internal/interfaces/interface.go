@@ -74,7 +74,8 @@ func (i *Interface) Pretty() string {
 			prettyReturnValues = fmt.Sprintf(" %v", returnValues[0])
 		}
 
-		prettyMethod := fmt.Sprintf("%v%v(%v)%v", prettyDocsLine(method.Docs), method.Name, prettyArguments, prettyReturnValues)
+		prettyMethodDocs := prettyDocsLine(method.Name, method.Docs)
+		prettyMethod := fmt.Sprintf("%v%v(%v)%v", prettyMethodDocs, method.Name, prettyArguments, prettyReturnValues)
 
 		methods = append(methods, prettyMethod)
 	}
@@ -88,10 +89,11 @@ func (i *Interface) Pretty() string {
 		interfaceBody = fmt.Sprintf("\n%v\n", indentedBody)
 	}
 
-	return fmt.Sprintf("%vtype %v interface {%v}", prettyDocsLine(i.Docs), i.Name, interfaceBody)
+	prettyInterfaceDocs := prettyDocsLine(i.Name, i.Docs)
+	return fmt.Sprintf("%vtype %v interface {%v}", prettyInterfaceDocs, i.Name, interfaceBody)
 }
 
-func prettyDocsLine(docs string) string {
+func prettyDocsLine(name, docs string) string {
 	if docs == "" {
 		return ""
 	}
@@ -101,13 +103,20 @@ func prettyDocsLine(docs string) string {
 		return ""
 	}
 
-	// TODO use entire first sentence even when broken up if first word matches name.
-	docLine := docLines[0]
-	if !strings.HasSuffix(docLine, ".") {
-		return ""
+	// Return first line if it ends with a period.
+	// This would better capture doc lines that include periods than the next block.
+	if strings.HasSuffix(docLines[0], ".") {
+		return fmt.Sprintf("// %v\n", docLines[0])
 	}
 
-	return fmt.Sprintf("// %v\n", docLine)
+	// Return first sentence if it starts with identifier.
+	if strings.HasPrefix(docLines[0], name) {
+		allDocs := strings.Join(docLines, " ")
+		firstSentence := strings.Split(allDocs, ".")[0]
+		return fmt.Sprintf("// %v.\n", firstSentence)
+	}
+
+	return ""
 }
 
 func prefixLines(s string, p string) string {
