@@ -18,6 +18,8 @@ const (
 	packageNameVal             = 120
 	sourceFileVal              = 10
 	totalImportPathPartVal     = 20
+	totalEmbeddedNameVal       = 80
+	totalEmbeddedNameTokenVal  = 80
 	totalMethodNameVal         = 80
 	totalMethodNameTokenVal    = 80
 )
@@ -78,16 +80,30 @@ func (si *Index) Include(srcDir string) error {
 			si.index.Index(i, totalImportPathPartVal/len(importPathParts), importPathParts...)
 		}
 
+		// Index on embedded interfaces.
+		if len(ifc.Embedded) > 0 {
+			si.index.Index(id, totalEmbeddedNameVal/len(ifc.Embedded), ifc.Embedded...)
+			embeddedNameTokens := []string{}
+			for _, embedded := range ifc.Embedded {
+				embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded)...)
+			}
+			if len(embeddedNameTokens) > 1 {
+				si.index.Index(id, totalEmbeddedNameTokenVal/len(embeddedNameTokens), embeddedNameTokens...)
+			}
+		}
+
 		// Index on interface methods.
-		for _, method := range ifc.Methods {
-			si.index.Index(id, totalMethodNameVal/len(ifc.Methods), method.Name)
-		}
-		methodNameTokens := []string{}
-		for _, method := range ifc.Methods {
-			methodNameTokens = append(methodNameTokens, camel.Split(method.Name)...)
-		}
-		if len(methodNameTokens) > 0 {
-			si.index.Index(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)
+		if len(ifc.Methods) > 0 {
+			for _, method := range ifc.Methods {
+				si.index.Index(id, totalMethodNameVal/len(ifc.Methods), method.Name)
+			}
+			methodNameTokens := []string{}
+			for _, method := range ifc.Methods {
+				methodNameTokens = append(methodNameTokens, camel.Split(method.Name)...)
+			}
+			if len(methodNameTokens) > 1 {
+				si.index.Index(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)
+			}
 		}
 	}
 

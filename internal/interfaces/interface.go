@@ -20,9 +20,8 @@ type Method struct {
 
 // Interface contains data about the location and shape of an interface.
 type Interface struct {
-	Name string
-	Docs string
-	// TODO index
+	Name              string
+	Docs              string
 	Embedded          []string
 	Methods           []Method
 	PackageName       string

@@ -73,6 +73,7 @@ func main() {
 	fmt.Println("========")
 
 	for _, result := range results[:16] {
+		fmt.Printf("=== %.6f ===\n", result.Confidence)
 		println(result.Interface.Pretty())
 	}
 }
