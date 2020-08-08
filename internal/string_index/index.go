@@ -29,9 +29,9 @@ func NewIndex() *Index {
 	}
 }
 
-// Index stores the relationship with the given ID and strings (queries).
+// Insert stores the relationship with the given ID and strings (queries).
 // It also requires a confidence to be associated with the relationship, which is used to order results.
-func (idx *Index) Index(id int, confidence int, strs ...string) {
+func (idx *Index) Insert(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {

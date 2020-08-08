@@ -17,7 +17,7 @@ type indexItem struct {
 func indexFrom(items ...indexItem) *string_index.Index {
 	idx := string_index.NewIndex()
 	for _, item := range items {
-		idx.Index(item.id, item.confidence, item.matchStrings...)
+		idx.Insert(item.id, item.confidence, item.matchStrings...)
 	}
 	return idx
 }

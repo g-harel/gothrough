@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/g-harel/gis/internal/interface_index"
+	"github.com/g-harel/gis/internal/parse"
 )
 
 var dest = flag.String("dest", ".index", "output filename")
@@ -32,9 +33,13 @@ func main() {
 	// Create index.
 	idx := interface_index.NewIndex()
 	for _, dir := range flag.Args() {
-		err := idx.Include(path.Join(dir, "src"))
+		interfaces, err := parse.FindInterfaces(path.Join(dir, "src"))
 		if err != nil {
 			fatalErr(err)
+		}
+
+		for _, ifc := range interfaces {
+			idx.Insert(*ifc)
 		}
 	}
 

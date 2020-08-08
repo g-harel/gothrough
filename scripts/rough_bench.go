@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/g-harel/gis/internal/interface_index"
+	"github.com/g-harel/gis/internal/parse"
 )
 
 func main() {
@@ -27,13 +28,19 @@ func main() {
 
 	indexTime := time.Now()
 	idx := interface_index.NewIndex()
-	err := idx.Include(root)
+	rootInterfaces, err := parse.FindInterfaces(root)
 	if err != nil {
 		panic(err)
 	}
-	err = idx.Include(path)
+	for _, ifc := range rootInterfaces {
+		idx.Insert(*ifc)
+	}
+	pathInterfaces, err := parse.FindInterfaces(path)
 	if err != nil {
 		panic(err)
+	}
+	for _, ifc := range pathInterfaces {
+		idx.Insert(*ifc)
 	}
 	fmt.Printf("Indexed in %s\n", time.Since(indexTime))
 

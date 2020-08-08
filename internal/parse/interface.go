@@ -6,7 +6,9 @@ import (
 	"go/ast"
 	"go/format"
 	"go/token"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"unicode"
 
@@ -45,8 +47,8 @@ func collectFields(fieldList *ast.FieldList) []interfaces.Field {
 	return result
 }
 
-// NewInterfaceVisitor creates a visitor that collects interfaces into the target array.
-func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
+// newInterfaceVisitor creates a visitor that collects interfaces into the target array.
+func newInterfaceVisitor(handler func(interfaces.Interface)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
@@ -119,4 +121,43 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 		}
 		return false
 	}
+}
+
+// FindInterfaces adds interfaces in the provided src directory to the index.
+func FindInterfaces(srcDir string) ([]*interfaces.Interface, error) {
+	found := []*interfaces.Interface{}
+
+	// Collect all interfaces in the provided directory.
+	err := filepath.Walk(srcDir, func(pathname string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		if !strings.HasSuffix(pathname, ".go") {
+			return nil
+		}
+		if strings.HasSuffix(pathname, "_test.go") {
+			return nil
+		}
+		if strings.Contains(pathname, "internal/") {
+			return nil
+		}
+		if strings.Contains(pathname, "vendor/") {
+			return nil
+		}
+		if strings.Contains(pathname, "testdata/") {
+			return nil
+		}
+		if strings.Contains(pathname, "testing/") {
+			return nil
+		}
+		visit(pathname, newInterfaceVisitor(func(ifc interfaces.Interface) {
+			found = append(found, &ifc)
+		}))
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("walk directory: %v", err)
+	}
+
+	return found, nil
 }
