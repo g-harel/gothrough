@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+const (
+	substringPenaltyScale = 3
+)
+
 type Match struct {
 	ID         int
 	Confidence float64
@@ -31,7 +35,7 @@ func (idx *Index) Index(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {
-			adjustmentFactor := math.Pow(float64(i)/float64(len(str)), 2)
+			adjustmentFactor := math.Pow(float64(i)/float64(len(str)), 3)
 			adjustedConfidence := float64(confidence) * adjustmentFactor
 			for _, substr := range Substrings(str, i) {
 				if len(idx.Matches[substr]) == 0 {
@@ -52,7 +56,7 @@ func (idx *Index) Search(query string) []Match {
 	confidences := map[int]float64{}
 	for _, subQuery := range strings.Fields(query) {
 		for i := 1; i <= len(subQuery); i++ {
-			adjustmentFactor := float64(i) / math.Pow(float64(len(subQuery)), 2)
+			adjustmentFactor := float64(i) / math.Pow(float64(len(subQuery)), substringPenaltyScale)
 			for _, substr := range Substrings(subQuery, i) {
 				for _, m := range idx.Matches[substr] {
 					if _, ok := confidences[m.ID]; !ok {

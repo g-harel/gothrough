@@ -2,6 +2,7 @@ package parse
 
 import (
 	"bytes"
+	"fmt"
 	"go/ast"
 	"go/format"
 	"go/token"
@@ -74,6 +75,11 @@ func NewInterfaceVisitor(handler func(interfaces.Interface)) Visitor {
 									if identType, ok := method.Type.(*ast.Ident); ok {
 										// TODO docs?
 										embedded = append(embedded, identType.Name)
+										continue
+									}
+									if selectorExprType, ok := method.Type.(*ast.SelectorExpr); ok {
+										embedded = append(embedded, fmt.Sprintf("%v.%v", selectorExprType.X, selectorExprType.Sel))
+										continue
 									}
 
 									arguments := []interfaces.Field{}

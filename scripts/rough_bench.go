@@ -72,8 +72,8 @@ func main() {
 	fmt.Printf("Queried in %s\n", time.Since(searchStart))
 	fmt.Println("========")
 
-	for _, result := range results[:16] {
-		fmt.Printf("=== %.6f ===\n", result.Confidence)
+	for _, result := range results[:8] {
+		fmt.Printf("\n// === %.6f === %v\n", result.Confidence, result.Interface.DocLink())
 		println(result.Interface.Pretty())
 	}
 }

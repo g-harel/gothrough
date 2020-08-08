@@ -85,7 +85,14 @@ func (si *Index) Include(srcDir string) error {
 			si.index.Index(id, totalEmbeddedNameVal/len(ifc.Embedded), ifc.Embedded...)
 			embeddedNameTokens := []string{}
 			for _, embedded := range ifc.Embedded {
-				embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded)...)
+				parts := strings.Split(embedded, ".")
+				if len(parts) > 1 {
+					packageNameParts := strings.Split(parts[0], "_")
+					embeddedNameTokens = append(embeddedNameTokens, packageNameParts...)
+					embeddedNameTokens = append(embeddedNameTokens, camel.Split(parts[1])...)
+				} else {
+					embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded)...)
+				}
 			}
 			if len(embeddedNameTokens) > 1 {
 				si.index.Index(id, totalEmbeddedNameTokenVal/len(embeddedNameTokens), embeddedNameTokens...)
