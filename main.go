@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/g-harel/gis/internal/interface_index"
+	"github.com/g-harel/gis/pages"
 )
 
 // http://localhost:3000/?query=io%20reader
@@ -30,8 +31,10 @@ func main() {
 		panic(err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.URL.String())
+	http.HandleFunc("/", pages.Home())
+
+	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL.String())
 
 		query, ok := r.URL.Query()["query"]
 		if !ok || len(query) != 1 {
@@ -50,7 +53,8 @@ func main() {
 			results = results[:16]
 		}
 		for _, result := range results {
-			fmt.Fprintf(w, "%4.3f %s\n", result.Confidence, result.Interface.String())
+			fmt.Fprintf(w, "\n// === %.6f === %v\n", result.Confidence, result.Interface.DocLink())
+			fmt.Fprintln(w, result.Interface.Pretty())
 		}
 	})
 
