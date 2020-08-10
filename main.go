@@ -10,7 +10,6 @@ import (
 	"github.com/g-harel/gis/pages"
 )
 
-// http://localhost:3000/?query=io%20reader
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -34,21 +33,29 @@ func main() {
 	http.HandleFunc("/", pages.Home())
 
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.URL.String())
+		headerResponse := func(statusCode int) {
+			w.WriteHeader(statusCode)
+			fmt.Fprintf(w, "%d %s", statusCode, http.StatusText(statusCode))
+		}
 
-		query, ok := r.URL.Query()["query"]
-		if !ok || len(query) != 1 {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintf(w, "%d %s", http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
+		err := r.ParseForm()
+		if err != nil {
+			headerResponse(http.StatusBadRequest)
 			return
 		}
 
-		results, err := idx.Search(query[0])
+		query := r.Form.Get("query")
+		if query == "" {
+			headerResponse(http.StatusBadRequest)
+			return
+		}
+
+		results, err := idx.Search(query)
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Fprintf(w, "%s\n========\n", query[0])
+		fmt.Fprintf(w, "%s\n========\n", query)
 		if len(results) > 16 {
 			results = results[:16]
 		}
