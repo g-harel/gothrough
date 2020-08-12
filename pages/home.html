@@ -1,14 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+<!--
+type Context struct {}
+-->
+
+{{- define "title" -}}
+    gis
+{{- end -}}
+
+{{- define "description" -}}
+    gis
+{{- end -}}
+
+{{- define "style" -}}
+{{- end -}}
+
+{{- define "body" -}}
     <form action="/test" method="POST" enctype="application/x-www-form-urlencoded">
         <input type="text" name="query" value=""/>
         <input type="submit" value="search" />
     </form>
-</body>
-</html>
+{{- end -}}

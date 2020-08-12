@@ -7,5 +7,5 @@ import (
 )
 
 func Home() http.HandlerFunc {
-	return templates.NewRenderer(nil, "pages/home.html").Handler
+	return templates.NewRenderer(nil, "pages/_layout.html", "pages/home.html").Handler
 }
