@@ -55,14 +55,17 @@ func main() {
 			panic(err)
 		}
 
-		fmt.Fprintf(w, "%s\n========\n", query)
+		prettyResults := []string{}
 		if len(results) > 16 {
 			results = results[:16]
 		}
 		for _, result := range results {
-			fmt.Fprintf(w, "\n// === %.6f === %v\n", result.Confidence, result.Interface.DocLink())
-			fmt.Fprintln(w, result.Interface.Pretty())
+			prettyResult := fmt.Sprintf("\n// === %.6f === %v\n", result.Confidence, result.Interface.DocLink())
+			prettyResult += result.Interface.Pretty()
+			prettyResults = append(prettyResults, prettyResult)
 		}
+
+		pages.Results(query, prettyResults)(w, r)
 	})
 
 	log.Printf("accepting connections at :%v", port)

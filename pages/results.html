@@ -1,0 +1,24 @@
+<!--
+type Context struct {
+    Query   string
+    Results []string
+}
+-->
+
+{{- define "title" -}}
+    gis
+{{- end -}}
+
+{{- define "description" -}}
+    gis
+{{- end -}}
+
+{{- define "style" -}}
+{{- end -}}
+
+{{- define "body" -}}
+    <h3>{{- .Query -}}</h3>
+    {{- range $i, $summary := .Results -}}
+        <pre>{{- $summary -}}</pre>
+    {{- end -}}
+{{- end -}}
