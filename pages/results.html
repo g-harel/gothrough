@@ -1,24 +1,46 @@
 <!--
 type Context struct {
     Query   string
-    Results []string
+    Results []struct {
+        Name              string
+        PackageName       string
+        Pretty            string
+    }
 }
 -->
 
 {{- define "title" -}}
-    gis
+    {{- .Query -}}
 {{- end -}}
 
 {{- define "description" -}}
     gis
 {{- end -}}
 
-{{- define "style" -}}
+{{- define "head" -}}
+    <style>
+        .result {
+            margin: 1rem 0;
+        }
+
+        .result pre {
+            -moz-tab-size: 4;
+            tab-size: 4;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/languages/go.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github-gist.min.css" />
+    <script>hljs.initHighlightingOnLoad();</script>
 {{- end -}}
 
 {{- define "body" -}}
-    <h3>{{- .Query -}}</h3>
-    {{- range $i, $summary := .Results -}}
-        <pre>{{- $summary -}}</pre>
+    <h1>{{- .Query -}}</h1>
+    {{- range $i, $result := .Results -}}
+        <div class="result">
+            <h2>{{- $result.PackageName -}}.{{- $result.Name -}}</h2>
+            <pre><code class="lang-go">{{- $result.Pretty -}}</code></pre>
+        </div>
     {{- end -}}
 {{- end -}}

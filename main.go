@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/g-harel/gis/internal/interface_index"
+	"github.com/g-harel/gis/internal/interfaces"
 	"github.com/g-harel/gis/pages"
 )
 
@@ -55,17 +56,15 @@ func main() {
 			panic(err)
 		}
 
-		prettyResults := []string{}
+		interfaceResults := []interfaces.Interface{}
 		if len(results) > 16 {
 			results = results[:16]
 		}
 		for _, result := range results {
-			prettyResult := fmt.Sprintf("\n// === %.6f === %v\n", result.Confidence, result.Interface.DocLink())
-			prettyResult += result.Interface.Pretty()
-			prettyResults = append(prettyResults, prettyResult)
+			interfaceResults = append(interfaceResults, *result.Interface)
 		}
 
-		pages.Results(query, prettyResults)(w, r)
+		pages.Results(query, interfaceResults)(w, r)
 	})
 
 	log.Printf("accepting connections at :%v", port)
