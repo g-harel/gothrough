@@ -12,9 +12,9 @@ func Home() http.HandlerFunc {
 }
 
 type ResultsResult struct {
-	Name        string
-	PackageName string
-	Pretty      string
+	Name         string
+	PackageName  string
+	PrettyTokens []interfaces.Token
 }
 
 func Results(query string, interfaces []interfaces.Interface) http.HandlerFunc {
@@ -27,9 +27,9 @@ func Results(query string, interfaces []interfaces.Interface) http.HandlerFunc {
 	}
 	for _, ifc := range interfaces {
 		context.Results = append(context.Results, ResultsResult{
-			Name:        ifc.Name,
-			PackageName: ifc.PackageName,
-			Pretty:      ifc.Pretty(),
+			Name:         ifc.Name,
+			PackageName:  ifc.PackageName,
+			PrettyTokens: ifc.PrettyTokens(),
 		})
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler

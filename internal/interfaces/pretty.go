@@ -118,6 +118,7 @@ func (i *Interface) Pretty() string {
 	return output
 }
 
+// TODO break lines that are longer than 80.
 func prettyDocsLine(name, docs string) string {
 	if docs == "" {
 		return ""
