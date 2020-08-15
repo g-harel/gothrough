@@ -1,7 +1,6 @@
 package interfaces
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -31,11 +30,13 @@ type Token struct {
 func (i *Interface) PrettyTokens() []Token {
 	tokens := []Token{}
 
-	prettyInterfaceDocs := prettyDocsLine(i.Name, i.Docs)
-	if prettyInterfaceDocs != "" {
-		tokens = append(tokens,
-			Token{prettyInterfaceDocs, kindComment},
-			tokenNewline)
+	interfaceDocs := prettyDocs(i.Name, i.Docs, 80)
+	if len(interfaceDocs) > 0 {
+		for _, line := range interfaceDocs {
+			tokens = append(tokens,
+				Token{line, kindComment},
+				tokenNewline)
+		}
 	}
 
 	tokens = append(tokens,
@@ -65,12 +66,14 @@ func (i *Interface) PrettyTokens() []Token {
 	}
 
 	for _, method := range i.Methods {
-		prettyMethodDocs := prettyDocsLine(method.Name, method.Docs)
-		if prettyMethodDocs != "" {
-			tokens = append(tokens,
-				tokenIndent,
-				Token{prettyMethodDocs, kindComment},
-				tokenNewline)
+		methodDocs := prettyDocs(method.Name, method.Docs, 76)
+		if len(methodDocs) > 0 {
+			for _, line := range methodDocs {
+				tokens = append(tokens,
+					tokenIndent,
+					Token{line, kindComment},
+					tokenNewline)
+			}
 		}
 
 		tokens = append(tokens,
@@ -118,31 +121,55 @@ func (i *Interface) Pretty() string {
 	return output
 }
 
-// TODO break lines that are longer than 80.
-func prettyDocsLine(name, docs string) string {
+// TODO break lines that are longer than max length.
+func prettyDocs(name, docs string, maxLength int) []string {
 	if docs == "" {
-		return ""
+		return []string{}
+	}
+
+	if maxLength <= 3 {
+		return []string{}
 	}
 
 	docLines := strings.Split(docs, "\n")
 	if len(docLines) < 1 {
-		return ""
+		return []string{}
 	}
 
-	// Return first line if it ends with a period.
-	// This would better capture doc lines that include periods than the next block.
+	// Find contents of the docs that should be kept.
+	finalDocs := ""
 	if strings.HasSuffix(docLines[0], ".") {
-		return fmt.Sprintf("// %v", docLines[0])
-	}
-
-	// Return first sentence if it starts with identifier.
-	if strings.HasPrefix(docLines[0], name) {
+		// Use first line if it ends with a period.
+		// This would better capture doc lines that include periods vs. the next block.
+		finalDocs = docLines[0]
+	} else if strings.HasPrefix(docLines[0], name) {
+		// Use entire first sentence if docs start with target name.
 		allDocs := strings.Join(docLines, " ")
-		firstSentence := strings.Split(allDocs, ".")[0]
-		return fmt.Sprintf("// %v.", firstSentence)
+		finalDocs = strings.Split(allDocs, ".")[0] + "."
+	} else {
+		return []string{}
 	}
 
-	return ""
+	// Break docs into lines along whitespace.
+	actualMaxLength := maxLength - 3
+	words := strings.Fields(finalDocs)
+	lines := []string{""}
+	for _, word := range words {
+		lastLineIndex := len(lines) - 1
+		if len(lines[lastLineIndex])+len(word)+1 < actualMaxLength {
+			// If word fits, add it to the last line.
+			lines[lastLineIndex] += " " + word
+		} else {
+			// If doesn't fit, add it to a new line.
+			lines = append(lines, " "+word)
+		}
+	}
+
+	for i, line := range lines {
+		lines[i] = "//" + line
+	}
+
+	return lines
 }
 
 func tokenizeFieldList(fields []Field) []Token {
