@@ -27,10 +27,10 @@ type Token struct {
 	Kind string
 }
 
-func (i *Interface) PrettyTokens() []Token {
+func (ifc *Interface) PrettyTokens() []Token {
 	tokens := []Token{}
 
-	interfaceDocs := prettyDocs(i.Name, i.Docs, 80)
+	interfaceDocs := prettyDocs(ifc.Docs)
 	if len(interfaceDocs) > 0 {
 		for _, line := range interfaceDocs {
 			tokens = append(tokens,
@@ -42,13 +42,13 @@ func (i *Interface) PrettyTokens() []Token {
 	tokens = append(tokens,
 		Token{"type", kindKeyword},
 		tokenSpace,
-		Token{i.Name, kindInterfaceName},
+		Token{ifc.Name, kindInterfaceName},
 		tokenSpace,
 		Token{"interface", kindKeyword},
 		tokenSpace,
 		Token{"{", kindPunctuation})
 
-	if len(i.Embedded) == 0 && len(i.Methods) == 0 {
+	if len(ifc.Embedded) == 0 && len(ifc.Methods) == 0 {
 		tokens = append(tokens,
 			Token{"}", kindPunctuation},
 			tokenNewline)
@@ -58,15 +58,25 @@ func (i *Interface) PrettyTokens() []Token {
 	tokens = append(tokens,
 		tokenNewline)
 
-	for _, embedded := range i.Embedded {
+	for _, embedded := range ifc.Embedded {
+		// TODO add space if they could have docs.
 		tokens = append(tokens,
 			tokenIndent,
 			Token{embedded, kindEmbeddedName},
 			tokenNewline)
 	}
 
-	for _, method := range i.Methods {
-		methodDocs := prettyDocs(method.Name, method.Docs, 76)
+	for i, method := range ifc.Methods {
+		// Add newline before definition in some situations.
+		prevWasEmbedded := i == 0 && len(ifc.Embedded) > 0
+		prevHadDocs := i > 0 && ifc.Methods[i-1].Docs != "" // TODO update if embedded can have docs.
+		selfIsNotFirstAndHasDocs := (i != 0 || prevWasEmbedded) && method.Docs != ""
+		if prevHadDocs || selfIsNotFirstAndHasDocs {
+			tokens = append(tokens,
+				tokenNewline)
+		}
+
+		methodDocs := prettyDocs(method.Docs)
 		if len(methodDocs) > 0 {
 			for _, line := range methodDocs {
 				tokens = append(tokens,
@@ -121,55 +131,20 @@ func (i *Interface) Pretty() string {
 	return output
 }
 
-// TODO break lines that are longer than max length.
-func prettyDocs(name, docs string, maxLength int) []string {
+func prettyDocs(docs string) []string {
 	if docs == "" {
 		return []string{}
 	}
 
-	if maxLength <= 3 {
-		return []string{}
-	}
-
-	docLines := strings.Split(docs, "\n")
+	docLines := strings.Split(strings.TrimSpace(docs), "\n")
 	if len(docLines) < 1 {
 		return []string{}
 	}
 
-	// Find contents of the docs that should be kept.
-	finalDocs := ""
-	if strings.HasSuffix(docLines[0], ".") {
-		// Use first line if it ends with a period.
-		// This would better capture doc lines that include periods vs. the next block.
-		finalDocs = docLines[0]
-	} else if strings.HasPrefix(docLines[0], name) {
-		// Use entire first sentence if docs start with target name.
-		allDocs := strings.Join(docLines, " ")
-		finalDocs = strings.Split(allDocs, ".")[0] + "."
-	} else {
-		return []string{}
+	for i, line := range docLines {
+		docLines[i] = "// " + line
 	}
-
-	// Break docs into lines along whitespace.
-	actualMaxLength := maxLength - 3
-	words := strings.Fields(finalDocs)
-	lines := []string{""}
-	for _, word := range words {
-		lastLineIndex := len(lines) - 1
-		if len(lines[lastLineIndex])+len(word)+1 < actualMaxLength {
-			// If word fits, add it to the last line.
-			lines[lastLineIndex] += " " + word
-		} else {
-			// If doesn't fit, add it to a new line.
-			lines = append(lines, " "+word)
-		}
-	}
-
-	for i, line := range lines {
-		lines[i] = "//" + line
-	}
-
-	return lines
+	return docLines
 }
 
 func tokenizeFieldList(fields []Field) []Token {
