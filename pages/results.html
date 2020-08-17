@@ -61,7 +61,11 @@ Fronted-only kinds:
 {{- end -}}
 
 {{- define "body" -}}
-    <h1>{{- .Query -}}</h1>
+    <form action="/search" method="GET" enctype="application/x-www-form-urlencoded">
+        <input type="text" name="q" value="{{- .Query -}}"/>
+        <input type="submit" value="search" />
+    </form>
+    <hr>
     {{- range $i, $result := .Results -}}
         <div class="result">
             <h2>{{- $result.PackageName -}}.{{- $result.Name -}}</h2>

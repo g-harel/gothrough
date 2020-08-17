@@ -14,8 +14,8 @@ type Context struct {}
 {{- end -}}
 
 {{- define "body" -}}
-    <form action="/test" method="POST" enctype="application/x-www-form-urlencoded">
-        <input type="text" name="query" value=""/>
+    <form action="/search" method="GET" enctype="application/x-www-form-urlencoded">
+        <input type="text" name="q" value=""/>
         <input type="submit" value="search" />
     </form>
 {{- end -}}

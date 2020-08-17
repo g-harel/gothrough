@@ -33,7 +33,7 @@ func main() {
 
 	http.HandleFunc("/", pages.Home())
 
-	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
 		headerResponse := func(statusCode int) {
 			w.WriteHeader(statusCode)
 			fmt.Fprintf(w, "%d %s", statusCode, http.StatusText(statusCode))
@@ -45,7 +45,7 @@ func main() {
 			return
 		}
 
-		query := r.Form.Get("query")
+		query := r.Form.Get("q")
 		if query == "" {
 			headerResponse(http.StatusBadRequest)
 			return
