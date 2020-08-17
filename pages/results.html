@@ -4,6 +4,7 @@ type Context struct {
     Results []struct {
         Name              string
         PackageName       string
+        PackageImportPath string
         PrettyTokens      []struct {
             Text string
             Kind string
@@ -21,6 +22,8 @@ Token kinds:
 - punctuation
 - field_type
 - whitespace
+Fronted-only kinds:
+- literal
 -->
 
 {{- define "title" -}}
@@ -39,16 +42,20 @@ Token kinds:
 
         code {
             color: #24292e;
+            display: block;
             line-height: 1.3;
             tab-size: 4; -moz-tab-size: 4;
             white-space: pre-wrap;
+            padding: 1em;
+            border: 1px solid #eee;
+            border-radius: 0.2em;
+            margin: 1em 0;
         }
 
         code .comment {color: #6a737d;}
-        code .embedded_name {color: #032f62;}
-        code .field_type {color: #6f42c1;}
+        code .embedded_name, code .literal {color: #032f62;}
+        code .field_type, code .interface_name {color: #6f42c1;}
         code .keyword {color: #d73a49;}
-        code .interface_name {color: #6f42c1;}
         code .method_name {color: #005cc5;}
     </style>
 {{- end -}}
@@ -58,6 +65,11 @@ Token kinds:
     {{- range $i, $result := .Results -}}
         <div class="result">
             <h2>{{- $result.PackageName -}}.{{- $result.Name -}}</h2>
+            <code><!--
+             --><span class="keyword">import</span><!--
+             --><span class="whitespace"> </span><!--
+             --><span class="literal">"{{- .PackageImportPath -}}"</span><!--
+         --></code>
             <code>
                 {{- range $_, $token := .PrettyTokens -}}
                     <span class="{{- $token.Kind -}}">{{- $token.Text -}}</span>
