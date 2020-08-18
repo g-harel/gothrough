@@ -60,11 +60,11 @@ Fronted-only kinds:
     </style>
 {{- end -}}
 
+{{- define "query" -}}
+    {{- .Query -}}
+{{- end -}}
+
 {{- define "body" -}}
-    <form action="/search" method="GET" enctype="application/x-www-form-urlencoded">
-        <input type="text" name="q" value="{{- .Query -}}"/>
-        <input type="submit" value="search" />
-    </form>
     <hr>
     {{- range $i, $result := .Results -}}
         <div class="result">

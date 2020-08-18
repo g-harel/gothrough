@@ -70,6 +70,10 @@
 <body style="opacity: 0;" onload="document.body.style.opacity = 1;">
     <header>
         <a href="/" aria-label="home">gis</a>
+        <form action="/search" method="GET" enctype="application/x-www-form-urlencoded">
+            <input type="text" name="q" value="{{- template "query" . -}}"/>
+            <input type="submit" value="search" />
+        </form>
     </header>
     <main>
         {{- template "body" . -}}
