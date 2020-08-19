@@ -147,9 +147,6 @@ func FindInterfaces(srcDir string) ([]*interfaces.Interface, error) {
 		if strings.Contains(pathname, "testdata/") {
 			return nil
 		}
-		if strings.Contains(pathname, "testing/") {
-			return nil
-		}
 		visit(pathname, newInterfaceVisitor(func(ifc interfaces.Interface) {
 			found = append(found, &ifc)
 		}))
