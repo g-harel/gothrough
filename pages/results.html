@@ -37,19 +37,28 @@ Fronted-only kinds:
 {{- define "head" -}}
     <style>
         .result {
-            margin: 1rem 0;
+            margin: 4rem 0;
+        }
+
+        .result .full-name {
+            font-weight: 600;
+        }
+
+        .result .full-name a {
+            color: #005cc5;
         }
 
         code {
+            border-radius: 0.2em;
+            border: 1px solid #eee;
             color: #24292e;
             display: block;
-            line-height: 1.3;
+            font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', 'Courier', 'monospace';
+            line-height: 1.5;
+            margin: 1em 0;
+            padding: 1em;
             tab-size: 4; -moz-tab-size: 4;
             white-space: pre-wrap;
-            padding: 1em;
-            border: 1px solid #eee;
-            border-radius: 0.2em;
-            margin: 1em 0;
         }
 
         code .comment {color: #6a737d;}
@@ -68,11 +77,16 @@ Fronted-only kinds:
     <hr>
     {{- range $i, $result := .Results -}}
         <div class="result">
-            <h2>{{- $result.PackageName -}}.{{- $result.Name -}}</h2>
+            <h2 class="full-name">
+                {{- $result.PackageName -}}.<!--
+             --><a href="https://godoc.org/{{- $result.PackageImportPath -}}#{{- $result.Name -}}">
+                    {{- $result.Name -}}
+                </a>
+            </h2>
             <code><!--
              --><span class="keyword">import</span><!--
              --><span class="whitespace"> </span><!--
-             --><span class="literal">"{{- .PackageImportPath -}}"</span><!--
+             --><span class="literal">"{{- $result.PackageImportPath -}}"</span><!--
          --></code>
             <code>
                 {{- range $_, $token := .PrettyTokens -}}
