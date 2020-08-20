@@ -37,7 +37,7 @@ Fronted-only kinds:
 {{- define "head" -}}
     <style>
         .result {
-            margin: 4rem 0;
+            margin: 0 0 4rem;
         }
 
         .result .full-name {
@@ -74,7 +74,6 @@ Fronted-only kinds:
 {{- end -}}
 
 {{- define "body" -}}
-    <hr>
     {{- range $i, $result := .Results -}}
         <div class="result">
             <h2 class="full-name">

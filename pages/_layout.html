@@ -40,15 +40,58 @@
     <!-- Layout styling. -->
     <style>
         header {
-            margin: 2.5rem 0 2.5rem;
-            text-align: center;
-            user-select: none;
-            -moz-user-select: -moz-none;
+            align-items: baseline;
+            display: flex;
+            flex-direction: row;
+            margin: 3rem 0 2rem;
+        }
+
+        header * {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        header h1 {
+            color: #005cc5;
+            margin-right: 2rem;
+            user-select: none; -moz-user-select: -moz-none;
+        }
+
+        header form {
+            align-items: stretch;
+            border-radius: 0.2em;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: row;
+            flex-grow: 1;
+        }
+
+        header form input {
+            font-family: inherit;
+        }
+
+        header form input[type="text"] {
+            border: none;
+            color: #032f62;
+            flex-grow: 1;
+            padding: 0.7rem 1rem;
+            z-index: 1;
+        }
+
+        header form input[type="text"]::placeholder {
+            color: #6a737d;
+        }
+
+        header form input[type="submit"] {
+            background-color: #eee;
+            border: none;
+            color: #005cc5;
+            cursor: pointer;
+            padding: 0 3rem;
         }
 
         main {
             flex-grow: 1;
-            margin: 0 1rem;
         }
 
         footer {
@@ -63,8 +106,7 @@
             font-weight: 600;
             margin: 0 0.5rem;
             padding: 0.5rem;
-            user-select: none;
-            -moz-user-select: -moz-none;
+            user-select: none; -moz-user-select: -moz-none;
         }
     </style>
 
@@ -72,10 +114,12 @@
 </head>
 <body style="opacity: 0;" onload="document.body.style.opacity = 1;">
     <header>
-        <a href="/" aria-label="home">gis</a>
+        <h1>
+            <a href="/" aria-label="home">gis</a>
+        </h1>
         <form action="/search" method="GET" enctype="application/x-www-form-urlencoded">
-            <input type="text" name="q" value="{{- template "query" . -}}"/>
-            <input type="submit" value="search" />
+            <input type="text" name="q" value="{{- template "query" . -}}" placeholder="search" />
+            <input type="submit" value="Go!" />
         </form>
     </header>
     <main>
