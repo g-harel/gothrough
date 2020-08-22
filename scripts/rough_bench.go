@@ -7,8 +7,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/g-harel/gis/internal/interface_index"
-	"github.com/g-harel/gis/internal/parse"
+	"github.com/g-harel/gothrough/internal/interface_index"
+	"github.com/g-harel/gothrough/internal/parse"
 )
 
 func main() {
@@ -80,7 +80,7 @@ func main() {
 	fmt.Println("========")
 
 	for _, result := range results[:8] {
-		fmt.Printf("\n// === %.6f === %v\n", result.Confidence, result.Interface.DocLink())
+		fmt.Printf("\n// === %.6f ===\n", result.Confidence)
 		println(result.Interface.Pretty())
 	}
 }

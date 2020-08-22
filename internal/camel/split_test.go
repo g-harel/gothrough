@@ -3,7 +3,7 @@ package camel_test
 import (
 	"testing"
 
-	"github.com/g-harel/gis/internal/camel"
+	"github.com/g-harel/gothrough/internal/camel"
 )
 
 func TestSplit(t *testing.T) {

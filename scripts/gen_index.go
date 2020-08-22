@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/g-harel/gis/internal/interface_index"
-	"github.com/g-harel/gis/internal/parse"
+	"github.com/g-harel/gothrough/internal/interface_index"
+	"github.com/g-harel/gothrough/internal/parse"
 )
 
 var dest = flag.String("dest", ".index", "output filename")

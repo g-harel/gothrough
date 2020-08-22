@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>gis - {{  template "title" . -}}</title>
+    <title>gothrough - {{  template "title" . -}}</title>
     <meta name="description" content="{{- template "description" . -}}">
 
     <!-- Global styles. -->
@@ -40,10 +40,10 @@
     <!-- Layout styling. -->
     <style>
         header {
-            align-items: baseline;
+            align-items: center;
             background-image: linear-gradient(#fff 70%, transparent);
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             padding: 3rem 0 4rem;
             position: sticky;
             top: 0;
@@ -57,8 +57,8 @@
 
         header h1 {
             color: #005cc5;
-            margin-right: 2rem;
             user-select: none; -moz-user-select: -moz-none;
+            margin: 0 0 2rem;
         }
 
         header form {
@@ -67,14 +67,14 @@
             border: 1px solid #eee;
             display: flex;
             flex-direction: row;
-            flex-grow: 1;
+            max-width: 40rem;
         }
 
         header form input {
             font-family: inherit;
         }
 
-        header form input[type="text"] {
+        header form input {
             border: none;
             color: #032f62;
             flex-grow: 1;
@@ -82,16 +82,20 @@
             z-index: 1;
         }
 
-        header form input[type="text"]::placeholder {
+        header form input::placeholder {
             color: #6a737d;
         }
 
-        header form input[type="submit"] {
+        header form button {
             background-color: #eee;
             border: none;
             color: #005cc5;
             cursor: pointer;
             padding: 0 3rem;
+        }
+
+        header form button:hover {
+            color: #032f62;
         }
 
         main {
@@ -119,11 +123,13 @@
 <body style="opacity: 0;" onload="document.body.style.opacity = 1;">
     <header>
         <h1>
-            <a href="/" aria-label="home">gis</a>
+            <a href="/" aria-label="home">GoThrough</a>
         </h1>
         <form action="/search" method="GET" enctype="application/x-www-form-urlencoded">
             <input type="text" name="q" value="{{- template "query" . -}}" placeholder="search" />
-            <input type="submit" value="Go!" />
+            <button type="submit">
+                <svg width="1rem" aria-hidden="true" focusable="false" data-icon="search" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z" class=""></path></svg>
+            </button>
         </form>
     </header>
     <main>
@@ -131,7 +137,7 @@
     </main>
     <footer>
         <a class="link" href="/">home</a>
-        <a class="link" href="https://github.com/g-harel/gis">source</a>
+        <a class="link" href="https://github.com/g-harel/gothrough">source</a>
         <a class="link" href="mailto:gabrielj.harel@gmail.com">contact</a>
     </footer>
 </body>

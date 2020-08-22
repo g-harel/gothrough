@@ -4,8 +4,8 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/g-harel/gis/internal/interfaces"
-	"github.com/g-harel/gis/internal/string_index"
+	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/string_index"
 )
 
 type encodableSearchIndex struct {

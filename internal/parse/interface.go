@@ -12,7 +12,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/g-harel/gis/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/interfaces"
 )
 
 // TODO make more utils and move somewhere else.

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/g-harel/gis/internal/interface_index"
-	"github.com/g-harel/gis/internal/interfaces"
-	"github.com/g-harel/gis/pages"
+	"github.com/g-harel/gothrough/internal/interface_index"
+	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/pages"
 )
 
 func main() {

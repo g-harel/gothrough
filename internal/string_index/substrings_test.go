@@ -3,7 +3,7 @@ package string_index_test
 import (
 	"testing"
 
-	"github.com/g-harel/gis/internal/string_index"
+	"github.com/g-harel/gothrough/internal/string_index"
 )
 
 func TestSubstring(t *testing.T) {

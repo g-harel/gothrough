@@ -3,8 +3,8 @@ package pages
 import (
 	"net/http"
 
-	"github.com/g-harel/gis/internal/interfaces"
-	"github.com/g-harel/gis/internal/templates"
+	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/templates"
 )
 
 func Home() http.HandlerFunc {

@@ -3,9 +3,9 @@ package interface_index
 import (
 	"strings"
 
-	"github.com/g-harel/gis/internal/camel"
-	"github.com/g-harel/gis/internal/interfaces"
-	"github.com/g-harel/gis/internal/string_index"
+	"github.com/g-harel/gothrough/internal/camel"
+	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/string_index"
 )
 
 // Confidence values for interface info items.
