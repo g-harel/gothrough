@@ -1,4 +1,4 @@
-package interfaces
+package types
 
 type Field struct {
 	Name string

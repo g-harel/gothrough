@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/g-harel/gothrough/internal/interface_index"
-	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/types"
 	"github.com/g-harel/gothrough/pages"
 )
 
@@ -56,7 +56,7 @@ func main() {
 			panic(err)
 		}
 
-		interfaceResults := []interfaces.Interface{}
+		interfaceResults := []types.Interface{}
 		if len(results) > 16 {
 			results = results[:16]
 		}

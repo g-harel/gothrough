@@ -3,8 +3,8 @@ package pages
 import (
 	"net/http"
 
-	"github.com/g-harel/gothrough/internal/interfaces"
 	"github.com/g-harel/gothrough/internal/templates"
+	"github.com/g-harel/gothrough/internal/types"
 )
 
 func Home() http.HandlerFunc {
@@ -15,10 +15,10 @@ type ResultsResult struct {
 	Name              string
 	PackageName       string
 	PackageImportPath string
-	PrettyTokens      []interfaces.Token
+	PrettyTokens      []types.Token
 }
 
-func Results(query string, interfaces []interfaces.Interface) http.HandlerFunc {
+func Results(query string, interfaces []types.Interface) http.HandlerFunc {
 	context := struct {
 		Query   string
 		Results []ResultsResult

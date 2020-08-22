@@ -4,13 +4,13 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/types"
 	"github.com/g-harel/gothrough/internal/string_index"
 )
 
 type encodableSearchIndex struct {
 	Index      *string_index.Index
-	Interfaces []*interfaces.Interface
+	Interfaces []*types.Interface
 }
 
 func (si *Index) ToBytes(w io.Writer) error {

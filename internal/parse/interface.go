@@ -12,7 +12,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/types"
 )
 
 // TODO make more utils and move somewhere else.
@@ -23,12 +23,12 @@ func pretty(node interface{}) string {
 	return buf.String()
 }
 
-func collectFields(fieldList *ast.FieldList) []interfaces.Field {
-	result := []interfaces.Field{}
+func collectFields(fieldList *ast.FieldList) []types.Field {
+	result := []types.Field{}
 	if fieldList != nil {
 		for _, field := range fieldList.List {
 			if len(field.Names) == 0 {
-				result = append(result, interfaces.Field{
+				result = append(result, types.Field{
 					Name: "",
 					Docs: field.Doc.Text(),
 					Type: pretty(field.Type),
@@ -36,7 +36,7 @@ func collectFields(fieldList *ast.FieldList) []interfaces.Field {
 				continue
 			}
 			for _, fieldNames := range field.Names {
-				result = append(result, interfaces.Field{
+				result = append(result, types.Field{
 					Name: fieldNames.Name,
 					Docs: field.Doc.Text(),
 					Type: pretty(field.Type),
@@ -48,7 +48,7 @@ func collectFields(fieldList *ast.FieldList) []interfaces.Field {
 }
 
 // newInterfaceVisitor creates a visitor that collects interfaces into the target array.
-func newInterfaceVisitor(handler func(interfaces.Interface)) visitFunc {
+func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
@@ -71,7 +71,7 @@ func newInterfaceVisitor(handler func(interfaces.Interface)) visitFunc {
 								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
 
 								// Collect methods.
-								methods := []interfaces.Method{}
+								methods := []types.Method{}
 								embedded := []string{}
 								for _, method := range interfaceType.Methods.List {
 									if identType, ok := method.Type.(*ast.Ident); ok {
@@ -84,15 +84,15 @@ func newInterfaceVisitor(handler func(interfaces.Interface)) visitFunc {
 										continue
 									}
 
-									arguments := []interfaces.Field{}
-									returnValues := []interfaces.Field{}
+									arguments := []types.Field{}
+									returnValues := []types.Field{}
 									if methodType, ok := method.Type.(*ast.FuncType); ok {
 										arguments = collectFields(methodType.Params)
 										returnValues = collectFields(methodType.Results)
 									}
 									for _, methodName := range method.Names {
 										if methodName.IsExported() {
-											methods = append(methods, interfaces.Method{
+											methods = append(methods, types.Method{
 												Name:         methodName.String(),
 												Docs:         method.Doc.Text(),
 												Arguments:    arguments,
@@ -102,7 +102,7 @@ func newInterfaceVisitor(handler func(interfaces.Interface)) visitFunc {
 									}
 								}
 
-								handler(interfaces.Interface{
+								handler(types.Interface{
 									Name:              name,
 									Docs:              typeDeclaration.Doc.Text(),
 									Embedded:          embedded,
@@ -124,8 +124,8 @@ func newInterfaceVisitor(handler func(interfaces.Interface)) visitFunc {
 }
 
 // FindInterfaces adds interfaces in the provided src directory to the index.
-func FindInterfaces(srcDir string) ([]*interfaces.Interface, error) {
-	found := []*interfaces.Interface{}
+func FindInterfaces(srcDir string) ([]*types.Interface, error) {
+	found := []*types.Interface{}
 
 	// Collect all interfaces in the provided directory.
 	err := filepath.Walk(srcDir, func(pathname string, info os.FileInfo, err error) error {
@@ -147,7 +147,7 @@ func FindInterfaces(srcDir string) ([]*interfaces.Interface, error) {
 		if strings.Contains(pathname, "testdata/") {
 			return nil
 		}
-		visit(pathname, newInterfaceVisitor(func(ifc interfaces.Interface) {
+		visit(pathname, newInterfaceVisitor(func(ifc types.Interface) {
 			found = append(found, &ifc)
 		}))
 		return nil

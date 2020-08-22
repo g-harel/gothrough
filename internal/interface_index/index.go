@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/g-harel/gothrough/internal/camel"
-	"github.com/g-harel/gothrough/internal/interfaces"
+	"github.com/g-harel/gothrough/internal/types"
 	"github.com/g-harel/gothrough/internal/string_index"
 )
 
@@ -24,18 +24,18 @@ const (
 
 type Index struct {
 	index      *string_index.Index
-	interfaces []*interfaces.Interface
+	interfaces []*types.Interface
 }
 
 type Result struct {
-	Interface  *interfaces.Interface
+	Interface  *types.Interface
 	Confidence float64
 }
 
 func NewIndex() *Index {
 	return &Index{
 		index:      string_index.NewIndex(),
-		interfaces: []*interfaces.Interface{},
+		interfaces: []*types.Interface{},
 	}
 }
 
@@ -58,7 +58,7 @@ func (si *Index) Search(query string) ([]*Result, error) {
 	return results, nil
 }
 
-func (si *Index) Insert(ifc interfaces.Interface) {
+func (si *Index) Insert(ifc types.Interface) {
 	si.interfaces = append(si.interfaces, &ifc)
 	id := len(si.interfaces) - 1
 
