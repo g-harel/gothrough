@@ -1,11 +1,12 @@
 package interface_index
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/g-harel/gothrough/internal/camel"
-	"github.com/g-harel/gothrough/internal/types"
 	"github.com/g-harel/gothrough/internal/string_index"
+	"github.com/g-harel/gothrough/internal/types"
 )
 
 // Confidence values for interface info items.
@@ -23,8 +24,9 @@ const (
 )
 
 type Index struct {
-	index      *string_index.Index
-	interfaces []*types.Interface
+	index             *string_index.Index
+	interfaces        []*types.Interface
+	computed_packages *[]string
 }
 
 type Result struct {
@@ -109,4 +111,25 @@ func (si *Index) Insert(ifc types.Interface) {
 			si.index.Insert(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)
 		}
 	}
+}
+
+func (si *Index) Packages() []string {
+	if si.computed_packages != nil {
+		return *si.computed_packages
+	}
+
+	seen := map[string]bool{}
+	packages := []string{}
+	for _, ifc := range si.interfaces {
+		if !seen[ifc.PackageImportPath] {
+			packages = append(packages, ifc.PackageImportPath)
+			seen[ifc.PackageImportPath] = true
+		}
+	}
+
+	sort.Strings(packages)
+	// TODO copute host nesting here, once.
+
+	si.computed_packages = &packages
+	return packages
 }

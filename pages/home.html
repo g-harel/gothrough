@@ -1,5 +1,8 @@
 <!--
-type Context struct {}
+type Context struct {
+    GoPackages []string
+    Packages   []string
+}
 -->
 
 {{- define "title" -}}
@@ -11,12 +14,36 @@ type Context struct {}
 {{- end -}}
 
 {{- define "head" -}}
+    <style>
+        .package-group {
+            columns: 4 16rem;
+            margin-top: 3rem;
+        }
+
+        .package {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: keep-all;
+            width: 100%;
+        }
+    </style>
 {{- end -}}
 
 {{- define "query" -}}
 {{- end -}}
 
 {{- define "body" -}}
-    TODO
-    - list of all packages being searched
+    {{- range $_, $packageGroup := .Packages -}}
+        <div class="package-group">
+            {{- range $_, $package := $packageGroup -}}
+                <span class="package">
+                    <a href="https://godoc.org/{{- $package -}}">
+                        {{- $package -}}
+                    </a>
+                </span>
+            {{- end -}}
+        </div>
+    {{- end -}}
 {{- end -}}

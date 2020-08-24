@@ -4,8 +4,8 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/g-harel/gothrough/internal/types"
 	"github.com/g-harel/gothrough/internal/string_index"
+	"github.com/g-harel/gothrough/internal/types"
 )
 
 type encodableSearchIndex struct {

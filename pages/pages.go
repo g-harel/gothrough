@@ -7,8 +7,13 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func Home() http.HandlerFunc {
-	return templates.NewRenderer(nil, "pages/_layout.html", "pages/home.html").Handler
+func Home(packages [][]string) http.HandlerFunc {
+	context := struct {
+		Packages [][]string
+	}{
+		Packages: packages,
+	}
+	return templates.NewRenderer(context, "pages/_layout.html", "pages/home.html").Handler
 }
 
 type ResultsResult struct {
