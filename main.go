@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sort"
-	"strings"
 
 	"github.com/g-harel/gothrough/internal/interface_index"
 	"github.com/g-harel/gothrough/internal/types"
@@ -34,33 +32,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		goPackages := []string{}
-		byHosts := map[string][]string{}
-
-		for _, packageImportPath := range idx.Packages() {
-			firstSection := strings.Split(packageImportPath, "/")[0]
-			if !strings.Contains(firstSection, ".") {
-				goPackages = append(goPackages, packageImportPath)
-				continue
-			}
-			if _, ok := byHosts[firstSection]; !ok {
-				byHosts[firstSection] = []string{}
-			}
-			byHosts[firstSection] = append(byHosts[firstSection], packageImportPath)
-		}
-
-		hosts := []string{}
-		for host := range byHosts {
-			hosts = append(hosts, host)
-		}
-		sort.Strings(hosts)
-
-		packages := [][]string{goPackages}
-		for _, host := range hosts {
-			packages = append(packages, byHosts[host])
-		}
-
-		pages.Home(packages)(w, r)
+		pages.Home(idx.Packages())(w, r)
 	})
 
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
@@ -86,6 +58,7 @@ func main() {
 			panic(err)
 		}
 
+		// TODO show confidence?
 		interfaceResults := []types.Interface{}
 		if len(results) > 16 {
 			results = results[:16]

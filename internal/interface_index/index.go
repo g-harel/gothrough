@@ -26,7 +26,7 @@ const (
 type Index struct {
 	index             *string_index.Index
 	interfaces        []*types.Interface
-	computed_packages *[]string
+	computed_packages *[][]string
 }
 
 type Result struct {
@@ -113,22 +113,50 @@ func (si *Index) Insert(ifc types.Interface) {
 	}
 }
 
-func (si *Index) Packages() []string {
+func (si *Index) Packages() [][]string {
 	if si.computed_packages != nil {
 		return *si.computed_packages
 	}
 
-	seen := map[string]bool{}
-	packages := []string{}
+	// Collect list of unique packages, separating the standard library vs. hosted ones.
+	seenPackages := map[string]bool{}
+	stdPackages := []string{}
+	hostedPackages := map[string][]string{}
 	for _, ifc := range si.interfaces {
-		if !seen[ifc.PackageImportPath] {
-			packages = append(packages, ifc.PackageImportPath)
-			seen[ifc.PackageImportPath] = true
+		if seenPackages[ifc.PackageImportPath] {
+			continue
 		}
+		seenPackages[ifc.PackageImportPath] = true
+
+		firstSection := strings.Split(ifc.PackageImportPath, "/")[0]
+		if !strings.Contains(firstSection, ".") {
+			stdPackages = append(stdPackages, ifc.PackageImportPath)
+			continue
+		}
+		if _, ok := hostedPackages[firstSection]; !ok {
+			hostedPackages[firstSection] = []string{}
+		}
+		hostedPackages[firstSection] = append(hostedPackages[firstSection], ifc.PackageImportPath)
 	}
 
-	sort.Strings(packages)
-	// TODO copute host nesting here, once.
+	// Create sorted list of hosts.
+	hosts := []string{}
+	for host := range hostedPackages {
+		hosts = append(hosts, host)
+	}
+	sort.Strings(hosts)
+
+	// Created nested array of packages grouped by host and in sorted host order.
+	// Standard library packages are added to the front.
+	packages := [][]string{stdPackages}
+	for _, host := range hosts {
+		packages = append(packages, hostedPackages[host])
+	}
+
+	// Sort packages within each host's list.
+	for i := range packages {
+		sort.Strings(packages[i])
+	}
 
 	si.computed_packages = &packages
 	return packages
