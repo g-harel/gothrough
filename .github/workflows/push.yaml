@@ -1,0 +1,31 @@
+on: push
+name: deploy
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+
+      # Setup.
+    - uses: actions/checkout@master
+
+      # Run tests. Failure will abort deployment.
+      # TODO fix scripts to allow tests.
+    # - name: go test
+    #   uses: cedrickring/golang-action@1.6.0
+
+      # Setup gcloud command.
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+          version: '307.0.0'
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+
+      # Build new deployable image.
+    - run: gcloud builds submit --tag gcr.io/gothrough/website
+      env:
+        CLOUDSDK_CORE_PROJECT: gothrough
+
+      # Deploy new image.
+    - run: gcloud --quiet run deploy --image gcr.io/gothrough/website --allow-unauthenticated --region=us-central1 --timeout=8s website --platform=managed
+      env:
+        CLOUDSDK_CORE_PROJECT: gothrough
