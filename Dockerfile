@@ -13,7 +13,7 @@ RUN go build -o website .
 # TODO install extra packages
 
 # Build index.
-RUN go run ./scripts/gen_index.go -dest=".interface_index" "$GOPATH" "$GOROOT"
+RUN go run ./scripts/gen_index.go -dest=".interface_index" "$GOPATH"
 
 #
 
@@ -30,7 +30,7 @@ COPY --from=build /gothrough/website .
 COPY --from=build /gothrough/.interface_index .
 
 # Copy static files from project source.
-COPY templates templates
+COPY pages pages
 
 ENV INDEX=.interface_index
 CMD ./website

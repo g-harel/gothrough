@@ -129,6 +129,9 @@ func FindInterfaces(srcDir string) ([]*types.Interface, error) {
 
 	// Collect all interfaces in the provided directory.
 	err := filepath.Walk(srcDir, func(pathname string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() {
 			return nil
 		}
