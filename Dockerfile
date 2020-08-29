@@ -1,4 +1,4 @@
-FROM golang:1.15 AS build
+FROM golang:1.15-alpine AS build
 
 WORKDIR /gothrough
 
@@ -10,7 +10,7 @@ RUN go build -o website .
 # TODO install extra packages
 
 # Build index.
-RUN go run ./scripts/gen_index.go -dest=".interface_index" "$GOPATH"
+RUN go run ./scripts/gen_index.go -dest=".interface_index" "$GOPATH" "/usr/local/go"
 
 #
 
