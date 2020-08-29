@@ -1,7 +1,4 @@
-FROM golang:1.15-alpine AS build
-
-# Required to fetch go modules.
-RUN apk add git
+FROM golang:1.15 AS build
 
 WORKDIR /gothrough
 
