@@ -77,7 +77,6 @@ Fronted-only kinds:
 {{- define "body" -}}
     {{- range $i, $result := .Results -}}
         <div class="result">
-            <!-- TODO sticky title -->
             <h2 class="full-name">
                 {{- $result.PackageName -}}.<!--
              --><a href="https://godoc.org/{{- $result.PackageImportPath -}}#{{- $result.Name -}}">
