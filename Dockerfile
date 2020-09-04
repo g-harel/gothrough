@@ -14,7 +14,7 @@ COPY . .
 RUN go build -o website .
 
 # Build index.
-RUN go run ./scripts/gen_index.go -dest=".interface_index" "$GOPATH" "/usr/local/go"
+RUN go run ./scripts/index/main.go -dest=".interface_index" "$GOPATH" "/usr/local/go"
 
 #
 
