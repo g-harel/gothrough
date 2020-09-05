@@ -72,29 +72,35 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 
 								// Collect methods.
 								methods := []types.Method{}
-								embedded := []string{}
-								for _, method := range interfaceType.Methods.List {
-									if identType, ok := method.Type.(*ast.Ident); ok {
-										// TODO docs?
-										embedded = append(embedded, identType.Name)
+								embedded := []types.Embedded{}
+								for _, member := range interfaceType.Methods.List {
+									if identType, ok := member.Type.(*ast.Ident); ok {
+										embedded = append(embedded, types.Embedded{
+											Docs: member.Doc.Text(),
+											Name: identType.Name,
+										})
 										continue
 									}
-									if selectorExprType, ok := method.Type.(*ast.SelectorExpr); ok {
-										embedded = append(embedded, fmt.Sprintf("%v.%v", selectorExprType.X, selectorExprType.Sel))
+									if selectorExprType, ok := member.Type.(*ast.SelectorExpr); ok {
+										embedded = append(embedded, types.Embedded{
+											Package: fmt.Sprintf("%v", selectorExprType.X),
+											Name:    selectorExprType.Sel.String(),
+											Docs:    member.Doc.Text(),
+										})
 										continue
 									}
 
 									arguments := []types.Field{}
 									returnValues := []types.Field{}
-									if methodType, ok := method.Type.(*ast.FuncType); ok {
+									if methodType, ok := member.Type.(*ast.FuncType); ok {
 										arguments = collectFields(methodType.Params)
 										returnValues = collectFields(methodType.Results)
 									}
-									for _, methodName := range method.Names {
+									for _, methodName := range member.Names {
 										if methodName.IsExported() {
 											methods = append(methods, types.Method{
 												Name:         methodName.String(),
-												Docs:         method.Doc.Text(),
+												Docs:         member.Doc.Text(),
 												Arguments:    arguments,
 												ReturnValues: returnValues,
 											})

@@ -53,6 +53,8 @@ func (idx *Index) Search(query string) []Match {
 	query = strings.ToLower(query)
 
 	// Sum confidences from matches.
+	// TODO order by average confidence per sub-query to allow increase in specificity.
+	// go run ./scripts/bench/main.go "image reader writer"
 	confidences := map[int]float64{}
 	for _, subQuery := range strings.Fields(query) {
 		for i := 1; i <= len(subQuery); i++ {

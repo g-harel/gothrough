@@ -81,17 +81,15 @@ func (si *Index) Insert(ifc types.Interface) {
 
 	// Index on embedded interfaces.
 	if len(ifc.Embedded) > 0 {
-		si.index.Insert(id, totalEmbeddedNameVal/len(ifc.Embedded), ifc.Embedded...)
+		for _, embedded := range ifc.Embedded {
+			si.index.Insert(id, totalEmbeddedNameVal/len(ifc.Embedded), embedded.Name)
+		}
 		embeddedNameTokens := []string{}
 		for _, embedded := range ifc.Embedded {
-			parts := strings.Split(embedded, ".")
-			if len(parts) > 1 {
-				packageNameParts := strings.Split(parts[0], "_")
-				embeddedNameTokens = append(embeddedNameTokens, packageNameParts...)
-				embeddedNameTokens = append(embeddedNameTokens, camel.Split(parts[1])...)
-			} else {
-				embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded)...)
+			if embedded.Package != "" {
+				embeddedNameTokens = append(embeddedNameTokens, embedded.Package)
 			}
+			embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded.Name)...)
 		}
 		if len(embeddedNameTokens) > 1 {
 			si.index.Insert(id, totalEmbeddedNameTokenVal/len(embeddedNameTokens), embeddedNameTokens...)

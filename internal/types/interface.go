@@ -13,11 +13,17 @@ type Method struct {
 	ReturnValues []Field
 }
 
+type Embedded struct {
+	Package string
+	Name    string
+	Docs    string
+}
+
 // Interface contains data about the location and shape of an interface.
 type Interface struct {
 	Name              string
 	Docs              string
-	Embedded          []string
+	Embedded          []Embedded
 	Methods           []Method
 	PackageName       string
 	PackageImportPath string

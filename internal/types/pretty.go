@@ -5,15 +5,16 @@ import (
 )
 
 const (
-	kindComment       = "comment"
-	kindEmbeddedName  = "embedded_name"
-	kindFieldName     = "field_name"
-	kindInterfaceName = "interface_name"
-	kindKeyword       = "keyword"
-	kindMethodName    = "method_name"
-	kindPunctuation   = "punctuation"
-	kindFieldType     = "field_type"
-	kindWhitespace    = "whitespace"
+	kindComment         = "comment"
+	kindEmbeddedName    = "embedded_name"
+	kindEmbeddedPackage = "embedded_package"
+	kindFieldName       = "field_name"
+	kindInterfaceName   = "interface_name"
+	kindKeyword         = "keyword"
+	kindMethodName      = "method_name"
+	kindPunctuation     = "punctuation"
+	kindFieldType       = "field_type"
+	kindWhitespace      = "whitespace"
 )
 
 var (
@@ -58,20 +59,44 @@ func (ifc *Interface) PrettyTokens() []Token {
 	tokens = append(tokens,
 		tokenNewline)
 
-	for _, embedded := range ifc.Embedded {
-		// TODO add space if they could have docs.
+	for i, embedded := range ifc.Embedded {
+		// Add newline before definition in some situations.
+		prevHadDocs := i > 0 && ifc.Embedded[i-1].Docs != ""
+		isNotFirstAndHasDocs := i != 0 && embedded.Docs != ""
+		if prevHadDocs || isNotFirstAndHasDocs {
+			tokens = append(tokens,
+				tokenNewline)
+		}
+
+		embeddedDocs := prettyDocs(embedded.Docs)
+		if len(embeddedDocs) > 0 {
+			for _, line := range embeddedDocs {
+				tokens = append(tokens,
+					tokenIndent,
+					Token{line, kindComment},
+					tokenNewline)
+			}
+		}
+
 		tokens = append(tokens,
-			tokenIndent,
-			Token{embedded, kindEmbeddedName},
+			tokenIndent)
+		if embedded.Package != "" {
+			tokens = append(tokens,
+				Token{embedded.Package, kindEmbeddedPackage},
+				Token{".", kindPunctuation})
+		}
+		tokens = append(tokens,
+			Token{embedded.Name, kindEmbeddedName},
 			tokenNewline)
 	}
 
 	for i, method := range ifc.Methods {
 		// Add newline before definition in some situations.
 		prevWasEmbedded := i == 0 && len(ifc.Embedded) > 0
-		prevHadDocs := i > 0 && ifc.Methods[i-1].Docs != "" // TODO update if embedded can have docs.
-		selfIsNotFirstAndHasDocs := (i != 0 || prevWasEmbedded) && method.Docs != ""
-		if prevHadDocs || selfIsNotFirstAndHasDocs {
+		prevEmbeddedHadDocs := len(ifc.Embedded) > 0 && ifc.Embedded[len(ifc.Embedded)-1].Docs != ""
+		prevMethodHadDocs := i > 0 && ifc.Methods[i-1].Docs != ""
+		isNotFirstAndHasDocs := (i != 0 || prevWasEmbedded) && method.Docs != ""
+		if prevEmbeddedHadDocs || prevMethodHadDocs || isNotFirstAndHasDocs {
 			tokens = append(tokens,
 				tokenNewline)
 		}
