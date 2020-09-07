@@ -53,30 +53,79 @@ func (idx *Index) Search(query string) []Match {
 	query = strings.ToLower(query)
 
 	// Sum confidences from matches.
-	// TODO order by average confidence per sub-query to allow increase in specificity.
-	// go run ./scripts/bench/main.go "image reader writer"
-	confidences := map[int]float64{}
-	for _, subQuery := range strings.Fields(query) {
-		for i := 1; i <= len(subQuery); i++ {
-			adjustmentFactor := float64(i) / math.Pow(float64(len(subQuery)), substringPenaltyScale)
-			for _, substr := range Substrings(subQuery, i) {
+	// confidences[sub_query_index][result_id] -> confidence
+	perSubQueryConfidences := map[int]map[int]float64{}
+	maxPerSubQueryConfidence := 0.0
+	for subQueryID, subQuery := range strings.Fields(query) {
+		perSubQueryConfidences[subQueryID] = map[int]float64{}
+		for j := 1; j <= len(subQuery); j++ {
+			adjustmentFactor := float64(j) / math.Pow(float64(len(subQuery)), substringPenaltyScale)
+			for _, substr := range Substrings(subQuery, j) {
 				for _, m := range idx.Matches[substr] {
-					if _, ok := confidences[m.ID]; !ok {
-						confidences[m.ID] = 0
+					if _, ok := perSubQueryConfidences[subQueryID][m.ID]; !ok {
+						perSubQueryConfidences[subQueryID][m.ID] = 0
 					}
-					confidences[m.ID] += m.Confidence * adjustmentFactor
+					perSubQueryConfidences[subQueryID][m.ID] += m.Confidence * adjustmentFactor
+					maxPerSubQueryConfidence = math.Max(
+						maxPerSubQueryConfidence,
+						perSubQueryConfidences[subQueryID][m.ID],
+					)
 				}
 			}
 		}
 	}
 
-	// Collect matched IDs (no duplicates).
+	// Combine together confidences of multiple sub-queries.
+	combinedConfidences := map[int]float64{}
+	for subQueryID := range perSubQueryConfidences {
+		for id := range perSubQueryConfidences[subQueryID] {
+			// Combine only when first seen.
+			if _, ok := combinedConfidences[id]; ok {
+				continue
+			}
+
+			// Collect confidence values of each sub-query, or 0 if no match.
+			adjustedConfidenceValues := []float64{}
+			for i := range perSubQueryConfidences {
+				confidence, ok := perSubQueryConfidences[i][id]
+				if ok {
+					adjustedConfidence := confidence / maxPerSubQueryConfidence
+					adjustedConfidenceValues = append(adjustedConfidenceValues, adjustedConfidence)
+				} else {
+					adjustedConfidenceValues = append(adjustedConfidenceValues, 0.0)
+				}
+			}
+
+			// Calculate confidence total and variance.
+			adjustedConfidenceCount := float64(len(adjustedConfidenceValues))
+			adjustedConfidenceTotal := 0.0
+			for _, confidence := range adjustedConfidenceValues {
+				adjustedConfidenceTotal += confidence
+			}
+			adjustedConfidenceMean := adjustedConfidenceTotal / adjustedConfidenceCount
+			adjustedConfidenceVariance := 0.0
+			for _, confidence := range adjustedConfidenceValues {
+				adjustedConfidenceVariance += math.Pow(confidence-adjustedConfidenceMean, 2) / adjustedConfidenceCount
+			}
+
+			// Combine confidences, rewarding results that have both a large sum
+			// and low standard deviation. Adjusted confidence values are <= 1.
+			combinedConfidences[id] = adjustedConfidenceTotal * (1 - math.Sqrt(adjustedConfidenceVariance))
+		}
+	}
+
+	// Flatten confidence map and scale values to [0, 1] range.
 	results := []Match{}
-	for id := range confidences {
+	maxConfidence := 0.0
+	for id := range combinedConfidences {
+		maxConfidence = math.Max(maxConfidence, combinedConfidences[id])
 		results = append(results, Match{
 			ID:         id,
-			Confidence: confidences[id],
+			Confidence: combinedConfidences[id],
 		})
+	}
+	for i := range results {
+		results[i].Confidence = results[i].Confidence / maxConfidence
 	}
 
 	sort.Slice(results, func(i, j int) bool {

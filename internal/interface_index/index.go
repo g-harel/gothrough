@@ -48,12 +48,11 @@ func (si *Index) Search(query string) ([]*Result, error) {
 		return []*Result{}, nil
 	}
 
-	maxConfidence := searchResult[0].Confidence
 	results := make([]*Result, len(searchResult))
 	for i, result := range searchResult {
 		results[i] = &Result{
 			Interface:  si.interfaces[result.ID],
-			Confidence: result.Confidence / maxConfidence,
+			Confidence: result.Confidence,
 		}
 	}
 
