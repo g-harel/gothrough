@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/g-harel/gothrough/internal/interface_index"
 	"github.com/g-harel/gothrough/internal/parse"
+	"github.com/g-harel/gothrough/internal/source_index"
 )
 
 var dest = flag.String("dest", ".index", "output filename")
@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// Create index.
-	idx := interface_index.NewIndex()
+	idx := source_index.NewIndex()
 	for _, dir := range flag.Args() {
 		interfaces, err := parse.FindInterfaces(path.Join(dir, "src"))
 		if err != nil {

@@ -1,4 +1,4 @@
-package interface_index
+package source_index
 
 import (
 	"encoding/gob"

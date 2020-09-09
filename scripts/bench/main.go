@@ -7,8 +7,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/g-harel/gothrough/internal/interface_index"
 	"github.com/g-harel/gothrough/internal/parse"
+	"github.com/g-harel/gothrough/internal/source_index"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	fmt.Println("========")
 
 	indexTime := time.Now()
-	idx := interface_index.NewIndex()
+	idx := source_index.NewIndex()
 	rootInterfaces, err := parse.FindInterfaces(root)
 	if err != nil {
 		panic(err)
@@ -53,7 +53,7 @@ func main() {
 	fmt.Printf("Encoded in %s\n", time.Since(encodeTime))
 
 	decodeTime := time.Now()
-	idx, err = interface_index.NewIndexFromBytes(&buf)
+	idx, err = source_index.NewIndexFromBytes(&buf)
 	if err != nil {
 		panic(err)
 	}

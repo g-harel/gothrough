@@ -14,7 +14,7 @@ COPY . .
 RUN go build -o website .
 
 # Build index.
-RUN go run ./scripts/index/main.go -dest=".interface_index" "$GOPATH" "/usr/local/go"
+RUN go run ./scripts/index/main.go -dest=".source_index" "$GOPATH" "/usr/local/go"
 
 #
 
@@ -25,9 +25,9 @@ WORKDIR /gothrough
 # Copy server binary from first stage.
 COPY --from=build /gothrough/website .
 # Copy index from first stage.
-COPY --from=build /gothrough/.interface_index .
+COPY --from=build /gothrough/.source_index .
 # Copy static files from project source.
 COPY pages pages
 
-ENV INDEX=.interface_index
+ENV INDEX=.source_index
 CMD ./website
