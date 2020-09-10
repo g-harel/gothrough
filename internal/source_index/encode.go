@@ -9,13 +9,13 @@ import (
 )
 
 type encodableSearchIndex struct {
-	Index      *string_index.Index
+	TextIndex  *string_index.Index
 	Interfaces []*types.Interface
 }
 
 func (si *Index) ToBytes(w io.Writer) error {
 	esi := encodableSearchIndex{
-		Index:      si.index,
+		TextIndex:  si.textIndex,
 		Interfaces: si.interfaces,
 	}
 
@@ -38,7 +38,7 @@ func NewIndexFromBytes(r io.Reader) (*Index, error) {
 	}
 
 	si := &Index{
-		index:      esi.Index,
+		textIndex: esi.TextIndex,
 		interfaces: esi.Interfaces,
 	}
 

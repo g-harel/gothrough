@@ -33,14 +33,14 @@ func main() {
 		panic(err)
 	}
 	for _, ifc := range rootInterfaces {
-		idx.Insert(*ifc)
+		idx.InsertInterface(*ifc)
 	}
 	pathInterfaces, err := parse.FindInterfaces(path)
 	if err != nil {
 		panic(err)
 	}
 	for _, ifc := range pathInterfaces {
-		idx.Insert(*ifc)
+		idx.InsertInterface(*ifc)
 	}
 	fmt.Printf("Indexed in %s\n", time.Since(indexTime))
 

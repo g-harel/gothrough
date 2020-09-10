@@ -31,6 +31,7 @@ func main() {
 	}
 
 	// Create index.
+	// TODO index constants.
 	idx := source_index.NewIndex()
 	for _, dir := range flag.Args() {
 		interfaces, err := parse.FindInterfaces(path.Join(dir, "src"))
@@ -39,7 +40,7 @@ func main() {
 		}
 
 		for _, ifc := range interfaces {
-			idx.Insert(*ifc)
+			idx.InsertInterface(*ifc)
 		}
 	}
 
@@ -50,7 +51,7 @@ func main() {
 	}
 	defer f.Close()
 
-	// Write index to ouput file.
+	// Write index to output file.
 	err = idx.ToBytes(f)
 	if err != nil {
 		fatalErr(err)

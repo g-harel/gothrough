@@ -4,27 +4,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/g-harel/gothrough/internal/camel"
 	"github.com/g-harel/gothrough/internal/string_index"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// Confidence values for interface info items.
-const (
-	perfectMatchVal            = 120
-	interfaceNameVal           = 120
-	totalInterfaceNameTokenVal = 120
-	packageNameVal             = 120
-	sourceFileVal              = 10
-	totalImportPathPartVal     = 20
-	totalEmbeddedNameVal       = 80
-	totalEmbeddedNameTokenVal  = 80
-	totalMethodNameVal         = 80
-	totalMethodNameTokenVal    = 80
-)
-
 type Index struct {
-	index             *string_index.Index
+	textIndex         *string_index.Index
 	interfaces        []*types.Interface
 	computed_packages *[][]string
 }
@@ -36,14 +21,14 @@ type Result struct {
 
 func NewIndex() *Index {
 	return &Index{
-		index:      string_index.NewIndex(),
+		textIndex:  string_index.NewIndex(),
 		interfaces: []*types.Interface{},
 	}
 }
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (si *Index) Search(query string) ([]*Result, error) {
-	searchResult := si.index.Search(query)
+	searchResult := si.textIndex.Search(query)
 	if len(searchResult) == 0 {
 		return []*Result{}, nil
 	}
@@ -59,57 +44,6 @@ func (si *Index) Search(query string) ([]*Result, error) {
 	return results, nil
 }
 
-func (si *Index) Insert(ifc types.Interface) {
-	si.interfaces = append(si.interfaces, &ifc)
-	id := len(si.interfaces) - 1
-
-	// Index on interface name.
-	si.index.Insert(id, interfaceNameVal, ifc.Name)
-	nameTokens := camel.Split(ifc.Name)
-	if len(nameTokens) > 1 {
-		si.index.Insert(id, totalInterfaceNameTokenVal/len(nameTokens), nameTokens...)
-	}
-
-	// Index on package path and source file.
-	importPathParts := strings.Split(ifc.PackageImportPath, "/")
-	si.index.Insert(id, packageNameVal, ifc.PackageName)
-	si.index.Insert(id, sourceFileVal, strings.TrimSuffix(ifc.SourceFile, ".go"))
-	if len(importPathParts) > 1 {
-		si.index.Insert(id, totalImportPathPartVal/len(importPathParts), importPathParts...)
-	}
-
-	// Index on embedded interfaces.
-	if len(ifc.Embedded) > 0 {
-		for _, embedded := range ifc.Embedded {
-			si.index.Insert(id, totalEmbeddedNameVal/len(ifc.Embedded), embedded.Name)
-		}
-		embeddedNameTokens := []string{}
-		for _, embedded := range ifc.Embedded {
-			if embedded.Package != "" {
-				embeddedNameTokens = append(embeddedNameTokens, embedded.Package)
-			}
-			embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded.Name)...)
-		}
-		if len(embeddedNameTokens) > 1 {
-			si.index.Insert(id, totalEmbeddedNameTokenVal/len(embeddedNameTokens), embeddedNameTokens...)
-		}
-	}
-
-	// Index on interface methods.
-	if len(ifc.Methods) > 0 {
-		for _, method := range ifc.Methods {
-			si.index.Insert(id, totalMethodNameVal/len(ifc.Methods), method.Name)
-		}
-		methodNameTokens := []string{}
-		for _, method := range ifc.Methods {
-			methodNameTokens = append(methodNameTokens, camel.Split(method.Name)...)
-		}
-		if len(methodNameTokens) > 1 {
-			si.index.Insert(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)
-		}
-	}
-}
-
 func (si *Index) Packages() [][]string {
 	if si.computed_packages != nil {
 		return *si.computed_packages
@@ -119,21 +53,26 @@ func (si *Index) Packages() [][]string {
 	seenPackages := map[string]bool{}
 	stdPackages := []string{}
 	hostedPackages := map[string][]string{}
-	for _, ifc := range si.interfaces {
-		if seenPackages[ifc.PackageImportPath] {
-			continue
+	addPackage := func(packageName string) {
+		if seenPackages[packageName] {
+			return
 		}
-		seenPackages[ifc.PackageImportPath] = true
+		seenPackages[packageName] = true
 
-		firstSection := strings.Split(ifc.PackageImportPath, "/")[0]
-		if !strings.Contains(firstSection, ".") {
-			stdPackages = append(stdPackages, ifc.PackageImportPath)
-			continue
+		firstNamePart := strings.Split(packageName, "/")[0]
+		if !strings.Contains(firstNamePart, ".") {
+			stdPackages = append(stdPackages, packageName)
+			return
 		}
-		if _, ok := hostedPackages[firstSection]; !ok {
-			hostedPackages[firstSection] = []string{}
+		if _, ok := hostedPackages[firstNamePart]; !ok {
+			hostedPackages[firstNamePart] = []string{}
 		}
-		hostedPackages[firstSection] = append(hostedPackages[firstSection], ifc.PackageImportPath)
+		hostedPackages[firstNamePart] = append(hostedPackages[firstNamePart], packageName)
+	}
+
+	// Add interface package names.
+	for _, ifc := range si.interfaces {
+		addPackage(ifc.PackageImportPath)
 	}
 
 	// Create sorted list of hosts.
