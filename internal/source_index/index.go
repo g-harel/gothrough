@@ -1,3 +1,4 @@
+// TODO rename to type_index
 package source_index
 
 import (
@@ -15,8 +16,11 @@ type Index struct {
 }
 
 type Result struct {
-	Interface  *types.Interface
-	Confidence float64
+	Confidence        float64
+	Name              string
+	PackageName       string
+	PackageImportPath string
+	Value             types.Prettier
 }
 
 func NewIndex() *Index {
@@ -35,9 +39,13 @@ func (si *Index) Search(query string) ([]*Result, error) {
 
 	results := make([]*Result, len(searchResult))
 	for i, result := range searchResult {
+		ifc := si.interfaces[result.ID]
 		results[i] = &Result{
-			Interface:  si.interfaces[result.ID],
-			Confidence: result.Confidence,
+			Confidence:        result.Confidence,
+			Name:              ifc.Name,
+			PackageName:       ifc.PackageName,
+			PackageImportPath: ifc.PackageImportPath,
+			Value:             ifc,
 		}
 	}
 

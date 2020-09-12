@@ -81,6 +81,6 @@ func main() {
 
 	for _, result := range results[:8] {
 		fmt.Printf("\n// === %.6f ===\n", result.Confidence)
-		println(result.Interface.Pretty())
+		println(result.Value.Pretty())
 	}
 }

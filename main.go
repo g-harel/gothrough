@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/g-harel/gothrough/internal/source_index"
-	"github.com/g-harel/gothrough/internal/types"
 	"github.com/g-harel/gothrough/pages"
 )
 
@@ -58,16 +57,7 @@ func main() {
 			panic(err)
 		}
 
-		// TODO show confidence?
-		interfaceResults := []types.Interface{}
-		if len(results) > 16 {
-			results = results[:16]
-		}
-		for _, result := range results {
-			interfaceResults = append(interfaceResults, *result.Interface)
-		}
-
-		pages.Results(query, interfaceResults)(w, r)
+		pages.Results(query, results)(w, r)
 	})
 
 	log.Printf("accepting connections at :%v", port)

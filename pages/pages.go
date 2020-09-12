@@ -3,6 +3,7 @@ package pages
 import (
 	"net/http"
 
+	"github.com/g-harel/gothrough/internal/source_index"
 	"github.com/g-harel/gothrough/internal/templates"
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -23,7 +24,7 @@ type ResultsResult struct {
 	PrettyTokens      []types.Token
 }
 
-func Results(query string, interfaces []types.Interface) http.HandlerFunc {
+func Results(query string, results []*source_index.Result) http.HandlerFunc {
 	context := struct {
 		Query   string
 		Results []ResultsResult
@@ -31,12 +32,12 @@ func Results(query string, interfaces []types.Interface) http.HandlerFunc {
 		Query:   query,
 		Results: []ResultsResult{},
 	}
-	for _, ifc := range interfaces {
+	for _, result := range results {
 		context.Results = append(context.Results, ResultsResult{
-			Name:              ifc.Name,
-			PackageName:       ifc.PackageName,
-			PackageImportPath: ifc.PackageImportPath,
-			PrettyTokens:      ifc.PrettyTokens(),
+			Name:              result.Name,
+			PackageName:       result.PackageName,
+			PackageImportPath: result.PackageImportPath,
+			PrettyTokens:      result.Value.PrettyTokens(),
 		})
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler

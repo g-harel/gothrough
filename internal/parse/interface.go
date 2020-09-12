@@ -71,18 +71,18 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
 
 								// Collect methods.
-								methods := []types.Method{}
-								embedded := []types.Embedded{}
+								methods := []types.MethodSignature{}
+								embedded := []types.EmbeddedInterface{}
 								for _, member := range interfaceType.Methods.List {
 									if identType, ok := member.Type.(*ast.Ident); ok {
-										embedded = append(embedded, types.Embedded{
+										embedded = append(embedded, types.EmbeddedInterface{
 											Docs: member.Doc.Text(),
 											Name: identType.Name,
 										})
 										continue
 									}
 									if selectorExprType, ok := member.Type.(*ast.SelectorExpr); ok {
-										embedded = append(embedded, types.Embedded{
+										embedded = append(embedded, types.EmbeddedInterface{
 											Package: fmt.Sprintf("%v", selectorExprType.X),
 											Name:    selectorExprType.Sel.String(),
 											Docs:    member.Doc.Text(),
@@ -98,7 +98,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 									}
 									for _, methodName := range member.Names {
 										if methodName.IsExported() {
-											methods = append(methods, types.Method{
+											methods = append(methods, types.MethodSignature{
 												Name:         methodName.String(),
 												Docs:         member.Doc.Text(),
 												Arguments:    arguments,
