@@ -20,7 +20,7 @@ type Result struct {
 	Name              string
 	PackageName       string
 	PackageImportPath string
-	Value             types.Prettier
+	Value             types.Type
 }
 
 func NewIndex() *Index {

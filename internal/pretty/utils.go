@@ -1,14 +1,10 @@
-package types
+package pretty
 
-import "strings"
+import (
+	"strings"
 
-func flattenTokens(tokens []Token) string {
-	output := ""
-	for _, token := range tokens {
-		output += token.Text
-	}
-	return output
-}
+	"github.com/g-harel/gothrough/internal/types"
+)
 
 func prettyDocs(docs string) []string {
 	if docs == "" {
@@ -26,7 +22,7 @@ func prettyDocs(docs string) []string {
 	return docLines
 }
 
-func tokenizeFieldList(fields []Field) []Token {
+func tokenizeFieldList(fields []types.Field) []Token {
 	tokens := []Token{}
 	for i, field := range fields {
 		if i > 0 {

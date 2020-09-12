@@ -1,24 +1,8 @@
-package types
+package pretty
 
-// Interface contains data about the location and shape of an interface.
-type Interface struct {
-	Name              string
-	Docs              string
-	Embedded          []EmbeddedInterface
-	Methods           []MethodSignature
-	PackageName       string
-	PackageImportPath string
-	SourceFile        string
-	SourceLine        int
-}
+import "github.com/g-harel/gothrough/internal/types"
 
-var _ Prettier = &Interface{}
-
-func (ifc *Interface) Pretty() string {
-	return flattenTokens(ifc.PrettyTokens())
-}
-
-func (ifc *Interface) PrettyTokens() []Token {
+func prettyTokensInterface(ifc *types.Interface) []Token {
 	// TODO Create tokenlist type with helper methods.
 	tokens := []Token{}
 

@@ -1,4 +1,12 @@
-package types
+// TODO rename to format
+package pretty
+
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/g-harel/gothrough/internal/types"
+)
 
 const (
 	kindComment         = "comment"
@@ -24,8 +32,22 @@ type Token struct {
 	Kind string
 }
 
-// TODO make this a method that works on all types instead of attaching it.
-type Prettier interface {
-	PrettyTokens() []Token
-	Pretty() string
+func Pretty(value interface{}) (string, error) {
+	tokens, err := PrettyTokens(value)
+	if err != nil {
+		return "", err
+	}
+
+	output := ""
+	for _, token := range tokens {
+		output += token.Text
+	}
+	return output, nil
+}
+
+func PrettyTokens(value interface{}) ([]Token, error) {
+	if ifc, ok := value.(*types.Interface); ok {
+		return prettyTokensInterface(ifc), nil
+	}
+	return []Token{}, fmt.Errorf("No matching tokenizer: %v", reflect.TypeOf(value))
 }

@@ -1,11 +1,12 @@
 package pages
 
 import (
+	"log"
 	"net/http"
 
+	"github.com/g-harel/gothrough/internal/pretty"
 	"github.com/g-harel/gothrough/internal/source_index"
 	"github.com/g-harel/gothrough/internal/templates"
-	"github.com/g-harel/gothrough/internal/types"
 )
 
 func Home(packages [][]string) http.HandlerFunc {
@@ -21,7 +22,7 @@ type ResultsResult struct {
 	Name              string
 	PackageName       string
 	PackageImportPath string
-	PrettyTokens      []types.Token
+	PrettyTokens      []pretty.Token
 }
 
 func Results(query string, results []*source_index.Result) http.HandlerFunc {
@@ -33,11 +34,16 @@ func Results(query string, results []*source_index.Result) http.HandlerFunc {
 		Results: []ResultsResult{},
 	}
 	for _, result := range results {
+		tokens, err := pretty.PrettyTokens(result.Value)
+		if err != nil {
+			log.Printf("could not format: %v", err)
+			continue
+		}
 		context.Results = append(context.Results, ResultsResult{
 			Name:              result.Name,
 			PackageName:       result.PackageName,
 			PackageImportPath: result.PackageImportPath,
-			PrettyTokens:      result.Value.PrettyTokens(),
+			PrettyTokens:      tokens,
 		})
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler

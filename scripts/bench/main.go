@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/g-harel/gothrough/internal/parse"
+	"github.com/g-harel/gothrough/internal/pretty"
 	"github.com/g-harel/gothrough/internal/source_index"
 )
 
@@ -81,6 +82,10 @@ func main() {
 
 	for _, result := range results[:8] {
 		fmt.Printf("\n// === %.6f ===\n", result.Confidence)
-		println(result.Value.Pretty())
+		p, err := pretty.Pretty(result.Value)
+		if err != nil {
+			panic(err)
+		}
+		println(p)
 	}
 }
