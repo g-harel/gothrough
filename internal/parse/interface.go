@@ -30,7 +30,7 @@ func collectFields(fieldList *ast.FieldList) []types.Field {
 			if len(field.Names) == 0 {
 				result = append(result, types.Field{
 					Name: "",
-					Docs: field.Doc.Text(),
+					Docs: types.Docs{Text: field.Doc.Text()},
 					Type: pretty(field.Type),
 				})
 				continue
@@ -38,7 +38,7 @@ func collectFields(fieldList *ast.FieldList) []types.Field {
 			for _, fieldNames := range field.Names {
 				result = append(result, types.Field{
 					Name: fieldNames.Name,
-					Docs: field.Doc.Text(),
+					Docs: types.Docs{Text: field.Doc.Text()},
 					Type: pretty(field.Type),
 				})
 			}
@@ -76,7 +76,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 								for _, member := range interfaceType.Methods.List {
 									if identType, ok := member.Type.(*ast.Ident); ok {
 										embedded = append(embedded, types.EmbeddedInterface{
-											Docs: member.Doc.Text(),
+											Docs: types.Docs{Text: member.Doc.Text()},
 											Name: identType.Name,
 										})
 										continue
@@ -85,7 +85,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 										embedded = append(embedded, types.EmbeddedInterface{
 											Package: fmt.Sprintf("%v", selectorExprType.X),
 											Name:    selectorExprType.Sel.String(),
-											Docs:    member.Doc.Text(),
+											Docs:    types.Docs{Text: member.Doc.Text()},
 										})
 										continue
 									}
@@ -100,7 +100,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 										if methodName.IsExported() {
 											methods = append(methods, types.MethodSignature{
 												Name:         methodName.String(),
-												Docs:         member.Doc.Text(),
+												Docs:         types.Docs{Text: member.Doc.Text()},
 												Arguments:    arguments,
 												ReturnValues: returnValues,
 											})
@@ -110,7 +110,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 
 								handler(types.Interface{
 									Name:              name,
-									Docs:              typeDeclaration.Doc.Text(),
+									Docs:              types.Docs{Text: typeDeclaration.Doc.Text()},
 									Embedded:          embedded,
 									Methods:           methods,
 									PackageName:       path.Base(relativePath),

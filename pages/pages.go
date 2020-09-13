@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/g-harel/gothrough/internal/pretty"
+	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/source_index"
 	"github.com/g-harel/gothrough/internal/templates"
+	"github.com/g-harel/gothrough/internal/tokens"
 )
 
 func Home(packages [][]string) http.HandlerFunc {
@@ -22,7 +23,7 @@ type ResultsResult struct {
 	Name              string
 	PackageName       string
 	PackageImportPath string
-	PrettyTokens      []pretty.Token
+	PrettyTokens      []tokens.Token
 }
 
 func Results(query string, results []*source_index.Result) http.HandlerFunc {
@@ -34,7 +35,7 @@ func Results(query string, results []*source_index.Result) http.HandlerFunc {
 		Results: []ResultsResult{},
 	}
 	for _, result := range results {
-		tokens, err := pretty.PrettyTokens(result.Value)
+		snippet, err := format.Format(result.Value)
 		if err != nil {
 			log.Printf("could not format: %v", err)
 			continue
@@ -43,7 +44,7 @@ func Results(query string, results []*source_index.Result) http.HandlerFunc {
 			Name:              result.Name,
 			PackageName:       result.PackageName,
 			PackageImportPath: result.PackageImportPath,
-			PrettyTokens:      tokens,
+			PrettyTokens:      snippet.Dump(),
 		})
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler
