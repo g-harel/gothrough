@@ -8,15 +8,20 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// Register types that could be hidden behind "types.Type".
+func init() {
+	gob.Register(&types.Interface{})
+}
+
 type encodableSearchIndex struct {
-	TextIndex  *string_index.Index
-	Interfaces []*types.Interface
+	TextIndex *string_index.Index
+	Results   []*Result
 }
 
 func (si *Index) ToBytes(w io.Writer) error {
 	esi := encodableSearchIndex{
-		TextIndex:  si.textIndex,
-		Interfaces: si.interfaces,
+		TextIndex: si.textIndex,
+		Results:   si.results,
 	}
 
 	enc := gob.NewEncoder(w)
@@ -39,7 +44,7 @@ func NewIndexFromBytes(r io.Reader) (*Index, error) {
 
 	si := &Index{
 		textIndex: esi.TextIndex,
-		interfaces: esi.Interfaces,
+		results:   esi.Results,
 	}
 
 	return si, nil

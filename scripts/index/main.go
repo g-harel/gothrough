@@ -18,7 +18,7 @@ func usageErr() {
 }
 
 func fatalErr(err error) {
-	fmt.Fprintf(os.Stderr, "fatal: %s", err)
+	fmt.Fprintf(os.Stderr, "fatal: %s\n", err)
 	os.Exit(1)
 }
 

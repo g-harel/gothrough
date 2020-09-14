@@ -9,12 +9,6 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-type Index struct {
-	textIndex         *string_index.Index
-	interfaces        []*types.Interface
-	computed_packages *[][]string
-}
-
 type Result struct {
 	Confidence        float64
 	Name              string
@@ -23,30 +17,31 @@ type Result struct {
 	Value             types.Type
 }
 
+type Index struct {
+	textIndex         *string_index.Index
+	results           []*Result
+	computed_packages *[][]string
+}
+
 func NewIndex() *Index {
 	return &Index{
-		textIndex:  string_index.NewIndex(),
-		interfaces: []*types.Interface{},
+		textIndex: string_index.NewIndex(),
+		results:   []*Result{},
 	}
 }
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (si *Index) Search(query string) ([]*Result, error) {
-	searchResult := si.textIndex.Search(query)
-	if len(searchResult) == 0 {
+	matches := si.textIndex.Search(query)
+	if len(matches) == 0 {
 		return []*Result{}, nil
 	}
 
-	results := make([]*Result, len(searchResult))
-	for i, result := range searchResult {
-		ifc := si.interfaces[result.ID]
-		results[i] = &Result{
-			Confidence:        result.Confidence,
-			Name:              ifc.Name,
-			PackageName:       ifc.PackageName,
-			PackageImportPath: ifc.PackageImportPath,
-			Value:             ifc,
-		}
+	results := make([]*Result, len(matches))
+	for i, match := range matches {
+		result := si.results[match.ID]
+		result.Confidence = match.Confidence
+		results[i] = result
 	}
 
 	return results, nil
@@ -61,26 +56,25 @@ func (si *Index) Packages() [][]string {
 	seenPackages := map[string]bool{}
 	stdPackages := []string{}
 	hostedPackages := map[string][]string{}
-	addPackage := func(packageName string) {
+
+	// Add package names.
+	for _, result := range si.results {
+		packageName := result.PackageImportPath
+
 		if seenPackages[packageName] {
-			return
+			continue
 		}
 		seenPackages[packageName] = true
 
 		firstNamePart := strings.Split(packageName, "/")[0]
 		if !strings.Contains(firstNamePart, ".") {
 			stdPackages = append(stdPackages, packageName)
-			return
+			continue
 		}
 		if _, ok := hostedPackages[firstNamePart]; !ok {
 			hostedPackages[firstNamePart] = []string{}
 		}
 		hostedPackages[firstNamePart] = append(hostedPackages[firstNamePart], packageName)
-	}
-
-	// Add interface package names.
-	for _, ifc := range si.interfaces {
-		addPackage(ifc.PackageImportPath)
 	}
 
 	// Create sorted list of hosts.

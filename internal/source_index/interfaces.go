@@ -8,6 +8,7 @@ import (
 )
 
 // Confidence values for interface info items.
+// TODO refactor into high/med/low
 const (
 	interfaceNameVal           = 120
 	totalInterfaceNameTokenVal = 120
@@ -21,9 +22,13 @@ const (
 )
 
 func (si *Index) InsertInterface(ifc types.Interface) {
-	si.interfaces = append(si.interfaces, &ifc)
-	// TODO id generator that would work with multiple types.
-	id := len(si.interfaces) - 1
+	si.results = append(si.results, &Result{
+		Name:              ifc.Name,
+		PackageName:       ifc.PackageName,
+		PackageImportPath: ifc.PackageImportPath,
+		Value:             &ifc,
+	})
+	id := len(si.results) - 1
 
 	// Index on interface name.
 	si.textIndex.Insert(id, interfaceNameVal, ifc.Name)
