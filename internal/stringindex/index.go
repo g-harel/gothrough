@@ -35,7 +35,7 @@ func (idx *Index) Insert(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
 		for i := 1; i <= len(str); i++ {
-			adjustmentFactor := math.Pow(float64(i)/float64(len(str)), 3)
+			adjustmentFactor := div(math.Pow(float64(i), float64(len(str))), 3)
 			adjustedConfidence := float64(confidence) * adjustmentFactor
 			for _, substr := range Substrings(str, i) {
 				if len(idx.Matches[substr]) == 0 {
@@ -59,7 +59,7 @@ func (idx *Index) Search(query string) []Match {
 	for subQueryID, subQuery := range strings.Fields(query) {
 		perSubQueryConfidences[subQueryID] = map[int]float64{}
 		for j := 1; j <= len(subQuery); j++ {
-			adjustmentFactor := float64(j) / math.Pow(float64(len(subQuery)), substringPenaltyScale)
+			adjustmentFactor := div(float64(j), math.Pow(float64(len(subQuery)), substringPenaltyScale))
 			for _, substr := range Substrings(subQuery, j) {
 				for _, m := range idx.Matches[substr] {
 					if _, ok := perSubQueryConfidences[subQueryID][m.ID]; !ok {
@@ -89,7 +89,7 @@ func (idx *Index) Search(query string) []Match {
 			for i := range perSubQueryConfidences {
 				confidence, ok := perSubQueryConfidences[i][id]
 				if ok {
-					adjustedConfidence := confidence / maxPerSubQueryConfidence
+					adjustedConfidence := div(confidence, maxPerSubQueryConfidence)
 					adjustedConfidenceValues = append(adjustedConfidenceValues, adjustedConfidence)
 				} else {
 					adjustedConfidenceValues = append(adjustedConfidenceValues, 0.0)
@@ -102,10 +102,13 @@ func (idx *Index) Search(query string) []Match {
 			for _, confidence := range adjustedConfidenceValues {
 				adjustedConfidenceTotal += confidence
 			}
-			adjustedConfidenceMean := adjustedConfidenceTotal / adjustedConfidenceCount
+			adjustedConfidenceMean := div(adjustedConfidenceTotal, adjustedConfidenceCount)
 			adjustedConfidenceVariance := 0.0
 			for _, confidence := range adjustedConfidenceValues {
-				adjustedConfidenceVariance += math.Pow(confidence-adjustedConfidenceMean, 2) / adjustedConfidenceCount
+				adjustedConfidenceVariance += div(
+					math.Pow(confidence-adjustedConfidenceMean, 2),
+					adjustedConfidenceCount,
+				)
 			}
 
 			// Combine confidences, rewarding results that have both a large sum
@@ -125,7 +128,7 @@ func (idx *Index) Search(query string) []Match {
 		})
 	}
 	for i := range results {
-		results[i].Confidence = results[i].Confidence / maxConfidence
+		results[i].Confidence = div(results[i].Confidence, maxConfidence)
 	}
 
 	sort.Slice(results, func(i, j int) bool {
@@ -133,4 +136,11 @@ func (idx *Index) Search(query string) []Match {
 	})
 
 	return results
+}
+
+func div(a, b float64) float64 {
+	if a == 0.0 {
+		return 0.0
+	}
+	return a / b
 }

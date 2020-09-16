@@ -43,7 +43,7 @@ func TestIndex(t *testing.T) {
 
 	t.Run("should return multiple matching values", func(t *testing.T) {
 		query := "multiple_indexed_values"
-		item0 := indexItem{12, 0, []string{query}}
+		item0 := indexItem{12, 1, []string{query}}
 		item1 := indexItem{78, 0, []string{query}}
 
 		idx := indexFrom(item0, item1)
@@ -57,7 +57,7 @@ func TestIndex(t *testing.T) {
 
 	t.Run("should only return matching values", func(t *testing.T) {
 		query := "only_matching"
-		item0 := indexItem{54, 0, []string{query}}
+		item0 := indexItem{54, 1, []string{query}}
 		item1 := indexItem{76, 0, []string{"%"}}
 
 		idx := indexFrom(item0, item1)
@@ -69,8 +69,8 @@ func TestIndex(t *testing.T) {
 
 	t.Run("should return partially matching values", func(t *testing.T) {
 		query := "abc xy"
-		item0 := indexItem{98, 0, []string{"ab"}}
-		item1 := indexItem{81, 0, []string{"xyz"}}
+		item0 := indexItem{98, 99, []string{"ab"}}
+		item1 := indexItem{81, 1, []string{"xyz"}}
 		item2 := indexItem{123456, 0, []string{"*"}}
 
 		idx := indexFrom(item0, item1, item2)
