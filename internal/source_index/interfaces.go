@@ -7,20 +7,6 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// Confidence values for interface info items.
-// TODO refactor into high/med/low
-const (
-	interfaceNameVal           = 120
-	totalInterfaceNameTokenVal = 120
-	packageNameVal             = 120
-	sourceFileVal              = 10
-	totalImportPathPartVal     = 20
-	totalEmbeddedNameVal       = 80
-	totalEmbeddedNameTokenVal  = 80
-	totalMethodNameVal         = 80
-	totalMethodNameTokenVal    = 80
-)
-
 func (si *Index) InsertInterface(ifc types.Interface) {
 	si.results = append(si.results, &Result{
 		Name:              ifc.Name,
@@ -31,24 +17,24 @@ func (si *Index) InsertInterface(ifc types.Interface) {
 	id := len(si.results) - 1
 
 	// Index on interface name.
-	si.textIndex.Insert(id, interfaceNameVal, ifc.Name)
+	si.textIndex.Insert(id, confidenceHigh, ifc.Name)
 	nameTokens := camel.Split(ifc.Name)
 	if len(nameTokens) > 1 {
-		si.textIndex.Insert(id, totalInterfaceNameTokenVal/len(nameTokens), nameTokens...)
+		si.textIndex.Insert(id, confidenceHigh/len(nameTokens), nameTokens...)
 	}
 
 	// Index on package path and source file.
 	importPathParts := strings.Split(ifc.PackageImportPath, "/")
-	si.textIndex.Insert(id, packageNameVal, ifc.PackageName)
-	si.textIndex.Insert(id, sourceFileVal, strings.TrimSuffix(ifc.SourceFile, ".go"))
+	si.textIndex.Insert(id, confidenceHigh, ifc.PackageName)
+	si.textIndex.Insert(id, confidenceLow, strings.TrimSuffix(ifc.SourceFile, ".go"))
 	if len(importPathParts) > 1 {
-		si.textIndex.Insert(id, totalImportPathPartVal/len(importPathParts), importPathParts...)
+		si.textIndex.Insert(id, confidenceLow/len(importPathParts), importPathParts...)
 	}
 
 	// Index on embedded interfaces.
 	if len(ifc.Embedded) > 0 {
 		for _, embedded := range ifc.Embedded {
-			si.textIndex.Insert(id, totalEmbeddedNameVal/len(ifc.Embedded), embedded.Name)
+			si.textIndex.Insert(id, confidenceMed/len(ifc.Embedded), embedded.Name)
 		}
 		embeddedNameTokens := []string{}
 		for _, embedded := range ifc.Embedded {
@@ -58,21 +44,21 @@ func (si *Index) InsertInterface(ifc types.Interface) {
 			embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded.Name)...)
 		}
 		if len(embeddedNameTokens) > 1 {
-			si.textIndex.Insert(id, totalEmbeddedNameTokenVal/len(embeddedNameTokens), embeddedNameTokens...)
+			si.textIndex.Insert(id, confidenceMed/len(embeddedNameTokens), embeddedNameTokens...)
 		}
 	}
 
 	// Index on interface methods.
 	if len(ifc.Methods) > 0 {
 		for _, method := range ifc.Methods {
-			si.textIndex.Insert(id, totalMethodNameVal/len(ifc.Methods), method.Name)
+			si.textIndex.Insert(id, confidenceMed/len(ifc.Methods), method.Name)
 		}
 		methodNameTokens := []string{}
 		for _, method := range ifc.Methods {
 			methodNameTokens = append(methodNameTokens, camel.Split(method.Name)...)
 		}
 		if len(methodNameTokens) > 1 {
-			si.textIndex.Insert(id, totalMethodNameTokenVal/len(methodNameTokens), methodNameTokens...)
+			si.textIndex.Insert(id, confidenceMed/len(methodNameTokens), methodNameTokens...)
 		}
 	}
 }

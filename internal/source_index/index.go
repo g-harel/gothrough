@@ -9,6 +9,13 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// Confidence values for info items.
+const (
+	confidenceHigh = 120
+	confidenceMed  = 80
+	confidenceLow  = 20
+)
+
 type Result struct {
 	Confidence        float64
 	Name              string
