@@ -1,4 +1,4 @@
-package string_index
+package stringindex
 
 // Substrings produces the list of all contiguous substrings of the given size.
 func Substrings(str string, size int) []string {

@@ -1,10 +1,10 @@
-package source_index
+package typeindex
 
 import (
 	"encoding/gob"
 	"io"
 
-	"github.com/g-harel/gothrough/internal/string_index"
+	"github.com/g-harel/gothrough/internal/stringindex"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
@@ -14,7 +14,7 @@ func init() {
 }
 
 type encodableSearchIndex struct {
-	TextIndex *string_index.Index
+	TextIndex *stringindex.Index
 	Results   []*Result
 }
 

@@ -1,4 +1,4 @@
-package string_index
+package stringindex
 
 import (
 	"math"

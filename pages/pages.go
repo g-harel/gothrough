@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/g-harel/gothrough/internal/format"
-	"github.com/g-harel/gothrough/internal/source_index"
 	"github.com/g-harel/gothrough/internal/templates"
 	"github.com/g-harel/gothrough/internal/tokens"
+	"github.com/g-harel/gothrough/internal/typeindex"
 )
 
 func Home(packages [][]string) http.HandlerFunc {
@@ -26,7 +26,7 @@ type ResultsResult struct {
 	PrettyTokens      []tokens.Token
 }
 
-func Results(query string, results []*source_index.Result) http.HandlerFunc {
+func Results(query string, results []*typeindex.Result) http.HandlerFunc {
 	context := struct {
 		Query   string
 		Results []ResultsResult

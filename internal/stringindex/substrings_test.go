@@ -1,9 +1,9 @@
-package string_index_test
+package stringindex_test
 
 import (
 	"testing"
 
-	"github.com/g-harel/gothrough/internal/string_index"
+	"github.com/g-harel/gothrough/internal/stringindex"
 )
 
 func TestSubstring(t *testing.T) {
@@ -41,7 +41,7 @@ func TestSubstring(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actual := string_index.Substrings(tc.InputString, tc.InputSize)
+			actual := stringindex.Substrings(tc.InputString, tc.InputSize)
 			if len(tc.Expected) != len(actual) {
 				t.Fatalf("expected/actual do not match\n%v\n%v", tc.Expected, actual)
 			}

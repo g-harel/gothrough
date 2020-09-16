@@ -1,4 +1,4 @@
-package source_index
+package typeindex
 
 import (
 	"strings"

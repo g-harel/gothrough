@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/g-harel/gothrough/internal/source_index"
+	"github.com/g-harel/gothrough/internal/typeindex"
 	"github.com/g-harel/gothrough/pages"
 )
 
@@ -25,7 +25,7 @@ func main() {
 		panic("missing index file")
 	}
 
-	idx, err := source_index.NewIndexFromBytes(f)
+	idx, err := typeindex.NewIndexFromBytes(f)
 	if err != nil {
 		panic(err)
 	}

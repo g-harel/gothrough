@@ -1,11 +1,10 @@
-// TODO rename to type_index
-package source_index
+package typeindex
 
 import (
 	"sort"
 	"strings"
 
-	"github.com/g-harel/gothrough/internal/string_index"
+	"github.com/g-harel/gothrough/internal/stringindex"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
@@ -25,14 +24,14 @@ type Result struct {
 }
 
 type Index struct {
-	textIndex         *string_index.Index
+	textIndex         *stringindex.Index
 	results           []*Result
 	computed_packages *[][]string
 }
 
 func NewIndex() *Index {
 	return &Index{
-		textIndex: string_index.NewIndex(),
+		textIndex: stringindex.NewIndex(),
 		results:   []*Result{},
 	}
 }

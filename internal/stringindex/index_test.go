@@ -1,11 +1,12 @@
-package string_index_test
+package stringindex_test
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/g-harel/gothrough/internal/string_index"
+	"github.com/g-harel/gothrough/internal/stringindex"
 )
 
 type indexItem struct {
@@ -14,8 +15,8 @@ type indexItem struct {
 	matchStrings []string
 }
 
-func indexFrom(items ...indexItem) *string_index.Index {
-	idx := string_index.NewIndex()
+func indexFrom(items ...indexItem) *stringindex.Index {
+	idx := stringindex.NewIndex()
 	for _, item := range items {
 		idx.Insert(item.id, item.confidence, item.matchStrings...)
 	}
@@ -48,6 +49,7 @@ func TestIndex(t *testing.T) {
 		idx := indexFrom(item0, item1)
 		actual := idx.Search(query)
 
+		fmt.Println(actual)
 		assertEqual(t, "length", len(actual), 2)
 		assertEqual(t, "first id", actual[0].ID, item0.id)
 		assertEqual(t, "second id", actual[1].ID, item1.id)
