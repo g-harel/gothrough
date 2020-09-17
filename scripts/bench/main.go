@@ -7,8 +7,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/format"
-	"github.com/g-harel/gothrough/internal/parse"
 	"github.com/g-harel/gothrough/internal/typeindex"
 )
 
@@ -29,19 +29,18 @@ func main() {
 
 	indexTime := time.Now()
 	idx := typeindex.NewIndex()
-	rootInterfaces, err := parse.FindInterfaces(root)
+
+	err := extract.Types(root, extract.TypeHandlers{
+		Interface: idx.InsertInterface,
+	})
 	if err != nil {
 		panic(err)
 	}
-	for _, ifc := range rootInterfaces {
-		idx.InsertInterface(*ifc)
-	}
-	pathInterfaces, err := parse.FindInterfaces(path)
+	err = extract.Types(path, extract.TypeHandlers{
+		Interface: idx.InsertInterface,
+	})
 	if err != nil {
 		panic(err)
-	}
-	for _, ifc := range pathInterfaces {
-		idx.InsertInterface(*ifc)
 	}
 	fmt.Printf("Indexed in %s\n", time.Since(indexTime))
 

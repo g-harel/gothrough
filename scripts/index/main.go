@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/g-harel/gothrough/internal/parse"
+	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/typeindex"
 )
 
@@ -34,13 +34,11 @@ func main() {
 	// TODO index constants.
 	idx := typeindex.NewIndex()
 	for _, dir := range flag.Args() {
-		interfaces, err := parse.FindInterfaces(path.Join(dir, "src"))
+		err = extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
+			Interface: idx.InsertInterface,
+		})
 		if err != nil {
 			fatalErr(err)
-		}
-
-		for _, ifc := range interfaces {
-			idx.InsertInterface(*ifc)
 		}
 	}
 
