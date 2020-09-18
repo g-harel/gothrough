@@ -20,8 +20,7 @@ type MethodSignature struct {
 	ReturnValues []Field
 }
 
-// TODO refactor to a more generic reference.
-type EmbeddedInterface struct {
+type Reference struct {
 	Package string
 	Name    string
 	Docs    Docs
@@ -31,7 +30,7 @@ type EmbeddedInterface struct {
 type Interface struct {
 	Name              string
 	Docs              Docs
-	Embedded          []EmbeddedInterface
+	Embedded          []Reference
 	Methods           []MethodSignature
 	PackageName       string
 	PackageImportPath string

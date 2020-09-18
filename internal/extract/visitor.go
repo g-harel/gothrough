@@ -7,8 +7,6 @@ import (
 	"go/token"
 )
 
-// TODO findall with callbacks
-
 // visitFunc is called for every node encountered while walking a file.
 type visitFunc func(filepath string, n ast.Node, fset *token.FileSet) (done bool)
 

@@ -9,7 +9,6 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// TODO make more utils and move somewhere else.
 func pretty(node interface{}) string {
 	buf := bytes.NewBufferString("")
 	renderer := token.NewFileSet()

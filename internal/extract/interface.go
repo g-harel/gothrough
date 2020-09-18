@@ -36,17 +36,17 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 
 								// Collect methods.
 								methods := []types.MethodSignature{}
-								embedded := []types.EmbeddedInterface{}
+								embedded := []types.Reference{}
 								for _, member := range interfaceType.Methods.List {
 									if identType, ok := member.Type.(*ast.Ident); ok {
-										embedded = append(embedded, types.EmbeddedInterface{
+										embedded = append(embedded, types.Reference{
 											Docs: types.Docs{Text: member.Doc.Text()},
 											Name: identType.Name,
 										})
 										continue
 									}
 									if selectorExprType, ok := member.Type.(*ast.SelectorExpr); ok {
-										embedded = append(embedded, types.EmbeddedInterface{
+										embedded = append(embedded, types.Reference{
 											Package: fmt.Sprintf("%v", selectorExprType.X),
 											Name:    selectorExprType.Sel.String(),
 											Docs:    types.Docs{Text: member.Doc.Text()},

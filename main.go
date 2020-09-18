@@ -60,6 +60,8 @@ func main() {
 		pages.Results(query, results)(w, r)
 	})
 
+	// TODO package viewer
+
 	log.Printf("accepting connections at :%v", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }
