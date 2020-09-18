@@ -34,7 +34,7 @@ func main() {
 	// TODO index constants.
 	idx := typeindex.NewIndex()
 	for _, dir := range flag.Args() {
-		err = extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
+		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
 			Interface: idx.InsertInterface,
 		})
 		if err != nil {
