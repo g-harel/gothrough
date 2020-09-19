@@ -21,6 +21,7 @@ func Home(packages [][]string) http.HandlerFunc {
 
 type ResultsResult struct {
 	Name              string
+	Confidence        int
 	PackageName       string
 	PackageImportPath string
 	PrettyTokens      []tokens.Token
@@ -42,6 +43,7 @@ func Results(query string, results []*typeindex.Result) http.HandlerFunc {
 		}
 		context.Results = append(context.Results, ResultsResult{
 			Name:              result.Name,
+			Confidence:        int(result.Confidence * 100),
 			PackageName:       result.PackageName,
 			PackageImportPath: result.PackageImportPath,
 			PrettyTokens:      snippet.Dump(),

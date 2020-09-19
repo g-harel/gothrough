@@ -3,6 +3,7 @@ type Context struct {
     Query   string
     Results []struct {
         Name              string
+        Confidence        int
         PackageName       string
         PackageImportPath string
         PrettyTokens      []struct {
@@ -32,7 +33,7 @@ Fronted-only kinds:
 {{- end -}}
 
 {{- define "description" -}}
-    Results for "{{- .Query -}}" query.
+    Results for '{{- .Query -}}' query.
 {{- end -}}
 
 {{- define "head" -}}
@@ -48,6 +49,11 @@ Fronted-only kinds:
 
         .result .full-name a {
             color: #005cc5;
+        }
+
+        .result .confidence {
+            color: #ccc;
+            user-select: none; -moz-user-select: none;
         }
 
         code {
@@ -84,6 +90,9 @@ Fronted-only kinds:
              --><a href="https://godoc.org/{{- $result.PackageImportPath -}}#{{- $result.Name -}}">
                     {{- $result.Name -}}
                 </a>
+                <span class="confidence">
+                    {{- $result.Confidence -}}%
+                </span>
             </h2>
             <code><!--
              --><span class="keyword">import</span><!--

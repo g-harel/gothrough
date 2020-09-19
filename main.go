@@ -57,6 +57,10 @@ func main() {
 			panic(err)
 		}
 
+		if len(results) > 16 {
+			results = results[:16]
+		}
+
 		pages.Results(query, results)(w, r)
 	})
 
