@@ -13,19 +13,19 @@ func init() {
 	gob.Register(&types.Interface{})
 }
 
-type encodableSearchIndex struct {
+type encodableTypeIndex struct {
 	TextIndex *stringindex.Index
 	Results   []*Result
 }
 
-func (si *Index) ToBytes(w io.Writer) error {
-	esi := encodableSearchIndex{
-		TextIndex: si.textIndex,
-		Results:   si.results,
+func (idx *Index) ToBytes(w io.Writer) error {
+	edx := encodableTypeIndex{
+		TextIndex: idx.textIndex,
+		Results:   idx.results,
 	}
 
 	enc := gob.NewEncoder(w)
-	err := enc.Encode(esi)
+	err := enc.Encode(edx)
 	if err != nil {
 		return err
 	}
@@ -34,18 +34,18 @@ func (si *Index) ToBytes(w io.Writer) error {
 }
 
 func NewIndexFromBytes(r io.Reader) (*Index, error) {
-	var esi encodableSearchIndex
+	var edx encodableTypeIndex
 
 	dec := gob.NewDecoder(r)
-	err := dec.Decode(&esi)
+	err := dec.Decode(&edx)
 	if err != nil {
 		return nil, err
 	}
 
-	si := &Index{
-		textIndex: esi.TextIndex,
-		results:   esi.Results,
+	idx := &Index{
+		textIndex: edx.TextIndex,
+		results:   edx.Results,
 	}
 
-	return si, nil
+	return idx, nil
 }

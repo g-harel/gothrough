@@ -24,9 +24,11 @@ type Result struct {
 }
 
 type Index struct {
-	textIndex         *stringindex.Index
-	results           []*Result
-	computed_packages *[][]string
+	textIndex *stringindex.Index
+	results   []*Result
+
+	computed_packages         *[][]string
+	computed_package_contents *map[string][]int
 }
 
 func NewIndex() *Index {
@@ -37,15 +39,15 @@ func NewIndex() *Index {
 }
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
-func (si *Index) Search(query string) ([]*Result, error) {
-	matches := si.textIndex.Search(query)
+func (idx *Index) Search(query string) ([]*Result, error) {
+	matches := idx.textIndex.Search(query)
 	if len(matches) == 0 {
 		return []*Result{}, nil
 	}
 
 	results := make([]*Result, len(matches))
 	for i, match := range matches {
-		result := si.results[match.ID]
+		result := idx.results[match.ID]
 		result.Confidence = match.Confidence
 		results[i] = result
 	}
@@ -53,9 +55,30 @@ func (si *Index) Search(query string) ([]*Result, error) {
 	return results, nil
 }
 
-func (si *Index) Packages() [][]string {
-	if si.computed_packages != nil {
-		return *si.computed_packages
+func (idx *Index) Package(importPath string) []*Result {
+	if idx.computed_package_contents == nil {
+		idx.computed_package_contents = &map[string][]int{}
+	}
+
+	resultIDs := []int{}
+	if contents, ok := (*idx.computed_package_contents)[importPath]; ok {
+		resultIDs = contents
+	} else {
+		// TODO
+	}
+
+	results := make([]*Result, len(resultIDs))
+	for i, id := range resultIDs {
+		results[i] = idx.results[id]
+	}
+
+	// TODO sort results
+	return results
+}
+
+func (idx *Index) Packages() [][]string {
+	if idx.computed_packages != nil {
+		return *idx.computed_packages
 	}
 
 	// Collect list of unique packages, separating the standard library vs. hosted ones.
@@ -64,7 +87,7 @@ func (si *Index) Packages() [][]string {
 	hostedPackages := map[string][]string{}
 
 	// Add package names.
-	for _, result := range si.results {
+	for _, result := range idx.results {
 		packageName := result.PackageImportPath
 
 		if seenPackages[packageName] {
@@ -102,6 +125,6 @@ func (si *Index) Packages() [][]string {
 		sort.Strings(packages[i])
 	}
 
-	si.computed_packages = &packages
+	idx.computed_packages = &packages
 	return packages
 }
