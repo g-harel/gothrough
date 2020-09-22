@@ -1,7 +1,7 @@
 package types
 
 // Type is a placeholder for a pointer to any other type in this package.
-type Type = interface{}
+type Type interface{}
 
 type Docs struct {
 	Text string

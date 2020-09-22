@@ -64,7 +64,13 @@ func (idx *Index) Package(importPath string) []*Result {
 	if contents, ok := (*idx.computed_package_contents)[importPath]; ok {
 		resultIDs = contents
 	} else {
-		// TODO
+		resultIDs = []int{}
+		for i, result := range idx.results {
+			if result.PackageImportPath == importPath {
+				resultIDs = append(resultIDs, i)
+			}
+		}
+		(*idx.computed_package_contents)[importPath] = resultIDs
 	}
 
 	results := make([]*Result, len(resultIDs))

@@ -1,0 +1,58 @@
+<!--
+type Context struct {
+    ImportPath   string
+    Results      []struct {
+        Name              string
+        Confidence        int
+        PackageName       string
+        PackageImportPath string
+        PrettyTokens      []struct {
+            Text string
+            Kind string
+        }
+    }
+}
+-->
+
+{{- define "title" -}}
+    {{- .ImportPath -}}
+{{- end -}}
+
+{{- define "description" -}}
+    Public contents of for '{{- .ImportPath -}}' package.
+{{- end -}}
+
+{{- define "head" -}}
+    <style>
+        h2 {
+            color: #005cc5;
+            font-weight: 600;
+            margin-top: 0;
+        }
+    </style>
+{{- end -}}
+
+{{- define "query" -}}
+{{- end -}}
+
+{{- define "body" -}}
+    <h2>
+        <a href="https://godoc.org/{{- .ImportPath -}}">
+            {{- .ImportPath -}}
+        </a>
+    </h2>
+    <code><!--
+     --><span class="keyword">import</span><!--
+     --><span class="whitespace"> </span><!--
+     --><span class="literal">"{{- .ImportPath -}}"</span><!--
+ --></code>
+    <code>
+        {{- range $i, $result := .Results -}}
+            {{- range $_, $token := .PrettyTokens -}}
+                <span class="{{- $token.Kind -}}">{{- $token.Text -}}</span>
+            {{- end -}}
+            <span class="whitespace">
+<!--     --></span>
+        {{- end -}}
+    </code>
+{{- end -}}

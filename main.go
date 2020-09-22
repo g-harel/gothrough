@@ -10,6 +10,11 @@ import (
 	"github.com/g-harel/gothrough/pages"
 )
 
+func headerResponse(w http.ResponseWriter, statusCode int) {
+	w.WriteHeader(statusCode)
+	fmt.Fprintf(w, "%d %s", statusCode, http.StatusText(statusCode))
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -35,20 +40,15 @@ func main() {
 	})
 
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
-		headerResponse := func(statusCode int) {
-			w.WriteHeader(statusCode)
-			fmt.Fprintf(w, "%d %s", statusCode, http.StatusText(statusCode))
-		}
-
 		err := r.ParseForm()
 		if err != nil {
-			headerResponse(http.StatusBadRequest)
+			headerResponse(w, http.StatusBadRequest)
 			return
 		}
 
 		query := r.Form.Get("q")
 		if query == "" {
-			headerResponse(http.StatusBadRequest)
+			headerResponse(w, http.StatusBadRequest)
 			return
 		}
 
@@ -64,7 +64,27 @@ func main() {
 		pages.Results(query, results)(w, r)
 	})
 
-	// TODO package viewer
+	http.HandleFunc("/package", func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			headerResponse(w, http.StatusBadRequest)
+			return
+		}
+
+		importPath := r.Form.Get("q")
+		if importPath == "" {
+			headerResponse(w, http.StatusBadRequest)
+			return
+		}
+
+		results := idx.Package(importPath)
+		if len(results) == 0 {
+			headerResponse(w, http.StatusNoContent)
+			return
+		}
+
+		pages.Package(importPath, results)(w, r)
+	})
 
 	log.Printf("accepting connections at :%v", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))

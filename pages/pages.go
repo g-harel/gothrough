@@ -10,6 +10,33 @@ import (
 	"github.com/g-harel/gothrough/internal/typeindex"
 )
 
+type PrettyResult struct {
+	Name              string
+	Confidence        int
+	PackageName       string
+	PackageImportPath string
+	PrettyTokens      []tokens.Token
+}
+
+func formatAll(results []*typeindex.Result) []PrettyResult {
+	formatted := []PrettyResult{}
+	for _, result := range results {
+		snippet, err := format.Format(result.Value)
+		if err != nil {
+			log.Printf("could not format: %v", err)
+			continue
+		}
+		formatted = append(formatted, PrettyResult{
+			Name:              result.Name,
+			Confidence:        int(result.Confidence * 100),
+			PackageName:       result.PackageName,
+			PackageImportPath: result.PackageImportPath,
+			PrettyTokens:      snippet.Dump(),
+		})
+	}
+	return formatted
+}
+
 func Home(packages [][]string) http.HandlerFunc {
 	context := struct {
 		Packages [][]string
@@ -19,35 +46,24 @@ func Home(packages [][]string) http.HandlerFunc {
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/home.html").Handler
 }
 
-type ResultsResult struct {
-	Name              string
-	Confidence        int
-	PackageName       string
-	PackageImportPath string
-	PrettyTokens      []tokens.Token
-}
-
 func Results(query string, results []*typeindex.Result) http.HandlerFunc {
 	context := struct {
 		Query   string
-		Results []ResultsResult
+		Results []PrettyResult
 	}{
 		Query:   query,
-		Results: []ResultsResult{},
-	}
-	for _, result := range results {
-		snippet, err := format.Format(result.Value)
-		if err != nil {
-			log.Printf("could not format: %v", err)
-			continue
-		}
-		context.Results = append(context.Results, ResultsResult{
-			Name:              result.Name,
-			Confidence:        int(result.Confidence * 100),
-			PackageName:       result.PackageName,
-			PackageImportPath: result.PackageImportPath,
-			PrettyTokens:      snippet.Dump(),
-		})
+		Results: formatAll(results),
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler
+}
+
+func Package(importPath string, results []*typeindex.Result) http.HandlerFunc {
+	context := struct {
+		ImportPath string
+		Results    []PrettyResult
+	}{
+		ImportPath: importPath,
+		Results:    formatAll(results),
+	}
+	return templates.NewRenderer(context, "pages/_layout.html", "pages/package.html").Handler
 }
