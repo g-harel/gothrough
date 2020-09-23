@@ -86,35 +86,4 @@ Fronted-only kinds:
             </code>
         </div>
     {{- end -}}
-
-    <script>
-        // TODO remove
-        document.addEventListener("DOMContentLoaded", function() {
-            var transparencyValue = 0.5;
-            var graceZoneSize = 40;
-
-            var header = document.querySelector("header");
-            var headerHeight = header.offsetHeight;
-            var triggerHeight = headerHeight - graceZoneSize;
-
-            var observer = new IntersectionObserver(function(entries) {
-                for (var entry of entries) {
-                    var isPartiallyHidden = entry.intersectionRatio < 1;
-                    var intersectionIsSmallerThanHeaderHeight = entry.intersectionRect.height < headerHeight;
-                    var shouldDim = isPartiallyHidden && intersectionIsSmallerThanHeaderHeight;
-                    entry.target.style.opacity = shouldDim ? transparencyValue : 1;
-                }
-            }, {
-                // Only make transparent when going off the top of the screen.
-                rootMargin: "-" + triggerHeight + "px 0px 99999999px",
-                // Trigger observer more often when near the point where it should go transparent.
-                threshold: [0, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 0.75, 1],
-            });
-
-            var results = document.querySelectorAll(".result");
-            for (var result of results) {
-                observer.observe(result);
-            }
-        });
-    </script>
 {{- end -}}
