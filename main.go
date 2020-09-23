@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/g-harel/gothrough/internal/filter"
 	"github.com/g-harel/gothrough/internal/typeindex"
 	"github.com/g-harel/gothrough/pages"
 )
@@ -52,7 +53,10 @@ func main() {
 			return
 		}
 
-		results, err := idx.Search(query)
+		// TODO use filters.
+		filters := filter.Parse(query)
+
+		results, err := idx.Search(filters.Query)
 		if err != nil {
 			panic(err)
 		}
