@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/g-harel/gothrough/internal/filter"
 	"github.com/g-harel/gothrough/internal/stringindex"
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -40,7 +41,10 @@ func NewIndex() *Index {
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (idx *Index) Search(query string) ([]*Result, error) {
-	matches := idx.textIndex.Search(query)
+	filters := filter.Parse(query)
+	// TODO error if unknown filters
+
+	matches := idx.textIndex.Search(filters.Query)
 	if len(matches) == 0 {
 		return []*Result{}, nil
 	}
@@ -51,6 +55,13 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		result.Confidence = match.Confidence
 		results[i] = result
 	}
+
+	// Use all results when no query terms.
+	if filters.Query == "" {
+		results = idx.results
+	}
+
+	// TODO use filters
 
 	return results, nil
 }

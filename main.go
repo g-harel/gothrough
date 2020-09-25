@@ -53,10 +53,7 @@ func main() {
 			return
 		}
 
-		// TODO use filters.
-		filters := filter.Parse(query)
-
-		results, err := idx.Search(filters.Query)
+		results, err := idx.Search(query)
 		if err != nil {
 			panic(err)
 		}

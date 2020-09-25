@@ -2,16 +2,18 @@ package filter
 
 import "strings"
 
-type Filter struct {
+type Filters struct {
 	Query          string
 	PackageFilters []string
 	Extra          map[string][]string
 }
 
-func Parse(query string) Filter {
+// TODO inverted
+// TODO aliases
+func Parse(query string) Filters {
 	parts := strings.Fields(query)
 
-	filter := Filter{
+	filter := Filters{
 		Query:          "",
 		PackageFilters: []string{},
 		Extra:          map[string][]string{},
