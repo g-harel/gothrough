@@ -1,6 +1,7 @@
 package typeindex
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -42,12 +43,11 @@ func NewIndex() *Index {
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (idx *Index) Search(query string) ([]*Result, error) {
 	filters := filter.Parse(query)
-	// TODO error if unknown filters
+	if len(filters.Extra) > 0 {
+		return nil, fmt.Errorf("unrecognized filters")
+	}
 
 	matches := idx.textIndex.Search(filters.Query)
-	if len(matches) == 0 {
-		return []*Result{}, nil
-	}
 
 	results := make([]*Result, len(matches))
 	for i, match := range matches {
@@ -61,9 +61,20 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		results = idx.results
 	}
 
-	// TODO use filters
+	// Use package filters.
+	filteredResults := []*Result{}
+	if len(filters.PackageFilters) > 0 {
+		for _, result := range results {
+			for _, filterValue := range filters.PackageFilters {
+				if result.PackageName == filterValue ||
+					result.PackageImportPath == filterValue {
+					filteredResults = append(filteredResults, result)
+				}
+			}
+		}
+	}
 
-	return results, nil
+	return filteredResults, nil
 }
 
 func (idx *Index) Package(importPath string) []*Result {

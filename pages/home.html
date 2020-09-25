@@ -39,7 +39,7 @@ type Context struct {
         <div class="package-group">
             {{- range $_, $package := $packageGroup -}}
                 <span class="package">
-                    <a href="/package?q={{- $package -}}">
+                    <a href="/search?q=package:{{- $package -}}">
                         {{- $package -}}
                     </a>
                 </span>

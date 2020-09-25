@@ -70,9 +70,11 @@ Fronted-only kinds:
              --><a href="https://godoc.org/{{- $result.PackageImportPath -}}#{{- $result.Name -}}">
                     {{- $result.Name -}}
                 </a>
-                <span class="confidence">
-                    {{- $result.Confidence -}}%
-                </span>
+                {{- if not (eq $result.Confidence 0) -}}
+                    <span class="confidence">
+                        {{- $result.Confidence -}}%
+                    </span>
+                {{- end -}}
             </h2>
             <code><!--
              --><span class="keyword">import</span><!--

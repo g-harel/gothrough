@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/g-harel/gothrough/internal/filter"
 	"github.com/g-harel/gothrough/internal/typeindex"
 	"github.com/g-harel/gothrough/pages"
 )
@@ -63,28 +62,6 @@ func main() {
 		}
 
 		pages.Results(query, results)(w, r)
-	})
-
-	http.HandleFunc("/package", func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			headerResponse(w, http.StatusBadRequest)
-			return
-		}
-
-		importPath := r.Form.Get("q")
-		if importPath == "" {
-			headerResponse(w, http.StatusBadRequest)
-			return
-		}
-
-		results := idx.Package(importPath)
-		if len(results) == 0 {
-			headerResponse(w, http.StatusNoContent)
-			return
-		}
-
-		pages.Package(importPath, results)(w, r)
 	})
 
 	log.Printf("accepting connections at :%v", port)

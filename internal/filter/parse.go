@@ -10,6 +10,7 @@ type Filters struct {
 
 // TODO inverted
 // TODO aliases
+// TODO dedupe filters
 func Parse(query string) Filters {
 	parts := strings.Fields(query)
 

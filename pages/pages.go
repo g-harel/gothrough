@@ -56,14 +56,3 @@ func Results(query string, results []*typeindex.Result) http.HandlerFunc {
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler
 }
-
-func Package(importPath string, results []*typeindex.Result) http.HandlerFunc {
-	context := struct {
-		ImportPath string
-		Results    []PrettyResult
-	}{
-		ImportPath: importPath,
-		Results:    formatAll(results),
-	}
-	return templates.NewRenderer(context, "pages/_layout.html", "pages/package.html").Handler
-}
