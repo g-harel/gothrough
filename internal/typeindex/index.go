@@ -72,6 +72,8 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 				}
 			}
 		}
+	} else {
+		filteredResults = results
 	}
 
 	return filteredResults, nil
