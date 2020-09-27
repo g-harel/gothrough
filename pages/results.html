@@ -63,6 +63,7 @@ Fronted-only kinds:
 {{- end -}}
 
 {{- define "body" -}}
+    <!-- TODO Special case when there are no results -->
     {{- range $i, $result := .Results -}}
         <div class="result">
             <h2 class="full-name">

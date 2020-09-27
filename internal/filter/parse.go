@@ -2,41 +2,40 @@ package filter
 
 import "strings"
 
-type Filters struct {
-	Query          string
-	PackageFilters []string
-	Extra          map[string][]string
+type ParsedQuery struct {
+	QueryWords string
+	Filters    map[string][]string
 }
 
-// TODO inverted
-// TODO aliases
-// TODO dedupe filters
-func Parse(query string) Filters {
+func Parse(query string) ParsedQuery {
 	parts := strings.Fields(query)
 
-	filter := Filters{
-		Query:          "",
-		PackageFilters: []string{},
-		Extra:          map[string][]string{},
+	parsed := ParsedQuery{
+		QueryWords: "",
+		Filters:    map[string][]string{},
 	}
 	for _, part := range parts {
 		if !strings.Contains(part, ":") {
-			filter.Query += " " + part
+			parsed.QueryWords += " " + part
 			continue
 		}
 
 		filterQuery := strings.SplitN(part, ":", 2)
 		prefix := filterQuery[0]
 		query := filterQuery[1]
-		if prefix == "package" {
-			filter.PackageFilters = append(filter.PackageFilters, query)
-		} else {
-			if _, ok := filter.Extra[prefix]; !ok {
-				filter.Extra[prefix] = []string{}
+
+		// Only add the prefix/query combination if it is not a duplicate.
+		isNew := true
+		for _, existingQuery := range parsed.Filters[prefix] {
+			if query == existingQuery {
+				isNew = false
+				break
 			}
-			filter.Extra[prefix] = append(filter.Extra[prefix], query)
+		}
+		if isNew {
+			parsed.Filters[prefix] = append(parsed.Filters[prefix], query)
 		}
 	}
 
-	return filter
+	return parsed
 }

@@ -1,7 +1,6 @@
 package typeindex
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -26,11 +25,9 @@ type Result struct {
 }
 
 type Index struct {
-	textIndex *stringindex.Index
-	results   []*Result
-
-	computed_packages         *[][]string
-	computed_package_contents *map[string][]int
+	textIndex         *stringindex.Index
+	results           []*Result
+	computed_packages *[][]string
 }
 
 func NewIndex() *Index {
@@ -42,30 +39,27 @@ func NewIndex() *Index {
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (idx *Index) Search(query string) ([]*Result, error) {
-	filters := filter.Parse(query)
-	if len(filters.Extra) > 0 {
-		return nil, fmt.Errorf("unrecognized filters")
-	}
+	parsedQuery := filter.Parse(query)
 
-	matches := idx.textIndex.Search(filters.Query)
-
-	results := make([]*Result, len(matches))
-	for i, match := range matches {
-		result := idx.results[match.ID]
-		result.Confidence = match.Confidence
-		results[i] = result
-	}
-
-	// Use all results when no query terms.
-	if filters.Query == "" {
+	var results []*Result
+	if parsedQuery.QueryWords == "" {
+		// Use all results when no query terms.
 		results = idx.results
+	} else {
+		matches := idx.textIndex.Search(parsedQuery.QueryWords)
+		results = make([]*Result, len(matches))
+		for i, match := range matches {
+			result := idx.results[match.ID]
+			result.Confidence = match.Confidence
+			results[i] = result
+		}
 	}
 
-	// Use package filters.
+	// Apply package filter.
 	filteredResults := []*Result{}
-	if len(filters.PackageFilters) > 0 {
+	if len(parsedQuery.Filters["package"]) > 0 {
 		for _, result := range results {
-			for _, filterValue := range filters.PackageFilters {
+			for _, filterValue := range parsedQuery.Filters["package"] {
 				if result.PackageName == filterValue ||
 					result.PackageImportPath == filterValue {
 					filteredResults = append(filteredResults, result)
@@ -77,33 +71,6 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	return filteredResults, nil
-}
-
-func (idx *Index) Package(importPath string) []*Result {
-	if idx.computed_package_contents == nil {
-		idx.computed_package_contents = &map[string][]int{}
-	}
-
-	resultIDs := []int{}
-	if contents, ok := (*idx.computed_package_contents)[importPath]; ok {
-		resultIDs = contents
-	} else {
-		resultIDs = []int{}
-		for i, result := range idx.results {
-			if result.PackageImportPath == importPath {
-				resultIDs = append(resultIDs, i)
-			}
-		}
-		(*idx.computed_package_contents)[importPath] = resultIDs
-	}
-
-	results := make([]*Result, len(resultIDs))
-	for i, id := range resultIDs {
-		results[i] = idx.results[id]
-	}
-
-	// TODO sort results
-	return results
 }
 
 func (idx *Index) Packages() [][]string {
