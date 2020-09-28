@@ -13,7 +13,7 @@ type Field struct {
 	Type string
 }
 
-type MethodSignature struct {
+type Function struct {
 	Name         string
 	Docs         Docs
 	Arguments    []Field
@@ -31,7 +31,7 @@ type Interface struct {
 	Name              string
 	Docs              Docs
 	Embedded          []Reference
-	Methods           []MethodSignature
+	Methods           []Function
 	PackageName       string
 	PackageImportPath string
 	SourceFile        string

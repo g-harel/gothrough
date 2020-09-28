@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"path"
 	"strings"
-	"unicode"
 
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -24,8 +23,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 					if interfaceSpec, ok := spec.(*ast.TypeSpec); ok {
 						if interfaceType, ok := interfaceSpec.Type.(*ast.InterfaceType); ok {
 							name := interfaceSpec.Name.String()
-							// Only parse public interfaces.
-							if unicode.IsUpper([]rune(name)[0]) {
+							if interfaceSpec.Name.IsExported() {
 								pathname, filename := path.Split(filepath)
 
 								// Attempt to detect source dir by looking for the closest "src" directory.
@@ -35,7 +33,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
 
 								// Collect methods.
-								methods := []types.MethodSignature{}
+								methods := []types.Function{}
 								embedded := []types.Reference{}
 								for _, member := range interfaceType.Methods.List {
 									if identType, ok := member.Type.(*ast.Ident); ok {
@@ -62,7 +60,7 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 									}
 									for _, methodName := range member.Names {
 										if methodName.IsExported() {
-											methods = append(methods, types.MethodSignature{
+											methods = append(methods, types.Function{
 												Name:         methodName.String(),
 												Docs:         types.Docs{Text: member.Doc.Text()},
 												Arguments:    arguments,

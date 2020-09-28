@@ -11,6 +11,7 @@ import (
 
 type TypeHandlers struct {
 	Interface func(types.Interface)
+	Function  func(types.Function)
 }
 
 func Types(srcDir string, handlers TypeHandlers) error {
@@ -38,6 +39,7 @@ func Types(srcDir string, handlers TypeHandlers) error {
 			return nil
 		}
 		visit(pathname, newInterfaceVisitor(handlers.Interface))
+		visit(pathname, newFunctionVisitor(handlers.Function))
 		return nil
 	})
 	if err != nil {

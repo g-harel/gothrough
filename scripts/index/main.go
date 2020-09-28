@@ -8,6 +8,7 @@ import (
 
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/typeindex"
+	"github.com/g-harel/gothrough/internal/types"
 )
 
 var dest = flag.String("dest", ".index", "output filename")
@@ -36,6 +37,9 @@ func main() {
 	for _, dir := range flag.Args() {
 		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
 			Interface: idx.InsertInterface,
+			Function: func(fn types.Function) {
+				// TODO
+			},
 		})
 		if err != nil {
 			fatalErr(err)
