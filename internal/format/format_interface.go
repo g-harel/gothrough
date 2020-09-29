@@ -57,27 +57,9 @@ func formatInterface(ifc *types.Interface) *tokens.Snippet {
 			snippet.Newline()
 		}
 
-		methodDocs := formatDocs(&method.Docs)
-		methodDocs.IndentLines()
-		snippet.Push(methodDocs)
-
-		snippet.Indent()
-		snippet.MethodName(method.Name)
-		snippet.Punctuation("(")
-		snippet.Push(formatFieldList(method.Arguments))
-		snippet.Punctuation(")")
-
-		if len(method.ReturnValues) == 1 {
-			snippet.Space()
-			snippet.Push(formatFieldList(method.ReturnValues))
-		} else if len(method.ReturnValues) > 1 {
-			snippet.Space()
-			snippet.Punctuation("(")
-			snippet.Push(formatFieldList(method.ReturnValues))
-			snippet.Punctuation(")")
-		}
-
-		snippet.Newline()
+		formattedMethod := formatFunction(&method)
+		formattedMethod.IndentLines()
+		snippet.Push(formattedMethod)
 	}
 
 	snippet.Punctuation("}")

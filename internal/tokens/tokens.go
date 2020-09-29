@@ -13,7 +13,7 @@ const (
 	kindFieldName       = "field_name"
 	kindInterfaceName   = "interface_name"
 	kindKeyword         = "keyword"
-	kindMethodName      = "method_name"
+	kindFunctionName    = "function_name"
 	kindPunctuation     = "punctuation"
 	kindFieldType       = "field_type"
 	kindWhitespace      = "whitespace"
@@ -99,8 +99,8 @@ func (snippet *Snippet) Keyword(text string) {
 	snippet.push(Token{text, kindKeyword})
 }
 
-func (snippet *Snippet) MethodName(text string) {
-	snippet.push(Token{text, kindMethodName})
+func (snippet *Snippet) FunctionName(text string) {
+	snippet.push(Token{text, kindFunctionName})
 }
 
 func (snippet *Snippet) Punctuation(text string) {
