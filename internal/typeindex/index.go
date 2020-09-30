@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/filter"
 	"github.com/g-harel/gothrough/internal/stringindex"
 	"github.com/g-harel/gothrough/internal/types"
@@ -17,11 +18,10 @@ const (
 )
 
 type Result struct {
-	Confidence        float64
-	Name              string
-	PackageName       string
-	PackageImportPath string
-	Value             types.Type
+	Confidence float64
+	Name       string
+	Location   extract.Location
+	Value      types.Type
 }
 
 type Index struct {
@@ -60,8 +60,8 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	if len(parsedQuery.Filters["package"]) > 0 {
 		for _, result := range results {
 			for _, filterValue := range parsedQuery.Filters["package"] {
-				if result.PackageName == filterValue ||
-					result.PackageImportPath == filterValue {
+				if result.Location.PackageName == filterValue ||
+					result.Location.PackageImportPath == filterValue {
 					filteredResults = append(filteredResults, result)
 				}
 			}
@@ -85,7 +85,7 @@ func (idx *Index) Packages() [][]string {
 
 	// Add package names.
 	for _, result := range idx.results {
-		packageName := result.PackageImportPath
+		packageName := result.Location.PackageImportPath
 
 		if seenPackages[packageName] {
 			continue

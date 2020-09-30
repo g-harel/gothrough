@@ -4,15 +4,15 @@ import (
 	"strings"
 
 	"github.com/g-harel/gothrough/internal/camel"
+	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func (idx *Index) InsertInterface(ifc types.Interface) {
+func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface) {
 	idx.results = append(idx.results, &Result{
-		Name:              ifc.Name,
-		PackageName:       ifc.PackageName,
-		PackageImportPath: ifc.PackageImportPath,
-		Value:             &ifc,
+		Name:     ifc.Name,
+		Location: location,
+		Value:    &ifc,
 	})
 	id := len(idx.results) - 1
 
@@ -24,9 +24,9 @@ func (idx *Index) InsertInterface(ifc types.Interface) {
 	}
 
 	// Index on package path and source file.
-	importPathParts := strings.Split(ifc.PackageImportPath, "/")
-	idx.textIndex.Insert(id, confidenceHigh, ifc.PackageName)
-	idx.textIndex.Insert(id, confidenceLow, strings.TrimSuffix(ifc.SourceFile, ".go"))
+	importPathParts := strings.Split(location.PackageImportPath, "/")
+	idx.textIndex.Insert(id, confidenceHigh, location.PackageName)
+	idx.textIndex.Insert(id, confidenceLow, strings.TrimSuffix(location.SourceFile, ".go"))
 	if len(importPathParts) > 1 {
 		idx.textIndex.Insert(id, confidenceLow/len(importPathParts), importPathParts...)
 	}

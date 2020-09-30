@@ -37,7 +37,7 @@ func main() {
 	for _, dir := range flag.Args() {
 		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
 			Interface: idx.InsertInterface,
-			Function: func(fn types.Function) {
+			Function: func(location extract.Location, fn types.Function) {
 				// TODO
 			},
 		})

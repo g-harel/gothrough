@@ -9,9 +9,15 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+type Location struct {
+	PackageName       string
+	PackageImportPath string
+	SourceFile        string
+}
+
 type TypeHandlers struct {
-	Interface func(types.Interface)
-	Function  func(types.Function)
+	Interface func(Location, types.Interface)
+	Function  func(Location, types.Function)
 }
 
 func Types(srcDir string, handlers TypeHandlers) error {

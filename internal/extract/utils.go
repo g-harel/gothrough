@@ -5,6 +5,8 @@ import (
 	"go/ast"
 	"go/format"
 	"go/token"
+	"path"
+	"strings"
 
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -38,4 +40,20 @@ func collectFields(fieldList *ast.FieldList) []types.Field {
 		}
 	}
 	return result
+}
+
+func getLocation(filepath string) Location {
+	pathname, filename := path.Split(filepath)
+
+	// Attempt to detect source dir by looking for the closest "src" directory.
+	pathParts := strings.Split(path.Clean(pathname), "/src")
+	srcDir := path.Join(pathParts[:len(pathParts)-1]...) + "/src/"
+
+	relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
+
+	return Location{
+		PackageName:       path.Base(relativePath),
+		PackageImportPath: relativePath,
+		SourceFile:        filename,
+	}
 }

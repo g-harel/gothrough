@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"path"
-	"strings"
 
 	"github.com/g-harel/gothrough/internal/types"
 )
 
 // newInterfaceVisitor creates a visitor that collects interfaces into the target array.
-func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
+func newInterfaceVisitor(handler func(Location, types.Interface)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
@@ -24,14 +22,6 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 						if interfaceType, ok := interfaceSpec.Type.(*ast.InterfaceType); ok {
 							name := interfaceSpec.Name.String()
 							if interfaceSpec.Name.IsExported() {
-								pathname, filename := path.Split(filepath)
-
-								// Attempt to detect source dir by looking for the closest "src" directory.
-								pathParts := strings.Split(path.Clean(pathname), "/src")
-								srcDir := path.Join(pathParts[:len(pathParts)-1]...) + "/src/"
-
-								relativePath := strings.TrimPrefix(path.Dir(filepath), srcDir)
-
 								// Collect methods.
 								methods := []types.Function{}
 								embedded := []types.Reference{}
@@ -70,16 +60,16 @@ func newInterfaceVisitor(handler func(types.Interface)) visitFunc {
 									}
 								}
 
-								handler(types.Interface{
-									Name:              name,
-									Docs:              types.Docs{Text: typeDeclaration.Doc.Text()},
-									Embedded:          embedded,
-									Methods:           methods,
-									PackageName:       path.Base(relativePath),
-									PackageImportPath: relativePath,
-									SourceFile:        filename,
-									SourceLine:        fset.Position(typeDeclaration.Pos()).Line,
-								})
+								handler(
+									getLocation(filepath),
+									types.Interface{
+										Name:     name,
+										Docs:     types.Docs{Text: typeDeclaration.Doc.Text()},
+										Embedded: embedded,
+										Methods:  methods,
+									},
+								)
+
 								return true
 							}
 						}

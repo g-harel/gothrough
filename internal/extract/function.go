@@ -8,7 +8,7 @@ import (
 )
 
 // newFunctionVisitor creates a visitor that collects Funcs into the target array.
-func newFunctionVisitor(handler func(types.Function)) visitFunc {
+func newFunctionVisitor(handler func(Location, types.Function)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
@@ -16,12 +16,15 @@ func newFunctionVisitor(handler func(types.Function)) visitFunc {
 
 		if funcDeclaration, ok := n.(*ast.FuncDecl); ok {
 			if funcDeclaration.Name.IsExported() {
-				handler(types.Function{
-					Name:         funcDeclaration.Name.String(),
-					Docs:         types.Docs{Text: funcDeclaration.Doc.Text()},
-					Arguments:    collectFields(funcDeclaration.Type.Params),
-					ReturnValues: collectFields(funcDeclaration.Type.Results),
-				})
+				handler(
+					getLocation(filepath),
+					types.Function{
+						Name:         funcDeclaration.Name.String(),
+						Docs:         types.Docs{Text: funcDeclaration.Doc.Text()},
+						Arguments:    collectFields(funcDeclaration.Type.Params),
+						ReturnValues: collectFields(funcDeclaration.Type.Results),
+					},
+				)
 			}
 		}
 		return false

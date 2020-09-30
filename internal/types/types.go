@@ -28,12 +28,8 @@ type Reference struct {
 
 // Interface contains data about the location and shape of an interface.
 type Interface struct {
-	Name              string
-	Docs              Docs
-	Embedded          []Reference
-	Methods           []Function
-	PackageName       string
-	PackageImportPath string
-	SourceFile        string
-	SourceLine        int
+	Name     string
+	Docs     Docs
+	Embedded []Reference
+	Methods  []Function
 }

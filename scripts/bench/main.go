@@ -33,7 +33,7 @@ func main() {
 
 	err := extract.Types(root, extract.TypeHandlers{
 		Interface: idx.InsertInterface,
-		Function: func(fn types.Function) {
+		Function: func(location extract.Location, fn types.Function) {
 			// TODO
 		},
 	})
@@ -42,7 +42,7 @@ func main() {
 	}
 	err = extract.Types(path, extract.TypeHandlers{
 		Interface: idx.InsertInterface,
-		Function: func(fn types.Function) {
+		Function: func(location extract.Location, fn types.Function) {
 			// TODO
 		},
 	})
