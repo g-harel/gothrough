@@ -1,8 +1,6 @@
 package typeindex
 
 import (
-	"strings"
-
 	"github.com/g-harel/gothrough/internal/camel"
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/types"
@@ -16,19 +14,13 @@ func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface
 	})
 	id := len(idx.results) - 1
 
+	idx.insertLocation(id, location)
+
 	// Index on interface name.
 	idx.textIndex.Insert(id, confidenceHigh, ifc.Name)
 	nameTokens := camel.Split(ifc.Name)
 	if len(nameTokens) > 1 {
 		idx.textIndex.Insert(id, confidenceHigh/len(nameTokens), nameTokens...)
-	}
-
-	// Index on package path and source file.
-	importPathParts := strings.Split(location.PackageImportPath, "/")
-	idx.textIndex.Insert(id, confidenceHigh, location.PackageName)
-	idx.textIndex.Insert(id, confidenceLow, strings.TrimSuffix(location.SourceFile, ".go"))
-	if len(importPathParts) > 1 {
-		idx.textIndex.Insert(id, confidenceLow/len(importPathParts), importPathParts...)
 	}
 
 	// Index on embedded interfaces.
