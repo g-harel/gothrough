@@ -10,6 +10,7 @@ import (
 
 // Register types that could be hidden behind "types.Type".
 func init() {
+	gob.Register(&types.Function{})
 	gob.Register(&types.Interface{})
 }
 

@@ -28,6 +28,9 @@ func Format(value interface{}) (*tokens.Snippet, error) {
 	if v, ok := value.(*types.Field); ok {
 		return formatField(v), nil
 	}
+	if v, ok := value.(*types.Function); ok {
+		return formatFunction(v), nil
+	}
 	if v, ok := value.(*types.Interface); ok {
 		return formatInterface(v), nil
 	}

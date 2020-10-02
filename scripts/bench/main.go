@@ -10,7 +10,6 @@ import (
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/typeindex"
-	"github.com/g-harel/gothrough/internal/types"
 )
 
 func main() {
@@ -33,18 +32,14 @@ func main() {
 
 	err := extract.Types(root, extract.TypeHandlers{
 		Interface: idx.InsertInterface,
-		Function: func(location extract.Location, fn types.Function) {
-			// TODO
-		},
+		Function:  idx.InsertFunction,
 	})
 	if err != nil {
 		panic(err)
 	}
 	err = extract.Types(path, extract.TypeHandlers{
 		Interface: idx.InsertInterface,
-		Function: func(location extract.Location, fn types.Function) {
-			// TODO
-		},
+		Function:  idx.InsertFunction,
 	})
 	if err != nil {
 		panic(err)

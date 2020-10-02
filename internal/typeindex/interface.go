@@ -16,7 +16,7 @@ func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface
 
 	idx.insertLocation(id, location)
 
-	// Index on interface name.
+	// Index on name.
 	idx.textIndex.Insert(id, confidenceHigh, ifc.Name)
 	nameTokens := camel.Split(ifc.Name)
 	if len(nameTokens) > 1 {
@@ -40,7 +40,7 @@ func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface
 		}
 	}
 
-	// Index on interface methods.
+	// Index on methods.
 	if len(ifc.Methods) > 0 {
 		for _, method := range ifc.Methods {
 			idx.textIndex.Insert(id, confidenceMed/len(ifc.Methods), method.Name)
