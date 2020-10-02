@@ -8,14 +8,13 @@ import (
 )
 
 // newFunctionVisitor creates a visitor that collects Funcs into the target array.
-// TODO filter out funcs with a receiver type.
 func newFunctionVisitor(handler func(Location, types.Function)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
 			return true
 		}
 
-		if funcDeclaration, ok := n.(*ast.FuncDecl); ok {
+		if funcDeclaration, ok := n.(*ast.FuncDecl); ok && funcDeclaration.Recv == nil {
 			if funcDeclaration.Name.IsExported() {
 				handler(
 					getLocation(filepath),
