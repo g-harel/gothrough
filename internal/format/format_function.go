@@ -5,11 +5,15 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// TODO primary one should be linked in top-lever format and add func keyword.
-func formatFunction(function *types.Function) *tokens.Snippet {
+func formatFunction(function *types.Function, decl bool) *tokens.Snippet {
 	snippet := tokens.NewSnippet()
 
 	snippet.Push(formatDocs(&function.Docs))
+
+	if decl {
+		snippet.Keyword("func")
+		snippet.Space()
+	}
 
 	snippet.FunctionName(function.Name)
 	snippet.Punctuation("(")

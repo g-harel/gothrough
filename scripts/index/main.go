@@ -22,6 +22,7 @@ func fatalErr(err error) {
 	os.Exit(1)
 }
 
+// TODO add options to bench.
 func main() {
 	flag.Parse()
 

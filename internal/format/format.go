@@ -29,10 +29,10 @@ func Format(value interface{}) (*tokens.Snippet, error) {
 		return formatField(v), nil
 	}
 	if v, ok := value.(*types.Function); ok {
-		return formatFunction(v), nil
+		return formatFunction(v, true), nil
 	}
 	if v, ok := value.(*types.Interface); ok {
-		return formatInterface(v), nil
+		return formatInterface(v, true), nil
 	}
 	return nil, fmt.Errorf("No matching tokenizer: %v", reflect.TypeOf(value))
 }

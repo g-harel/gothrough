@@ -5,13 +5,16 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func formatInterface(ifc *types.Interface) *tokens.Snippet {
+func formatInterface(ifc *types.Interface, decl bool) *tokens.Snippet {
 	snippet := tokens.NewSnippet()
 
 	snippet.Push(formatDocs(&ifc.Docs))
 
-	snippet.Keyword("type")
-	snippet.Space()
+	if decl {
+		snippet.Keyword("type")
+		snippet.Space()
+	}
+
 	snippet.InterfaceName(ifc.Name)
 	snippet.Space()
 	snippet.Keyword("interface")
@@ -57,7 +60,7 @@ func formatInterface(ifc *types.Interface) *tokens.Snippet {
 			snippet.Newline()
 		}
 
-		formattedMethod := formatFunction(&method)
+		formattedMethod := formatFunction(&method, false)
 		formattedMethod.IndentLines()
 		snippet.Push(formattedMethod)
 	}
