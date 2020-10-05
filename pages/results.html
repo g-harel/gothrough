@@ -28,12 +28,12 @@ type Context struct {
             margin: 0 0 4rem;
         }
 
-        .result .full-name {
+        .result h2 {
             font-weight: 600;
             margin-top: 0;
         }
 
-        .result .full-name a {
+        .result a {
             color: #005cc5;
         }
 
@@ -49,10 +49,28 @@ type Context struct {
 {{- end -}}
 
 {{- define "body" -}}
-    <!-- TODO Special case when there are no results -->
+    {{- if not .Results -}}
+        <div class="result">
+            <h2>No results</h2>
+            <code><span class="function_name"><!--
+-->         ,_---~~~~~----._
+  _,,_,*^____      _____``*g*\"*,
+ / __/ /'     ^.  /      \ ^@q   f
+[  @f | @))    |  | @))   l  0 _/
+ \`/   \~____ / __ \_____/    \
+  |           _l__l_           I
+  }          [______]           I
+  ]            | | |            |
+  ]             ~ ~             |
+  |                            |
+   |                           |
+https://gist.github.com/belbomemo/b5e7dad10fa567a5fe8a<!--
+         --></span></code>
+        </div>
+    {{- end -}}
     {{- range $i, $result := .Results -}}
         <div class="result">
-            <h2 class="full-name">
+            <h2>
                 {{- $result.PackageName -}}.<!--
              --><a href="https://godoc.org/{{- $result.PackageImportPath -}}#{{- $result.Name -}}">
                     {{- $result.Name -}}
