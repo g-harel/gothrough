@@ -16,8 +16,9 @@ type Location struct {
 }
 
 type TypeHandlers struct {
-	Interface func(Location, types.Interface)
+	Value     func(Location, types.Value)
 	Function  func(Location, types.Function)
+	Interface func(Location, types.Interface)
 }
 
 func Types(srcDir string, handlers TypeHandlers) error {
@@ -44,8 +45,9 @@ func Types(srcDir string, handlers TypeHandlers) error {
 		if strings.Contains(pathname, "testdata/") {
 			return nil
 		}
-		visit(pathname, newInterfaceVisitor(handlers.Interface))
+		visit(pathname, newValueVisitor(handlers.Value))
 		visit(pathname, newFunctionVisitor(handlers.Function))
+		visit(pathname, newInterfaceVisitor(handlers.Interface))
 		return nil
 	})
 	if err != nil {

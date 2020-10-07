@@ -26,10 +26,16 @@ type Reference struct {
 	Docs    Docs
 }
 
-// Interface contains data about the location and shape of an interface.
 type Interface struct {
 	Name     string
 	Docs     Docs
 	Embedded []Reference
 	Methods  []Function
+}
+
+type Value struct {
+	Name  string
+	Docs  Docs
+	Type  string
+	Value string
 }

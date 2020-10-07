@@ -10,6 +10,7 @@ import (
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/typeindex"
+	"github.com/g-harel/gothrough/internal/types"
 )
 
 var dest = flag.String("dest", ".index", "output filename")
@@ -42,6 +43,10 @@ func main() {
 		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
 			Interface: idx.InsertInterface,
 			Function:  idx.InsertFunction,
+			Value: func(location extract.Location, value types.Value) {
+				// TODO
+				fmt.Println(value)
+			},
 		})
 		if err != nil {
 			fatalErr(err)
@@ -78,7 +83,11 @@ func main() {
 		fmt.Printf("Queried in %s\n", time.Since(searchStart))
 		fmt.Println("========")
 
-		for _, result := range results[:8] {
+		if len(results) > 8 {
+			results = results[:8]
+		}
+
+		for _, result := range results {
 			fmt.Printf("=== %.6f ===\n", result.Confidence)
 			p, err := format.String(result.Value)
 			if err != nil {
