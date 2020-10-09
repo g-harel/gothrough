@@ -12,6 +12,7 @@ import (
 func init() {
 	gob.Register(&types.Function{})
 	gob.Register(&types.Interface{})
+	gob.Register(&types.Value{})
 }
 
 type encodableTypeIndex struct {

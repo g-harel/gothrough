@@ -12,6 +12,7 @@ const (
 	kindEmbeddedPackage = "embedded_package"
 	kindFieldName       = "field_name"
 	kindInterfaceName   = "interface_name"
+	kindLiteral         = "literal"
 	kindKeyword         = "keyword"
 	kindFunctionName    = "function_name"
 	kindPunctuation     = "punctuation"
@@ -93,6 +94,10 @@ func (snippet *Snippet) FieldName(text string) {
 
 func (snippet *Snippet) InterfaceName(text string) {
 	snippet.push(Token{text, kindInterfaceName})
+}
+
+func (snippet *Snippet) Literal(text string) {
+	snippet.push(Token{text, kindLiteral})
 }
 
 func (snippet *Snippet) Keyword(text string) {

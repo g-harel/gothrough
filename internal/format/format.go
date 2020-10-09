@@ -34,5 +34,8 @@ func Format(value interface{}) (*tokens.Snippet, error) {
 	if v, ok := value.(*types.Interface); ok {
 		return formatInterface(v, true), nil
 	}
+	if v, ok := value.(*types.Value); ok {
+		return formatValue(v), nil
+	}
 	return nil, fmt.Errorf("No matching tokenizer: %v", reflect.TypeOf(value))
 }

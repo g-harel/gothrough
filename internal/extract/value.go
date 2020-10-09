@@ -28,8 +28,10 @@ func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 								handler(
 									getLocation(filepath),
 									types.Value{
-										Name:  name.String(),
-										Docs:  types.Docs{Text: valueDeclaration.Doc.Text()},
+										Name: name.String(),
+										Docs: types.Docs{
+											Text: valueDeclaration.Doc.Text() + valueSpec.Doc.Text(),
+										},
 										Value: pretty(valueSpec.Values[i]),
 									},
 								)

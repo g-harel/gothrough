@@ -56,6 +56,7 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply package filter.
+	// TODO sort by type + alphabetically (maybe print without docs and sort as string)
 	filteredResults := []*Result{}
 	if len(parsedQuery.Filters["package"]) > 0 {
 		for _, result := range results {

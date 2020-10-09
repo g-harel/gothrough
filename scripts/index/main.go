@@ -10,7 +10,6 @@ import (
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/typeindex"
-	"github.com/g-harel/gothrough/internal/types"
 )
 
 var dest = flag.String("dest", ".index", "output filename")
@@ -37,16 +36,12 @@ func main() {
 	indexTime := time.Now()
 
 	// Create index.
-	// TODO index constants.
 	idx := typeindex.NewIndex()
 	for _, dir := range flag.Args() {
 		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
 			Interface: idx.InsertInterface,
 			Function:  idx.InsertFunction,
-			Value: func(location extract.Location, value types.Value) {
-				// TODO
-				fmt.Println(value)
-			},
+			Value:     idx.InsertValue,
 		})
 		if err != nil {
 			fatalErr(err)
