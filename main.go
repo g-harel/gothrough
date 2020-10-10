@@ -28,13 +28,13 @@ func main() {
 
 	fi, err := os.Stat(indexFilename)
 	if err != nil {
-		panic(fmt.Sprintf("stat index file: ", err))
+		panic(fmt.Sprintf("stat index file: %v", err))
 	}
 	log.Printf("Index size: %v bytes", fi.Size())
 
 	f, err := os.Open(indexFilename)
 	if err != nil {
-		panic(fmt.Sprintf("open index file: ", err))
+		panic(fmt.Sprintf("open index file: %v", err))
 	}
 
 	idx, err := typeindex.NewIndexFromBytes(f)
@@ -62,10 +62,6 @@ func main() {
 		results, err := idx.Search(query)
 		if err != nil {
 			panic(err)
-		}
-
-		if len(results) > 16 {
-			results = results[:16]
 		}
 
 		pages.Results(query, results)(w, r)

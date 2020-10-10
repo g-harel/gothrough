@@ -1,7 +1,10 @@
 package typeindex
 
 import (
+	"fmt"
+	"os"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/g-harel/gothrough/internal/extract"
@@ -69,6 +72,20 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		}
 	} else {
 		filteredResults = results
+	}
+
+	// Default to 32 results or use configured number.
+	count := 32
+	if len(parsedQuery.Filters["count"]) == 1 {
+		c, err := strconv.Atoi(parsedQuery.Filters["count"][0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "parse count filter: %v", err)
+		} else {
+			count = c
+		}
+	}
+	if len(filteredResults) > count {
+		filteredResults = filteredResults[:count]
 	}
 
 	return filteredResults, nil
