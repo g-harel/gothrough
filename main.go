@@ -25,9 +25,16 @@ func main() {
 	if indexFilename == "" {
 		indexFilename = ".index"
 	}
+
+	fi, err := os.Stat(indexFilename)
+	if err != nil {
+		panic(fmt.Sprintf("stat index file: ", err))
+	}
+	log.Printf("Index size: %v bytes", fi.Size())
+
 	f, err := os.Open(indexFilename)
 	if err != nil {
-		panic("missing index file")
+		panic(fmt.Sprintf("open index file: ", err))
 	}
 
 	idx, err := typeindex.NewIndexFromBytes(f)
