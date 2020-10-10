@@ -8,7 +8,6 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// newInterfaceVisitor creates a visitor that collects interfaces into the target array.
 func newInterfaceVisitor(handler func(Location, types.Interface)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {

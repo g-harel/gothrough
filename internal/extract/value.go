@@ -7,9 +7,7 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// newValueVisitor creates a visitor that collects Consts into the target array.
-// TODO record vars as well as consts
-// TODO handle vars with no value
+// TODO handle vars with no value and only type
 func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {
@@ -17,7 +15,7 @@ func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 		}
 
 		if valueDeclaration, ok := n.(*ast.GenDecl); ok {
-			if valueDeclaration.Tok == token.CONST {
+			if valueDeclaration.Tok == token.CONST || valueDeclaration.Tok == token.VAR {
 				for _, spec := range valueDeclaration.Specs {
 					if valueSpec, ok := spec.(*ast.ValueSpec); ok {
 						for i, name := range valueSpec.Names {
@@ -32,6 +30,7 @@ func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 										Docs: types.Docs{
 											Text: valueDeclaration.Doc.Text() + valueSpec.Doc.Text(),
 										},
+										Const: valueDeclaration.Tok == token.CONST,
 										Value: pretty(valueSpec.Values[i]),
 									},
 								)

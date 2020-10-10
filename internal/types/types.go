@@ -36,6 +36,7 @@ type Interface struct {
 type Value struct {
 	Name  string
 	Docs  Docs
+	Const bool
 	Type  string
 	Value string
 }

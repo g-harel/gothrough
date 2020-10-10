@@ -7,7 +7,6 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// newFunctionVisitor creates a visitor that collects Funcs into the target array.
 func newFunctionVisitor(handler func(Location, types.Function)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
 		if n == nil {

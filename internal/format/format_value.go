@@ -10,7 +10,11 @@ func formatValue(value *types.Value) *tokens.Snippet {
 
 	snippet.Push(formatDocs(&value.Docs))
 
-	snippet.Keyword("const")
+	if value.Const {
+		snippet.Keyword("const")
+	} else {
+		snippet.Keyword("var")
+	}
 	snippet.Space()
 
 	// TODO more specific kind
