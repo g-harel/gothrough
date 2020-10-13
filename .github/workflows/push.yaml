@@ -25,6 +25,6 @@ jobs:
         CLOUDSDK_CORE_PROJECT: gothrough
 
       # Deploy new image.
-    - run: gcloud --quiet run deploy --image gcr.io/gothrough/website --allow-unauthenticated --region=us-central1 --timeout=8s website2 --platform=managed --memory=2Gi
+    - run: gcloud --quiet run deploy --image gcr.io/gothrough/website --allow-unauthenticated --region=us-central1 --timeout=32s website --platform=managed --memory=2Gi
       env:
         CLOUDSDK_CORE_PROJECT: gothrough
