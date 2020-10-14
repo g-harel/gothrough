@@ -28,7 +28,7 @@ func formatAll(results []*typeindex.Result) []PrettyResult {
 		}
 		formatted = append(formatted, PrettyResult{
 			Name:              result.Name,
-			Confidence:        int(result.Confidence * 100),
+			Confidence:        int(result.Confidence * 1000),
 			PackageName:       result.Location.PackageName,
 			PackageImportPath: result.Location.PackageImportPath,
 			PrettyTokens:      snippet.Dump(),

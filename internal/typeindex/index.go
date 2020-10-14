@@ -45,8 +45,8 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	parsedQuery := filter.Parse(query)
 
 	var results []*Result
+	// Use all results when no query terms.
 	if parsedQuery.QueryWords == "" {
-		// Use all results when no query terms.
 		results = idx.results
 	} else {
 		matches := idx.textIndex.Search(parsedQuery.QueryWords)
@@ -58,8 +58,9 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		}
 	}
 
+	// TODO type filter
+
 	// Apply package filter.
-	// TODO sort by type + alphabetically (maybe print without docs and sort as string)
 	filteredResults := []*Result{}
 	if len(parsedQuery.Filters["package"]) > 0 {
 		for _, result := range results {
@@ -72,6 +73,14 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		}
 	} else {
 		filteredResults = results
+	}
+
+	// Sort results when there is no query.
+	// This happens when only filters are used.
+	if parsedQuery.QueryWords == "" {
+		sort.SliceStable(filteredResults, func(i, j int) bool {
+			return types.Compare(filteredResults[i].Value, filteredResults[j].Value)
+		})
 	}
 
 	// Default to 32 results or use configured number.
