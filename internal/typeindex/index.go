@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/g-harel/gothrough/internal/extract"
-	"github.com/g-harel/gothrough/internal/filter"
 	"github.com/g-harel/gothrough/internal/stringindex"
+	"github.com/g-harel/gothrough/internal/tags"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
@@ -42,14 +42,14 @@ func NewIndex() *Index {
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (idx *Index) Search(query string) ([]*Result, error) {
-	parsedQuery := filter.Parse(query)
+	q := tags.Parse(query)
 
 	var results []*Result
 	// Use all results when no query terms.
-	if parsedQuery.QueryWords == "" {
+	if q.Words == "" {
 		results = idx.results
 	} else {
-		matches := idx.textIndex.Search(parsedQuery.QueryWords)
+		matches := idx.textIndex.Search(q.Words)
 		results = make([]*Result, len(matches))
 		for i, match := range matches {
 			result := idx.results[match.ID]
@@ -59,13 +59,13 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply type filter.
-	if len(parsedQuery.Filters["type"]) > 0 {
+	if len(q.Tags["type"]) > 0 {
 		temp := results[:]
 		results = []*Result{}
 		for _, result := range temp {
-			for _, typeValue := range parsedQuery.Filters["type"] {
+			for _, tag := range q.Tags["type"] {
 				typeString, ok := types.TypeString(result.Value)
-				if ok && typeValue == typeString {
+				if ok && tag == typeString {
 					results = append(results, result)
 				}
 			}
@@ -73,13 +73,12 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply package filter.
-	if len(parsedQuery.Filters["package"]) > 0 {
+	if len(q.Tags["package"]) > 0 {
 		temp := results[:]
 		results = []*Result{}
 		for _, result := range temp {
-			for _, filterValue := range parsedQuery.Filters["package"] {
-				if result.Location.PackageName == filterValue ||
-					result.Location.PackageImportPath == filterValue {
+			for _, tag := range q.Tags["package"] {
+				if result.Location.PackageName == tag || result.Location.PackageImportPath == tag {
 					results = append(results, result)
 				}
 			}
@@ -87,8 +86,8 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Sort results when there is no query.
-	// This happens when only filters are used.
-	if parsedQuery.QueryWords == "" {
+	// This happens when the query has no words.
+	if q.Words == "" {
 		sort.SliceStable(results, func(i, j int) bool {
 			return types.Compare(results[i].Value, results[j].Value)
 		})
@@ -96,10 +95,10 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 
 	// Default to 32 results or use configured number.
 	count := 32
-	if len(parsedQuery.Filters["count"]) == 1 {
-		c, err := strconv.Atoi(parsedQuery.Filters["count"][0])
+	if len(q.Tags["count"]) == 1 {
+		c, err := strconv.Atoi(q.Tags["count"][0])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "parse count filter: %v", err)
+			fmt.Fprintf(os.Stderr, "parse count tag: %v", err)
 		} else {
 			count = c
 		}

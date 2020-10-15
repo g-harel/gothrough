@@ -1,40 +1,39 @@
-package filter
+package tags
 
 import "strings"
 
 type ParsedQuery struct {
-	QueryWords string
-	// TODO rename to tag
-	Filters map[string][]string
+	Words string
+	Tags  map[string][]string
 }
 
 func Parse(query string) ParsedQuery {
 	parts := strings.Fields(query)
 
 	parsed := ParsedQuery{
-		QueryWords: "",
-		Filters:    map[string][]string{},
+		Words: "",
+		Tags:  map[string][]string{},
 	}
 	for _, part := range parts {
 		if !strings.Contains(part, ":") {
-			parsed.QueryWords += " " + part
+			parsed.Words += " " + part
 			continue
 		}
 
-		filterQuery := strings.SplitN(part, ":", 2)
-		prefix := filterQuery[0]
-		query := filterQuery[1]
+		tagQuery := strings.SplitN(part, ":", 2)
+		prefix := tagQuery[0]
+		query := tagQuery[1]
 
 		// Only add the prefix/query combination if it is not a duplicate.
 		isNew := true
-		for _, existingQuery := range parsed.Filters[prefix] {
+		for _, existingQuery := range parsed.Tags[prefix] {
 			if query == existingQuery {
 				isNew = false
 				break
 			}
 		}
 		if isNew {
-			parsed.Filters[prefix] = append(parsed.Filters[prefix], query)
+			parsed.Tags[prefix] = append(parsed.Tags[prefix], query)
 		}
 	}
 
