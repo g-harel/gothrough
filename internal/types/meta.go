@@ -1,5 +1,21 @@
 package types
 
+func TypeString(t Type) (string, bool) {
+	switch v := t.(type) {
+	case *Value:
+		if v.Const {
+			return "const", true
+		}
+		return "var", true
+	case *Interface:
+		return "interface", true
+	case *Function:
+		return "function", true
+	default:
+		return "", false
+	}
+}
+
 func Compare(a, b Type) bool {
 	aVal := extractTypeSortValue(a)
 	bVal := extractTypeSortValue(b)

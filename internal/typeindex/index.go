@@ -58,28 +58,39 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		}
 	}
 
-	// TODO type filter
-
-	// Apply package filter.
-	filteredResults := []*Result{}
-	if len(parsedQuery.Filters["package"]) > 0 {
-		for _, result := range results {
-			for _, filterValue := range parsedQuery.Filters["package"] {
-				if result.Location.PackageName == filterValue ||
-					result.Location.PackageImportPath == filterValue {
-					filteredResults = append(filteredResults, result)
+	// Apply type filter.
+	if len(parsedQuery.Filters["type"]) > 0 {
+		temp := results[:]
+		results = []*Result{}
+		for _, result := range temp {
+			for _, typeValue := range parsedQuery.Filters["type"] {
+				typeString, ok := types.TypeString(result.Value)
+				if ok && typeValue == typeString {
+					results = append(results, result)
 				}
 			}
 		}
-	} else {
-		filteredResults = results
+	}
+
+	// Apply package filter.
+	if len(parsedQuery.Filters["package"]) > 0 {
+		temp := results[:]
+		results = []*Result{}
+		for _, result := range temp {
+			for _, filterValue := range parsedQuery.Filters["package"] {
+				if result.Location.PackageName == filterValue ||
+					result.Location.PackageImportPath == filterValue {
+					results = append(results, result)
+				}
+			}
+		}
 	}
 
 	// Sort results when there is no query.
 	// This happens when only filters are used.
 	if parsedQuery.QueryWords == "" {
-		sort.SliceStable(filteredResults, func(i, j int) bool {
-			return types.Compare(filteredResults[i].Value, filteredResults[j].Value)
+		sort.SliceStable(results, func(i, j int) bool {
+			return types.Compare(results[i].Value, results[j].Value)
 		})
 	}
 
@@ -93,11 +104,11 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 			count = c
 		}
 	}
-	if len(filteredResults) > count {
-		filteredResults = filteredResults[:count]
+	if len(results) > count {
+		results = results[:count]
 	}
 
-	return filteredResults, nil
+	return results, nil
 }
 
 func (idx *Index) Packages() [][]string {

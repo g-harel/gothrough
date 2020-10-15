@@ -4,7 +4,8 @@ import "strings"
 
 type ParsedQuery struct {
 	QueryWords string
-	Filters    map[string][]string
+	// TODO rename to tag
+	Filters map[string][]string
 }
 
 func Parse(query string) ParsedQuery {
