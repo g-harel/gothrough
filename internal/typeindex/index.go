@@ -58,32 +58,44 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		}
 	}
 
-	// Apply type filter.
-	if len(q.Tags["type"]) > 0 {
-		temp := results[:]
-		results = []*Result{}
-		for _, result := range temp {
-			for _, tag := range q.Tags["type"] {
-				typeString, ok := types.TypeString(result.Value)
-				if ok && tag == typeString {
-					results = append(results, result)
+	filterResults := func(tag string, handler func(tagValue string, result *Result) bool) {
+		if len(q.Tags[tag]) > 0 {
+			temp := results[:]
+			results = []*Result{}
+			for _, result := range temp {
+				for _, tagValue := range q.Tags[tag] {
+					if handler(tagValue, result) {
+						results = append(results, result)
+						break
+					}
 				}
 			}
 		}
 	}
 
+	// Apply type filter.
+	filterResults("type", func(tagValue string, result *Result) bool {
+		typeString, ok := types.TypeString(result.Value)
+		return ok && tagValue == typeString
+	})
+
+	// Apply inverted type filter.
+	// filterResults("-type", func(tagValue string, result *Result) bool {
+	// 	typeString, ok := types.TypeString(result.Value)
+	// 	return ok && tagValue != typeString
+	// })
+
 	// Apply package filter.
-	if len(q.Tags["package"]) > 0 {
-		temp := results[:]
-		results = []*Result{}
-		for _, result := range temp {
-			for _, tag := range q.Tags["package"] {
-				if result.Location.PackageName == tag || result.Location.PackageImportPath == tag {
-					results = append(results, result)
-				}
-			}
-		}
-	}
+	filterResults("package", func(tagValue string, result *Result) bool {
+		return result.Location.PackageName == tagValue ||
+			result.Location.PackageImportPath == tagValue
+	})
+
+	// Apply inverted package filter.
+	// filterResults("-package", func(tagValue string, result *Result) bool {
+	// 	return result.Location.PackageName != tagValue &&
+	// 		result.Location.PackageImportPath != tagValue
+	// })
 
 	// Sort results when there is no query.
 	// This happens when the query has no words.
