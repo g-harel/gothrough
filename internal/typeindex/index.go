@@ -40,6 +40,34 @@ func NewIndex() *Index {
 	}
 }
 
+func filter(original []*Result, handler func(result *Result) bool) []*Result {
+	filtered := []*Result{}
+	for _, result := range original {
+		if handler(result) {
+			filtered = append(filtered, result)
+		}
+	}
+	return filtered
+}
+
+func and(bools []bool) bool {
+	for _, b := range bools {
+		if !b {
+			return false
+		}
+	}
+	return true
+}
+
+func or(bools []bool) bool {
+	for _, b := range bools {
+		if b {
+			return true
+		}
+	}
+	return false
+}
+
 // Search returns a interfaces that match the query in deacreasing order of confidence.
 func (idx *Index) Search(query string) ([]*Result, error) {
 	q := tags.Parse(query)
@@ -58,44 +86,51 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		}
 	}
 
-	filterResults := func(tag string, handler func(tagValue string, result *Result) bool) {
-		if len(q.Tags[tag]) > 0 {
-			temp := results[:]
-			results = []*Result{}
-			for _, result := range temp {
-				for _, tagValue := range q.Tags[tag] {
-					if handler(tagValue, result) {
-						results = append(results, result)
-						break
-					}
-				}
+	// Apply type filter.
+	if len(q.Tags["type"]) > 0 {
+		results = filter(results, func(result *Result) bool {
+			bools := []bool{}
+			for _, tag := range q.Tags["type"] {
+				typeString, ok := types.TypeString(result.Value)
+				bools = append(bools, ok && tag == typeString)
 			}
-		}
+			return or(bools)
+		})
 	}
 
-	// Apply type filter.
-	filterResults("type", func(tagValue string, result *Result) bool {
-		typeString, ok := types.TypeString(result.Value)
-		return ok && tagValue == typeString
-	})
-
 	// Apply inverted type filter.
-	// filterResults("-type", func(tagValue string, result *Result) bool {
-	// 	typeString, ok := types.TypeString(result.Value)
-	// 	return ok && tagValue != typeString
-	// })
+	if len(q.Tags["-type"]) > 0 {
+		results = filter(results, func(result *Result) bool {
+			bools := []bool{}
+			for _, tag := range q.Tags["-type"] {
+				typeString, ok := types.TypeString(result.Value)
+				bools = append(bools, !ok || tag != typeString)
+			}
+			return and(bools)
+		})
+	}
 
 	// Apply package filter.
-	filterResults("package", func(tagValue string, result *Result) bool {
-		return result.Location.PackageName == tagValue ||
-			result.Location.PackageImportPath == tagValue
-	})
+	if len(q.Tags["package"]) > 0 {
+		results = filter(results, func(result *Result) bool {
+			bools := []bool{}
+			for _, tag := range q.Tags["package"] {
+				bools = append(bools, result.Location.PackageName == tag || result.Location.PackageImportPath == tag)
+			}
+			return or(bools)
+		})
+	}
 
 	// Apply inverted package filter.
-	// filterResults("-package", func(tagValue string, result *Result) bool {
-	// 	return result.Location.PackageName != tagValue &&
-	// 		result.Location.PackageImportPath != tagValue
-	// })
+	if len(q.Tags["-package"]) > 0 {
+		results = filter(results, func(result *Result) bool {
+			bools := []bool{}
+			for _, tag := range q.Tags["-package"] {
+				bools = append(bools, result.Location.PackageName != tag && result.Location.PackageImportPath != tag)
+			}
+			return and(bools)
+		})
+	}
 
 	// Sort results when there is no query.
 	// This happens when the query has no words.
