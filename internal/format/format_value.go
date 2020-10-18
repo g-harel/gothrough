@@ -18,7 +18,7 @@ func formatValue(value *types.Value) *tokens.Snippet {
 	snippet.Space()
 
 	// TODO more specific kind
-	snippet.FunctionName(value.Name)
+	snippet.DeclName(value.Name)
 	snippet.Space()
 	snippet.Punctuation("=")
 	snippet.Space()

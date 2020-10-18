@@ -15,7 +15,7 @@ func formatFunction(function *types.Function, decl bool) *tokens.Snippet {
 		snippet.Space()
 	}
 
-	snippet.FunctionName(function.Name)
+	snippet.DeclName(function.Name)
 	snippet.Punctuation("(")
 	snippet.Push(formatFieldList(function.Arguments))
 	snippet.Punctuation(")")

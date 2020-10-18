@@ -8,13 +8,13 @@ const (
 
 const (
 	kindComment         = "comment"
+	kindDeclName        = "decl_name"
 	kindEmbeddedName    = "embedded_name"
 	kindEmbeddedPackage = "embedded_package"
 	kindFieldName       = "field_name"
 	kindInterfaceName   = "interface_name"
 	kindLiteral         = "literal"
 	kindKeyword         = "keyword"
-	kindFunctionName    = "function_name"
 	kindPunctuation     = "punctuation"
 	kindFieldType       = "field_type"
 	kindWhitespace      = "whitespace"
@@ -104,8 +104,8 @@ func (snippet *Snippet) Keyword(text string) {
 	snippet.push(Token{text, kindKeyword})
 }
 
-func (snippet *Snippet) FunctionName(text string) {
-	snippet.push(Token{text, kindFunctionName})
+func (snippet *Snippet) DeclName(text string) {
+	snippet.push(Token{text, kindDeclName})
 }
 
 func (snippet *Snippet) Punctuation(text string) {
