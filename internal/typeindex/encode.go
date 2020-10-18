@@ -1,7 +1,9 @@
 package typeindex
 
 import (
+	"compress/gzip"
 	"encoding/gob"
+	"fmt"
 	"io"
 
 	"github.com/g-harel/gothrough/internal/stringindex"
@@ -26,10 +28,20 @@ func (idx *Index) ToBytes(w io.Writer) error {
 		Results:   idx.results,
 	}
 
-	enc := gob.NewEncoder(w)
-	err := enc.Encode(edx)
+	gw, err := gzip.NewWriterLevel(w, gzip.BestCompression)
 	if err != nil {
-		return err
+		return fmt.Errorf("create gzip writer: %v", err)
+	}
+
+	enc := gob.NewEncoder(gw)
+	err = enc.Encode(edx)
+	if err != nil {
+		return fmt.Errorf("encode index: %v", err)
+	}
+
+	err = gw.Close()
+	if err != nil {
+		return fmt.Errorf("close gzip writer: %v", err)
 	}
 
 	return nil
@@ -38,10 +50,20 @@ func (idx *Index) ToBytes(w io.Writer) error {
 func NewIndexFromBytes(r io.Reader) (*Index, error) {
 	var edx encodableTypeIndex
 
-	dec := gob.NewDecoder(r)
-	err := dec.Decode(&edx)
+	gr, err := gzip.NewReader(r)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create gzip reader: %v", err)
+	}
+
+	dec := gob.NewDecoder(gr)
+	err = dec.Decode(&edx)
+	if err != nil {
+		return nil, fmt.Errorf("decode index: %v", err)
+	}
+
+	err = gr.Close()
+	if err != nil {
+		return nil, fmt.Errorf("close gzip reader: %v", err)
 	}
 
 	idx := &Index{

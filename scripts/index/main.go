@@ -36,15 +36,15 @@ func main() {
 	indexTime := time.Now()
 
 	// Create index.
-	idx := typeindex.NewIndex()
+	widx := typeindex.NewIndex()
 	for _, dir := range flag.Args() {
 		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
-			Interface: idx.InsertInterface,
-			Function:  idx.InsertFunction,
-			Value:     idx.InsertValue,
+			Interface: widx.InsertInterface,
+			Function:  widx.InsertFunction,
+			Value:     widx.InsertValue,
 		})
 		if err != nil {
-			fatalErr(err)
+			fatalErr(fmt.Errorf("extract types: %v", err))
 		}
 	}
 
@@ -53,26 +53,41 @@ func main() {
 	writeTime := time.Now()
 
 	// Create output file.
-	f, err := os.Create(*dest)
+	wf, err := os.Create(*dest)
 	if err != nil {
-		fatalErr(err)
+		fatalErr(fmt.Errorf("create index file: %v", err))
 	}
-	defer f.Close()
+	defer wf.Close()
 
 	// Write index to output file.
-	err = idx.ToBytes(f)
+	err = widx.ToBytes(wf)
 	if err != nil {
-		fatalErr(err)
+		fatalErr(fmt.Errorf("write index to file: %v", err))
 	}
 
 	fmt.Printf("Written in %s\n", time.Since(writeTime))
 
+	readTime := time.Now()
+
+	rf, err := os.Open(*dest)
+	if err != nil {
+		fatalErr(fmt.Errorf("open index file: %v", err))
+	}
+
+	// Read index from output file.
+	ridx, err := typeindex.NewIndexFromBytes(rf)
+	if err != nil {
+		fatalErr(fmt.Errorf("create index form file: %v", err))
+	}
+
+	fmt.Printf("Read in %s\n", time.Since(readTime))
+
 	if *query != "" {
 		searchStart := time.Now()
 
-		results, err := idx.Search(*query)
+		results, err := ridx.Search(*query)
 		if err != nil {
-			fatalErr(err)
+			fatalErr(fmt.Errorf("search index: %v", err))
 		}
 
 		fmt.Printf("Queried in %s\n", time.Since(searchStart))
@@ -86,7 +101,7 @@ func main() {
 			fmt.Printf("=== %.6f ===\n", result.Confidence)
 			p, err := format.String(result.Value)
 			if err != nil {
-				fatalErr(err)
+				fatalErr(fmt.Errorf("format result: %v", err))
 			}
 			println(p)
 		}
