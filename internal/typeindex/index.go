@@ -74,7 +74,7 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 
 	var results []*Result
 	// Use all results when no query terms.
-	if q.Words == "" {
+	if strings.TrimSpace(q.Words) == "" {
 		results = idx.results
 	} else {
 		matches := idx.textIndex.Search(q.Words)

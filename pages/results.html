@@ -81,11 +81,6 @@ https://gist.github.com/belbomemo/b5e7dad10fa567a5fe8a<!--
                     </span>
                 {{- end -}}
             </h2>
-            <code><!--
-             --><span class="keyword">import</span><!--
-             --><span class="whitespace"> </span><!--
-             --><span class="literal">"{{- $result.PackageImportPath -}}"</span><!--
-         --></code>
             <code>
                 {{- range $_, $token := .PrettyTokens -}}
                     <span class="{{- $token.Kind -}}">{{- $token.Text -}}</span>
