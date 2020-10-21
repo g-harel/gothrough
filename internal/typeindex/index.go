@@ -72,17 +72,19 @@ func or(bools []bool) bool {
 func (idx *Index) Search(query string) ([]*Result, error) {
 	q := tags.Parse(query)
 
+	plain := strings.TrimSpace(q.Words) == ""
+
 	var results []*Result
 	// Use all results when no query terms.
-	if strings.TrimSpace(q.Words) == "" {
+	if plain {
 		results = idx.results
 	} else {
 		matches := idx.textIndex.Search(q.Words)
 		results = make([]*Result, len(matches))
 		for i, match := range matches {
-			result := idx.results[match.ID]
+			result := *idx.results[match.ID]
 			result.Confidence = match.Confidence
-			results[i] = result
+			results[i] = &result
 		}
 	}
 
@@ -132,9 +134,8 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		})
 	}
 
-	// Sort results when there is no query.
-	// This happens when the query has no words.
-	if q.Words == "" {
+	// Sort results when plain query.
+	if plain {
 		sort.SliceStable(results, func(i, j int) bool {
 			return types.Compare(results[i].Value, results[j].Value)
 		})
