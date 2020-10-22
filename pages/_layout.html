@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
 
     <title>gothrough - {{  template "title" . -}}</title>
     <meta name="description" content="{{- template "description" . -}}">
@@ -21,6 +21,7 @@
             flex-direction: column;
             margin: 0 auto;
             max-width: 80em;
+            min-width: 600px;
             min-height: 100vh;
             overflow-x: hidden;
             overflow-y: scroll;
@@ -45,6 +46,7 @@
             font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', 'Courier', 'monospace';
             line-height: 1.5;
             margin: 1em 0;
+            overflow-x: auto;
             padding: 1em;
             tab-size: 4; -moz-tab-size: 4;
             white-space: pre-wrap;
@@ -95,15 +97,12 @@
         }
 
         header form input {
-            font-family: inherit;
-        }
-
-        header form input {
             border: none;
             border-radius: 0.2em 0 0 0.2em;
             border: 1px solid #fff;
             box-sizing: border-box;
             color: #032f62;
+            font-family: inherit;
             flex-grow: 1;
             padding: 0.7rem 1rem;
             z-index: 1;
@@ -153,7 +152,6 @@
 
     {{- template "head" . -}}
 </head>
-<!-- TODO mobile styling -->
 <body style="opacity: 0;" onload="document.body.style.opacity = 1;">
     <header>
         <h1>

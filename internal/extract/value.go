@@ -8,7 +8,6 @@ import (
 )
 
 // TODO handle vars with no value and only type
-// TODO handle declarations with multiple values as one.
 // TODO check behavior for iota
 func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
