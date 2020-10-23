@@ -19,9 +19,14 @@ func formatValue(value *types.Value) *tokens.Snippet {
 
 	snippet.DeclName(value.Name)
 	snippet.Space()
-	snippet.Punctuation("=")
-	snippet.Space()
-	snippet.Literal(value.Value)
+
+	if value.Value != "" {
+		snippet.Punctuation("=")
+		snippet.Space()
+		snippet.Literal(value.Value)
+	} else {
+		snippet.FieldType(value.Type)
+	}
 
 	snippet.Newline()
 

@@ -7,7 +7,6 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-// TODO handle vars with no value and only type
 // TODO check behavior for iota
 func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 	return func(filepath string, n ast.Node, fset *token.FileSet) bool {
@@ -20,10 +19,15 @@ func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 				for _, spec := range valueDeclaration.Specs {
 					if valueSpec, ok := spec.(*ast.ValueSpec); ok {
 						for i, name := range valueSpec.Names {
-							if len(valueSpec.Values) <= i {
-								continue
-							}
 							if name.IsExported() {
+								prettyValue := ""
+								if len(valueSpec.Values) > i {
+									prettyValue = pretty(valueSpec.Values[i])
+								}
+								prettyType := ""
+								if valueSpec.Type != nil {
+									prettyType = pretty(valueSpec.Type)
+								}
 								handler(
 									getLocation(filepath),
 									types.Value{
@@ -32,7 +36,8 @@ func newValueVisitor(handler func(Location, types.Value)) visitFunc {
 											Text: valueDeclaration.Doc.Text() + valueSpec.Doc.Text(),
 										},
 										Const: valueDeclaration.Tok == token.CONST,
-										Value: pretty(valueSpec.Values[i]),
+										Value: prettyValue,
+										Type:  prettyType,
 									},
 								)
 							}
