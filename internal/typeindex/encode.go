@@ -28,7 +28,7 @@ func (idx *Index) ToBytes(w io.Writer) error {
 		Results:   idx.results,
 	}
 
-	gw, err := gzip.NewWriterLevel(w, gzip.BestCompression)
+	gw, err := gzip.NewWriterLevel(w, gzip.NoCompression)
 	if err != nil {
 		return fmt.Errorf("create gzip writer: %v", err)
 	}

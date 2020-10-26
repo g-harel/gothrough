@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"time"
 
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/format"
@@ -33,9 +32,8 @@ func main() {
 		usageErr()
 	}
 
-	indexTime := time.Now()
-
 	// Create index.
+	indexTimer := NewTimer("index")
 	widx := typeindex.NewIndex()
 	for _, dir := range flag.Args() {
 		err := extract.Types(path.Join(dir, "src"), extract.TypeHandlers{
@@ -47,12 +45,10 @@ func main() {
 			fatalErr(fmt.Errorf("extract types: %v", err))
 		}
 	}
-
-	fmt.Printf("Indexed in %s\n", time.Since(indexTime))
-
-	writeTime := time.Now()
+	indexTimer.Done()
 
 	// Create output file.
+	writeTimer := NewTimer("encode/write")
 	wf, err := os.Create(*dest)
 	if err != nil {
 		fatalErr(fmt.Errorf("create index file: %v", err))
@@ -64,11 +60,9 @@ func main() {
 	if err != nil {
 		fatalErr(fmt.Errorf("write index to file: %v", err))
 	}
+	writeTimer.Done()
 
-	fmt.Printf("Written in %s\n", time.Since(writeTime))
-
-	readTime := time.Now()
-
+	readTimer := NewTimer("read/decode")
 	rf, err := os.Open(*dest)
 	if err != nil {
 		fatalErr(fmt.Errorf("open index file: %v", err))
@@ -79,18 +73,16 @@ func main() {
 	if err != nil {
 		fatalErr(fmt.Errorf("create index form file: %v", err))
 	}
-
-	fmt.Printf("Read in %s\n", time.Since(readTime))
+	readTimer.Done()
 
 	if *query != "" {
-		searchStart := time.Now()
-
+		searchTimer := NewTimer("search")
 		results, err := ridx.Search(*query)
 		if err != nil {
 			fatalErr(fmt.Errorf("search index: %v", err))
 		}
+		searchTimer.Done()
 
-		fmt.Printf("Queried in %s\n", time.Since(searchStart))
 		fmt.Println("========")
 
 		if len(results) > 8 {

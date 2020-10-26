@@ -34,7 +34,7 @@ func NewIndex() *Index {
 func (idx *Index) Insert(id int, confidence int, strs ...string) {
 	for _, str := range strs {
 		str = strings.ToLower(str)
-		for i := 1; i <= len(str); i++ {
+		for i := 2; i <= len(str); i++ {
 			adjustmentFactor := math.Pow(div(float64(i), float64(len(str))), 3)
 			adjustedConfidence := float64(confidence) * adjustmentFactor
 			for _, substr := range Substrings(str, i) {
