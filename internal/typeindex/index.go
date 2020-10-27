@@ -69,6 +69,7 @@ func or(bools []bool) bool {
 }
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
+// TODO short tags
 func (idx *Index) Search(query string) ([]*Result, error) {
 	q := tags.Parse(query)
 
@@ -117,6 +118,7 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		results = filter(results, func(result *Result) bool {
 			bools := []bool{}
 			for _, tag := range q.Tags["package"] {
+				// TODO partial match?
 				bools = append(bools, result.Location.PackageName == tag || result.Location.PackageImportPath == tag)
 			}
 			return or(bools)

@@ -7,10 +7,9 @@ import (
 )
 
 func (idx *Index) insertLocation(id int, location extract.Location) {
-	// Index on package path and source file.
-	importPathParts := strings.Split(location.PackageImportPath, "/")
+	// Index on package path and name.
 	idx.textIndex.Insert(id, confidenceHigh, location.PackageName)
-	idx.textIndex.Insert(id, confidenceLow, strings.TrimSuffix(location.SourceFile, ".go"))
+	importPathParts := strings.Split(location.PackageImportPath, "/")
 	if len(importPathParts) > 1 {
 		idx.textIndex.Insert(id, confidenceLow/len(importPathParts), importPathParts...)
 	}

@@ -5,6 +5,7 @@ import (
 )
 
 // Split breaks the camel cased input string into its tokens.
+// TODO split with underscores too for variables
 func Split(str string) []string {
 	tokens := []string{}
 	var lastRune rune

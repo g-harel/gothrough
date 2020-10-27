@@ -16,8 +16,8 @@ func (idx *Index) InsertValue(location extract.Location, val types.Value) {
 
 	idx.insertLocation(id, location)
 
-	// Index on name.
-	idx.textIndex.Insert(id, confidenceHigh, val.Name)
+	// Index on name parts.
+	// Full name is not indexed to preserve space.
 	nameTokens := camel.Split(val.Name)
 	if len(nameTokens) > 1 {
 		idx.textIndex.Insert(id, confidenceHigh/len(nameTokens), nameTokens...)
