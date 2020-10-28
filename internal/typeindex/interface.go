@@ -1,7 +1,7 @@
 package typeindex
 
 import (
-	"github.com/g-harel/gothrough/internal/camel"
+	"github.com/g-harel/gothrough/internal/cases"
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -18,7 +18,7 @@ func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface
 
 	// Index on name.
 	idx.textIndex.Insert(id, confidenceHigh, ifc.Name)
-	nameTokens := camel.Split(ifc.Name)
+	nameTokens := cases.Split(ifc.Name)
 	if len(nameTokens) > 1 {
 		idx.textIndex.Insert(id, confidenceHigh/len(nameTokens), nameTokens...)
 	}
@@ -33,7 +33,7 @@ func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface
 			if embedded.Package != "" {
 				embeddedNameTokens = append(embeddedNameTokens, embedded.Package)
 			}
-			embeddedNameTokens = append(embeddedNameTokens, camel.Split(embedded.Name)...)
+			embeddedNameTokens = append(embeddedNameTokens, cases.Split(embedded.Name)...)
 		}
 		if len(embeddedNameTokens) > 1 {
 			idx.textIndex.Insert(id, confidenceMed/len(embeddedNameTokens), embeddedNameTokens...)
@@ -47,7 +47,7 @@ func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface
 		}
 		methodNameTokens := []string{}
 		for _, method := range ifc.Methods {
-			methodNameTokens = append(methodNameTokens, camel.Split(method.Name)...)
+			methodNameTokens = append(methodNameTokens, cases.Split(method.Name)...)
 		}
 		if len(methodNameTokens) > 1 {
 			idx.textIndex.Insert(id, confidenceMed/len(methodNameTokens), methodNameTokens...)

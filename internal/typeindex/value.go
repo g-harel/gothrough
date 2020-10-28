@@ -1,7 +1,7 @@
 package typeindex
 
 import (
-	"github.com/g-harel/gothrough/internal/camel"
+	"github.com/g-harel/gothrough/internal/cases"
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -18,7 +18,7 @@ func (idx *Index) InsertValue(location extract.Location, val types.Value) {
 
 	// Index on name parts.
 	// Full name is not indexed to preserve space.
-	nameTokens := camel.Split(val.Name)
+	nameTokens := cases.Split(val.Name)
 	if len(nameTokens) > 1 {
 		idx.textIndex.Insert(id, confidenceHigh/len(nameTokens), nameTokens...)
 	}

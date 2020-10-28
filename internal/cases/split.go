@@ -1,12 +1,22 @@
-package camel
+package cases
 
 import (
+	"strings"
 	"unicode"
 )
 
-// Split breaks the camel cased input string into its tokens.
-// TODO split with underscores too for variables
 func Split(str string) []string {
+	tokens := []string{}
+
+	for _, part := range strings.Split(str, "_") {
+		tokens = append(tokens, splitCamel(part)...)
+	}
+
+	return tokens
+}
+
+// Breaks the camel cased input string into its tokens.
+func splitCamel(str string) []string {
 	tokens := []string{}
 	var lastRune rune
 

@@ -1,7 +1,7 @@
 package typeindex
 
 import (
-	"github.com/g-harel/gothrough/internal/camel"
+	"github.com/g-harel/gothrough/internal/cases"
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/types"
 )
@@ -18,7 +18,7 @@ func (idx *Index) InsertFunction(location extract.Location, fnc types.Function) 
 
 	// Index on name.
 	idx.textIndex.Insert(id, confidenceHigh, fnc.Name)
-	nameTokens := camel.Split(fnc.Name)
+	nameTokens := cases.Split(fnc.Name)
 	if len(nameTokens) > 1 {
 		idx.textIndex.Insert(id, confidenceHigh/len(nameTokens), nameTokens...)
 	}
@@ -30,7 +30,7 @@ func (idx *Index) InsertFunction(location extract.Location, fnc types.Function) 
 				continue
 			}
 			idx.textIndex.Insert(id, confidenceMed/len(fnc.Arguments), argument.Name)
-			argumentNameTokens := camel.Split(argument.Name)
+			argumentNameTokens := cases.Split(argument.Name)
 			if len(argumentNameTokens) > 1 {
 				idx.textIndex.Insert(id, confidenceMed/len(argumentNameTokens), argumentNameTokens...)
 			}
@@ -44,7 +44,7 @@ func (idx *Index) InsertFunction(location extract.Location, fnc types.Function) 
 				continue
 			}
 			idx.textIndex.Insert(id, confidenceMed/len(fnc.ReturnValues), returnValue.Name)
-			returnValueNameTokens := camel.Split(returnValue.Name)
+			returnValueNameTokens := cases.Split(returnValue.Name)
 			if len(returnValueNameTokens) > 1 {
 				idx.textIndex.Insert(id, confidenceMed/len(returnValueNameTokens), returnValueNameTokens...)
 			}

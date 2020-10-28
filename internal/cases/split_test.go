@@ -1,9 +1,9 @@
-package camel_test
+package cases_test
 
 import (
 	"testing"
 
-	"github.com/g-harel/gothrough/internal/camel"
+	"github.com/g-harel/gothrough/internal/cases"
 )
 
 func TestSplit(t *testing.T) {
@@ -39,7 +39,7 @@ func TestSplit(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actual := camel.Split(tc.Input)
+			actual := cases.Split(tc.Input)
 			if len(tc.Expected) != len(actual) {
 				t.Fatalf("expected/actual do not match\n%v\n%v", tc.Expected, actual)
 			}
