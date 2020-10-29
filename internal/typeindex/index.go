@@ -69,18 +69,17 @@ func or(bools []bool) bool {
 }
 
 // Search returns a interfaces that match the query in deacreasing order of confidence.
-// TODO short tags
 func (idx *Index) Search(query string) ([]*Result, error) {
 	q := tags.Parse(query)
 
-	plain := strings.TrimSpace(q.Words) == ""
+	plain := q.GetWords() == ""
 
 	var results []*Result
 	// Use all results when no query terms.
 	if plain {
 		results = idx.results
 	} else {
-		matches := idx.textIndex.Search(q.Words)
+		matches := idx.textIndex.Search(q.GetWords())
 		results = make([]*Result, len(matches))
 		for i, match := range matches {
 			result := *idx.results[match.ID]
@@ -90,10 +89,11 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply type filter.
-	if len(q.Tags["type"]) > 0 {
+	typeTags := q.GetTags("type", "t")
+	if len(typeTags) > 0 {
 		results = filter(results, func(result *Result) bool {
 			bools := []bool{}
-			for _, tag := range q.Tags["type"] {
+			for _, tag := range typeTags {
 				typeString, ok := types.TypeString(result.Value)
 				bools = append(bools, ok && tag == typeString)
 			}
@@ -102,10 +102,11 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply inverted type filter.
-	if len(q.Tags["-type"]) > 0 {
+	invertedTypeTags := q.GetTags("-type", "-t")
+	if len(invertedTypeTags) > 0 {
 		results = filter(results, func(result *Result) bool {
 			bools := []bool{}
-			for _, tag := range q.Tags["-type"] {
+			for _, tag := range invertedTypeTags {
 				typeString, ok := types.TypeString(result.Value)
 				bools = append(bools, !ok || tag != typeString)
 			}
@@ -114,10 +115,11 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply package filter.
-	if len(q.Tags["package"]) > 0 {
+	packageTags := q.GetTags("package", "p")
+	if len(packageTags) > 0 {
 		results = filter(results, func(result *Result) bool {
 			bools := []bool{}
-			for _, tag := range q.Tags["package"] {
+			for _, tag := range packageTags {
 				// TODO partial match?
 				bools = append(bools, result.Location.PackageName == tag || result.Location.PackageImportPath == tag)
 			}
@@ -126,10 +128,11 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	}
 
 	// Apply inverted package filter.
-	if len(q.Tags["-package"]) > 0 {
+	invertedPackageTags := q.GetTags("-package", "-p")
+	if len(invertedPackageTags) > 0 {
 		results = filter(results, func(result *Result) bool {
 			bools := []bool{}
-			for _, tag := range q.Tags["-package"] {
+			for _, tag := range invertedPackageTags {
 				bools = append(bools, result.Location.PackageName != tag && result.Location.PackageImportPath != tag)
 			}
 			return and(bools)
@@ -145,8 +148,9 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 
 	// Default to 32 results or use configured number.
 	count := 32
-	if len(q.Tags["count"]) == 1 {
-		c, err := strconv.Atoi(q.Tags["count"][0])
+	countTags := q.GetTags("count", "c")
+	if len(countTags) == 1 {
+		c, err := strconv.Atoi(countTags[0])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "parse count tag: %v", err)
 		} else {

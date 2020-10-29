@@ -3,20 +3,20 @@ package tags
 import "strings"
 
 type ParsedQuery struct {
-	Words string
-	Tags  map[string][]string
+	words string
+	tags  map[string][]string
 }
 
 func Parse(query string) ParsedQuery {
 	parts := strings.Fields(query)
 
 	parsed := ParsedQuery{
-		Words: "",
-		Tags:  map[string][]string{},
+		words: "",
+		tags:  map[string][]string{},
 	}
 	for _, part := range parts {
 		if !strings.Contains(part, ":") {
-			parsed.Words += " " + part
+			parsed.words += " " + part
 			continue
 		}
 
@@ -26,16 +26,28 @@ func Parse(query string) ParsedQuery {
 
 		// Only add the prefix/query combination if it is not a duplicate.
 		isNew := true
-		for _, existingQuery := range parsed.Tags[prefix] {
+		for _, existingQuery := range parsed.tags[prefix] {
 			if query == existingQuery {
 				isNew = false
 				break
 			}
 		}
 		if isNew {
-			parsed.Tags[prefix] = append(parsed.Tags[prefix], query)
+			parsed.tags[prefix] = append(parsed.tags[prefix], query)
 		}
 	}
 
 	return parsed
+}
+
+func (p ParsedQuery) GetWords() string {
+	return strings.TrimSpace(p.words)
+}
+
+func (p ParsedQuery) GetTags(tags ...string) []string {
+	allValues := []string{}
+	for _, tag := range tags {
+		allValues = append(allValues, p.tags[tag]...)
+	}
+	return allValues
 }
