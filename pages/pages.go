@@ -6,7 +6,6 @@ import (
 
 	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/templates"
-	"github.com/g-harel/gothrough/internal/tokens"
 	"github.com/g-harel/gothrough/internal/typeindex"
 )
 
@@ -15,7 +14,7 @@ type PrettyResult struct {
 	Confidence        int
 	PackageName       string
 	PackageImportPath string
-	PrettyTokens      []tokens.Token
+	PrettyTokens      []format.Token
 }
 
 func formatAll(results []*typeindex.Result) []PrettyResult {

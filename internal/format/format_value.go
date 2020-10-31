@@ -1,12 +1,11 @@
 package format
 
 import (
-	"github.com/g-harel/gothrough/internal/tokens"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func formatValue(value *types.Value) *tokens.Snippet {
-	snippet := tokens.NewSnippet()
+func formatValue(value *types.Value) *Snippet {
+	snippet := NewSnippet()
 
 	snippet.Push(formatDocs(&value.Docs))
 

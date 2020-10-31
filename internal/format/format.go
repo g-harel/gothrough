@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/g-harel/gothrough/internal/tokens"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
@@ -21,7 +20,7 @@ func String(value types.Type) (string, error) {
 	return output, nil
 }
 
-func Format(value interface{}) (*tokens.Snippet, error) {
+func Format(value interface{}) (*Snippet, error) {
 	if v, ok := value.(*types.Docs); ok {
 		return formatDocs(v), nil
 	}

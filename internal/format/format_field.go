@@ -1,12 +1,11 @@
 package format
 
 import (
-	"github.com/g-harel/gothrough/internal/tokens"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func formatField(field *types.Field) *tokens.Snippet {
-	snippet := tokens.NewSnippet()
+func formatField(field *types.Field) *Snippet {
+	snippet := NewSnippet()
 
 	if field.Name != "" {
 		snippet.FieldName(field.Name)
@@ -17,8 +16,8 @@ func formatField(field *types.Field) *tokens.Snippet {
 	return snippet
 }
 
-func formatFieldList(fields []types.Field) *tokens.Snippet {
-	snippet := tokens.NewSnippet()
+func formatFieldList(fields []types.Field) *Snippet {
+	snippet := NewSnippet()
 
 	for i, field := range fields {
 		if i > 0 {

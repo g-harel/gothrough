@@ -1,12 +1,11 @@
 package format
 
 import (
-	"github.com/g-harel/gothrough/internal/tokens"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func formatInterface(ifc *types.Interface, decl bool) *tokens.Snippet {
-	snippet := tokens.NewSnippet()
+func formatInterface(ifc *types.Interface, decl bool) *Snippet {
+	snippet := NewSnippet()
 
 	snippet.Push(formatDocs(&ifc.Docs))
 

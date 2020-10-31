@@ -3,12 +3,11 @@ package format
 import (
 	"strings"
 
-	"github.com/g-harel/gothrough/internal/tokens"
 	"github.com/g-harel/gothrough/internal/types"
 )
 
-func formatDocs(docs *types.Docs) *tokens.Snippet {
-	snippet := tokens.NewSnippet()
+func formatDocs(docs *types.Docs) *Snippet {
+	snippet := NewSnippet()
 
 	if docs.Text == "" {
 		return snippet

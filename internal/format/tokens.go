@@ -1,4 +1,4 @@
-package tokens
+package format
 
 const (
 	textIndent  = "\t"
