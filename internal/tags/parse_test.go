@@ -11,7 +11,7 @@ type Expected struct {
 	Tags  map[string][]string
 }
 
-func TestSplit(t *testing.T) {
+func TestParse(t *testing.T) {
 	tt := map[string]struct {
 		Input    string
 		Expected Expected
