@@ -18,11 +18,41 @@ func TestString(t *testing.T) {
 			},
 			Expected: "type Test interface {}\n",
 		},
+		// TODO interface tests
 		"simple function": {
 			Input: &types.Function{
 				Name: "Test",
 			},
 			Expected: "func Test()\n",
+		},
+		"function with single return value": {
+			Input: &types.Function{
+				Name:         "GetCount",
+				ReturnValues: []types.Field{{Type: "int"}},
+			},
+			Expected: "func GetCount() int\n",
+		},
+		"function with multiple return values": {
+			Input: &types.Function{
+				Name:         "Calc",
+				ReturnValues: []types.Field{{Type: "int"}, {Type: "error"}},
+			},
+			Expected: "func Calc() (int, error)\n",
+		},
+		"function with named return values": {
+			Input: &types.Function{
+				Name:         "Test",
+				ReturnValues: []types.Field{{Name: "expected", Type: "string"}},
+			},
+			Expected: "func Test() (expected string)\n",
+		},
+		"function with argument": {
+			Input: &types.Function{
+				Name:         "Square",
+				Arguments:    []types.Field{{Name: "num", Type: "int"}},
+				ReturnValues: []types.Field{{Type: "int"}},
+			},
+			Expected: "func Square(num int) int\n",
 		},
 		"simple value": {
 			Input: &types.Value{
@@ -30,6 +60,21 @@ func TestString(t *testing.T) {
 				Type: "string",
 			},
 			Expected: "var Test string\n",
+		},
+		"const value": {
+			Input: &types.Value{
+				Name:  "Count",
+				Type:  "int",
+				Const: true,
+			},
+			Expected: "const Count int\n",
+		},
+		"value with literal": {
+			Input: &types.Value{
+				Name:  "TEST_NAME",
+				Value: "\"abc\"",
+			},
+			Expected: "var TEST_NAME = \"abc\"\n",
 		},
 	}
 
