@@ -18,7 +18,67 @@ func TestString(t *testing.T) {
 			},
 			Expected: "type Test interface {}\n",
 		},
-		// TODO interface tests
+		"interface with function and embedded": {
+			Input: &types.Interface{
+				Name:     "Extender",
+				Embedded: []types.Reference{{Package: "io", Name: "Reader"}},
+				Methods:  []types.Function{{Name: "Print"}},
+			},
+			Expected: `type Extender interface {
+	io.Reader
+	Print()
+}
+`,
+		},
+		"interface with docs": {
+			Input: &types.Interface{
+				Name: "Potato",
+				Docs: types.Docs{Text: "Potato does the thing."},
+				Embedded: []types.Reference{
+					{
+						Package: "earth",
+						Name:    "Grower",
+						Docs: types.Docs{
+							Text: "Grows the thing with the thing.",
+						},
+					},
+				},
+				Methods: []types.Function{
+					{
+						Name: "Pick",
+						Docs: types.Docs{
+							Text: "Takes the thing from the thing.",
+						},
+					},
+					{
+						Name: "Squish",
+						ReturnValues: []types.Field{
+							{Type: "int"},
+						},
+					},
+					{
+						Name: "Eat",
+						ReturnValues: []types.Field{
+							{Type: "string"},
+							{Type: "error"},
+						},
+					},
+				},
+			},
+			Expected: `// Potato does the thing.
+type Potato interface {
+	// Grows the thing with the thing.
+	earth.Grower
+
+	// Takes the thing from the thing.
+	Pick()
+
+	Squish() int
+
+	Eat() (string, error)
+}
+`,
+		},
 		"simple function": {
 			Input: &types.Function{
 				Name: "Test",
