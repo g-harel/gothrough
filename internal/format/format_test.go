@@ -36,6 +36,12 @@ func TestString(t *testing.T) {
 				Docs: types.Docs{Text: "Potato does the thing."},
 				Embedded: []types.Reference{
 					{
+						Name: "Tester",
+					},
+					{
+						Name: "Water",
+					},
+					{
 						Package: "earth",
 						Name:    "Grower",
 						Docs: types.Docs{
@@ -67,6 +73,9 @@ func TestString(t *testing.T) {
 			},
 			Expected: `// Potato does the thing.
 type Potato interface {
+	Tester
+	Water
+
 	// Grows the thing with the thing.
 	earth.Grower
 
@@ -74,7 +83,6 @@ type Potato interface {
 	Pick()
 
 	Squish() int
-
 	Eat() (string, error)
 }
 `,

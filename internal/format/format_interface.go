@@ -52,7 +52,7 @@ func formatInterface(ifc *types.Interface, decl bool) *Snippet {
 	for i, method := range ifc.Methods {
 		// Add newline before definition in some situations.
 		prevWasEmbedded := i == 0 && len(ifc.Embedded) > 0
-		prevEmbeddedHadDocs := len(ifc.Embedded) > 0 && ifc.Embedded[len(ifc.Embedded)-1].Docs.Text != ""
+		prevEmbeddedHadDocs := prevWasEmbedded && len(ifc.Embedded) > 0 && ifc.Embedded[len(ifc.Embedded)-1].Docs.Text != ""
 		prevMethodHadDocs := i > 0 && ifc.Methods[i-1].Docs.Text != ""
 		isNotFirstAndHasDocs := (i != 0 || prevWasEmbedded) && method.Docs.Text != ""
 		if prevEmbeddedHadDocs || prevMethodHadDocs || isNotFirstAndHasDocs {
