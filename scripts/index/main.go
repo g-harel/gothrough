@@ -7,8 +7,8 @@ import (
 	"path"
 
 	"github.com/g-harel/gothrough/internal/extract"
-	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/typeindex"
+	"github.com/g-harel/gothrough/internal/types/format"
 )
 
 var dest = flag.String("dest", ".index", "output filename")

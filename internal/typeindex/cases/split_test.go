@@ -3,7 +3,7 @@ package cases_test
 import (
 	"testing"
 
-	"github.com/g-harel/gothrough/internal/cases"
+	"github.com/g-harel/gothrough/internal/typeindex/cases"
 )
 
 func TestSplit(t *testing.T) {

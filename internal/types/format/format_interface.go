@@ -7,46 +7,46 @@ import (
 func formatInterface(ifc *types.Interface, decl bool) *Snippet {
 	snippet := NewSnippet()
 
-	snippet.Push(formatDocs(&ifc.Docs))
+	snippet.concat(formatDocs(&ifc.Docs))
 
 	if decl {
-		snippet.Keyword("type")
-		snippet.Space()
+		snippet.keyword("type")
+		snippet.space()
 	}
 
-	snippet.InterfaceName(ifc.Name)
-	snippet.Space()
-	snippet.Keyword("interface")
-	snippet.Space()
-	snippet.Punctuation("{")
+	snippet.interfaceName(ifc.Name)
+	snippet.space()
+	snippet.keyword("interface")
+	snippet.space()
+	snippet.punctuation("{")
 
 	if len(ifc.Embedded) == 0 && len(ifc.Methods) == 0 {
-		snippet.Punctuation("}")
-		snippet.Newline()
+		snippet.punctuation("}")
+		snippet.newline()
 		return snippet
 	}
 
-	snippet.Newline()
+	snippet.newline()
 
 	for i, embedded := range ifc.Embedded {
 		// Add newline before definition in some situations.
 		prevHadDocs := i > 0 && ifc.Embedded[i-1].Docs.Text != ""
 		isNotFirstAndHasDocs := i != 0 && embedded.Docs.Text != ""
 		if prevHadDocs || isNotFirstAndHasDocs {
-			snippet.Newline()
+			snippet.newline()
 		}
 
 		embeddedDocs := formatDocs(&embedded.Docs)
-		embeddedDocs.IndentLines()
-		snippet.Push(embeddedDocs)
+		embeddedDocs.indentSnippet()
+		snippet.concat(embeddedDocs)
 
-		snippet.Indent()
+		snippet.indent()
 		if embedded.Package != "" {
-			snippet.EmbeddedPackage(embedded.Package)
-			snippet.Punctuation(".")
+			snippet.embeddedPackage(embedded.Package)
+			snippet.punctuation(".")
 		}
-		snippet.EmbeddedName(embedded.Name)
-		snippet.Newline()
+		snippet.embeddedName(embedded.Name)
+		snippet.newline()
 	}
 
 	for i, method := range ifc.Methods {
@@ -56,16 +56,16 @@ func formatInterface(ifc *types.Interface, decl bool) *Snippet {
 		prevMethodHadDocs := i > 0 && ifc.Methods[i-1].Docs.Text != ""
 		isNotFirstAndHasDocs := (i != 0 || prevWasEmbedded) && method.Docs.Text != ""
 		if prevEmbeddedHadDocs || prevMethodHadDocs || isNotFirstAndHasDocs {
-			snippet.Newline()
+			snippet.newline()
 		}
 
 		formattedMethod := formatFunction(&method, false)
-		formattedMethod.IndentLines()
-		snippet.Push(formattedMethod)
+		formattedMethod.indentSnippet()
+		snippet.concat(formattedMethod)
 	}
 
-	snippet.Punctuation("}")
-	snippet.Newline()
+	snippet.punctuation("}")
+	snippet.newline()
 
 	return snippet
 }

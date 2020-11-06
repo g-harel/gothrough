@@ -41,15 +41,15 @@ func (snippet *Snippet) push(token Token) {
 	snippet.tokens = append(snippet.tokens, token)
 }
 
-func (snippet *Snippet) Push(s *Snippet) {
+func (snippet *Snippet) concat(s *Snippet) {
 	snippet.tokens = append(snippet.tokens, s.Dump()...)
 }
 
-func (snippet *Snippet) Indent() {
+func (snippet *Snippet) indent() {
 	snippet.push(Token{textIndent, kindWhitespace})
 }
 
-func (snippet *Snippet) IndentLines() {
+func (snippet *Snippet) indentSnippet() {
 	indentToken := Token{textIndent, kindWhitespace}
 
 	if len(snippet.tokens) == 0 {
@@ -68,54 +68,54 @@ func (snippet *Snippet) IndentLines() {
 	}
 }
 
-func (snippet *Snippet) Newline() {
+func (snippet *Snippet) newline() {
 	snippet.push(Token{textNewline, kindWhitespace})
 }
 
-func (snippet *Snippet) Space() {
+func (snippet *Snippet) space() {
 	snippet.push(Token{textSpace, kindWhitespace})
 }
 
-func (snippet *Snippet) Comment(text string) {
+func (snippet *Snippet) comment(text string) {
 	snippet.push(Token{text, kindComment})
 }
 
-func (snippet *Snippet) EmbeddedName(text string) {
+func (snippet *Snippet) embeddedName(text string) {
 	snippet.push(Token{text, kindEmbeddedName})
 }
 
-func (snippet *Snippet) EmbeddedPackage(text string) {
+func (snippet *Snippet) embeddedPackage(text string) {
 	snippet.push(Token{text, kindEmbeddedPackage})
 }
 
-func (snippet *Snippet) FieldName(text string) {
+func (snippet *Snippet) fieldName(text string) {
 	snippet.push(Token{text, kindFieldName})
 }
 
-func (snippet *Snippet) InterfaceName(text string) {
+func (snippet *Snippet) interfaceName(text string) {
 	snippet.push(Token{text, kindInterfaceName})
 }
 
-func (snippet *Snippet) Literal(text string) {
+func (snippet *Snippet) literal(text string) {
 	snippet.push(Token{text, kindLiteral})
 }
 
-func (snippet *Snippet) Keyword(text string) {
+func (snippet *Snippet) keyword(text string) {
 	snippet.push(Token{text, kindKeyword})
 }
 
-func (snippet *Snippet) DeclName(text string) {
+func (snippet *Snippet) declName(text string) {
 	snippet.push(Token{text, kindDeclName})
 }
 
-func (snippet *Snippet) Punctuation(text string) {
+func (snippet *Snippet) punctuation(text string) {
 	snippet.push(Token{text, kindPunctuation})
 }
 
-func (snippet *Snippet) FieldType(text string) {
+func (snippet *Snippet) fieldType(text string) {
 	snippet.push(Token{text, kindFieldType})
 }
 
-func (snippet *Snippet) Whitespace(text string) {
+func (snippet *Snippet) whitespace(text string) {
 	snippet.push(Token{text, kindWhitespace})
 }

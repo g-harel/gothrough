@@ -1,8 +1,8 @@
 package typeindex
 
 import (
-	"github.com/g-harel/gothrough/internal/cases"
 	"github.com/g-harel/gothrough/internal/extract"
+	"github.com/g-harel/gothrough/internal/typeindex/cases"
 	"github.com/g-harel/gothrough/internal/types"
 )
 

@@ -3,7 +3,7 @@ package tags_test
 import (
 	"testing"
 
-	"github.com/g-harel/gothrough/internal/tags"
+	"github.com/g-harel/gothrough/internal/typeindex/tags"
 )
 
 type Expected struct {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/g-harel/gothrough/internal/extract"
 	"github.com/g-harel/gothrough/internal/stringindex"
-	"github.com/g-harel/gothrough/internal/tags"
+	"github.com/g-harel/gothrough/internal/typeindex/tags"
 	"github.com/g-harel/gothrough/internal/types"
 )
 

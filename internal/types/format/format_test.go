@@ -3,8 +3,8 @@ package format_test
 import (
 	"testing"
 
-	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/types"
+	"github.com/g-harel/gothrough/internal/types/format"
 )
 
 func TestString(t *testing.T) {

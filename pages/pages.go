@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/g-harel/gothrough/internal/format"
 	"github.com/g-harel/gothrough/internal/templates"
 	"github.com/g-harel/gothrough/internal/typeindex"
+	"github.com/g-harel/gothrough/internal/types/format"
 )
 
 type PrettyResult struct {

@@ -8,10 +8,10 @@ func formatField(field *types.Field) *Snippet {
 	snippet := NewSnippet()
 
 	if field.Name != "" {
-		snippet.FieldName(field.Name)
-		snippet.Space()
+		snippet.fieldName(field.Name)
+		snippet.space()
 	}
-	snippet.FieldType(field.Type)
+	snippet.fieldType(field.Type)
 
 	return snippet
 }
@@ -21,10 +21,10 @@ func formatFieldList(fields []types.Field) *Snippet {
 
 	for i, field := range fields {
 		if i > 0 {
-			snippet.Punctuation(",")
-			snippet.Space()
+			snippet.punctuation(",")
+			snippet.space()
 		}
-		snippet.Push(formatField(&field))
+		snippet.concat(formatField(&field))
 	}
 
 	return snippet

@@ -19,8 +19,8 @@ func formatDocs(docs *types.Docs) *Snippet {
 	}
 
 	for _, line := range docLines {
-		snippet.Comment("// " + line)
-		snippet.Newline()
+		snippet.comment("// " + line)
+		snippet.newline()
 	}
 
 	return snippet
