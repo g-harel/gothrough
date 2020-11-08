@@ -77,7 +77,8 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	var results []*Result
 	// Use all results when no query terms.
 	if plain {
-		results = idx.results
+		results = make([]*Result, len(idx.results))
+		copy(results, idx.results)
 	} else {
 		matches := idx.textIndex.Search(q.GetWords())
 		results = make([]*Result, len(matches))
