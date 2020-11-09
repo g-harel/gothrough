@@ -1,20 +1,48 @@
 <!--
 type Context struct {
-    GoPackages []string
-    Packages   []string
+    Packages [][]string
 }
 -->
 
 {{- define "title" -}}
-    gothrough
+    Home
 {{- end -}}
 
 {{- define "description" -}}
-    Search through Go packages.
+    GoThrough hosts a searchable index of exported members in the Go standard library and a selection of hosted packages.
 {{- end -}}
 
 {{- define "head" -}}
     <style>
+        a {
+            color: #005cc5;
+        }
+
+        .info {
+            border-bottom: 1px solid #eee;
+            padding: 2rem 0;
+        }
+
+        .info table {
+            border-collapse: collapse;
+        }
+
+        .info table td {
+            padding: 0.4rem;
+        }
+
+        .info table tr:nth-child(2n) {
+            background-color: #f7f7f7;
+        }
+
+        .info table td.monospace {
+            font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', 'Courier', 'monospace';
+        }
+
+        .info table td.def {
+            padding: 0 2rem;
+        }
+
         .package-group {
             columns: 4 16rem;
             margin: 3rem 0;
@@ -35,6 +63,46 @@ type Context struct {
 {{- end -}}
 
 {{- define "body" -}}
+    <div class="info">
+        <p>
+            GoThrough hosts a searchable index of exported members in the Go standard library and a <a href="https://github.com/g-harel/gothrough/blob/master/packages.txt">selection of hosted packages</a>.
+        </p>
+        <p>
+            You can use and combine the following tags to refine and customize your query.
+            <table>
+                <tr>
+                    <td class="monospace">&nbsp;count</td>
+                    <td class="monospace">&nbsp;c</td>
+                    <td class="def">Maximum number of results returned (default 32).</td>
+                    <td class="monospace"><a href="/search?q=reader count:4">reader count:4</a></td>
+                </tr>
+                <tr>
+                    <td class="monospace">&nbsp;package</td>
+                    <td class="monospace">&nbsp;p</td>
+                    <td class="def">Only show results from this package.</td>
+                    <td class="monospace"><a href="/search?q=package:regexp p:strings replace">package:regexp p:strings replace</a></td>
+                </tr>
+                <tr>
+                    <td class="monospace">-package</td>
+                    <td class="monospace">-p</td>
+                    <td class="def">Don't show results from this package.</td>
+                    <td class="monospace"><a href="/search?q=status -p:http">status -p:http</a></td>
+                </tr>
+                <tr>
+                    <td class="monospace">&nbsp;type</td>
+                    <td class="monospace">&nbsp;t</td>
+                    <td class="def">Only show results of this type (<i>const</i>, <i>var</i>, <i>function</i>, <i>interface</i>).</td>
+                    <td class="monospace"><a href="/search?q=reader type:interface">reader type:interface</a></td>
+                </tr>
+                <tr>
+                    <td class="monospace">-type</td>
+                    <td class="monospace">-t</td>
+                    <td class="def">Don't show results of this type (<i>const</i>, <i>var</i>, <i>function</i>, <i>interface</i>).</td>
+                    <td class="monospace"><a href="/search?q=err -type:function -t:interface">err -type:function -t:interface</a></td>
+                </tr>
+            </table>
+        </p>
+    </div>
     {{- range $_, $packageGroup := .Packages -}}
         <div class="package-group">
             {{- range $_, $package := $packageGroup -}}
