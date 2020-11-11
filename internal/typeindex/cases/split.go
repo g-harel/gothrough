@@ -5,6 +5,7 @@ import (
 	"unicode"
 )
 
+// Split breaks up the string by both camel case and snake case.
 func Split(str string) []string {
 	tokens := []string{}
 

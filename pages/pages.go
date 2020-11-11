@@ -9,6 +9,7 @@ import (
 	"github.com/g-harel/gothrough/internal/types/format"
 )
 
+// PrettyResult wraps the index results into a template-friendly struct.
 type PrettyResult struct {
 	Name              string
 	Confidence        int
@@ -36,6 +37,7 @@ func formatAll(results []*typeindex.Result) []PrettyResult {
 	return formatted
 }
 
+// Home returns a baked handler for the homepage.
 func Home(packages [][]string) http.HandlerFunc {
 	context := struct {
 		Packages [][]string
@@ -45,6 +47,7 @@ func Home(packages [][]string) http.HandlerFunc {
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/home.html").Handler
 }
 
+// Results returns a baked handler for the results page.
 func Results(query string, results []*typeindex.Result) http.HandlerFunc {
 	context := struct {
 		Query   string

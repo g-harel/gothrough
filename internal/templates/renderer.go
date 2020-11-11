@@ -13,6 +13,7 @@ type Renderer struct {
 	context    interface{}
 }
 
+// NewRenderer creates a new renderer.
 func NewRenderer(context interface{}, filenames ...string) *Renderer {
 	return &Renderer{0, filenames, context}
 }

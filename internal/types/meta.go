@@ -1,5 +1,6 @@
 package types
 
+// TypeString maps an unknown type to a string indicating its type.
 func TypeString(t Type) (string, bool) {
 	switch v := t.(type) {
 	case *Value:
@@ -16,6 +17,8 @@ func TypeString(t Type) (string, bool) {
 	}
 }
 
+// Compare compares arguments for the purposes of sorting.
+// Types are first ordered by type, then by string comapring their names.
 func Compare(a, b Type) bool {
 	aVal := extractTypeSortValue(a)
 	bVal := extractTypeSortValue(b)

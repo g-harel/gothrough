@@ -6,6 +6,7 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// InsertFunction adds a function to the index.
 func (idx *Index) InsertFunction(location extract.Location, fnc types.Function) {
 	idx.results = append(idx.results, &Result{
 		Name:     fnc.Name,

@@ -10,6 +10,7 @@ const (
 	substringPenaltyScale = 3
 )
 
+// Match stores the confidence that a result with the id is a match.
 type Match struct {
 	ID         int
 	Confidence float64

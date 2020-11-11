@@ -2,11 +2,13 @@ package tags
 
 import "strings"
 
+// ParsedQuery represents a parsed query.
 type ParsedQuery struct {
 	words string
 	tags  map[string][]string
 }
 
+// Parse parses the query to extract tags.
 func Parse(query string) ParsedQuery {
 	parts := strings.Fields(query)
 
@@ -40,10 +42,12 @@ func Parse(query string) ParsedQuery {
 	return parsed
 }
 
+// GetWords returns the parts of the query that were not parsed as tags.
 func (p ParsedQuery) GetWords() string {
 	return strings.TrimSpace(p.words)
 }
 
+// GetTags collects the tag values for all the given tag names.
 func (p ParsedQuery) GetTags(tags ...string) []string {
 	allValues := []string{}
 	for _, tag := range tags {

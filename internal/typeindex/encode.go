@@ -22,6 +22,7 @@ type encodableTypeIndex struct {
 	Results   []*Result
 }
 
+// ToBytes encodes the index to bytes and writes them to the writer.
 func (idx *Index) ToBytes(w io.Writer) error {
 	edx := encodableTypeIndex{
 		TextIndex: idx.textIndex,
@@ -47,6 +48,7 @@ func (idx *Index) ToBytes(w io.Writer) error {
 	return nil
 }
 
+// NewIndexFromBytes decodes the reader's data into an index.
 func NewIndexFromBytes(r io.Reader) (*Index, error) {
 	var edx encodableTypeIndex
 

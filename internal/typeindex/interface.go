@@ -6,6 +6,7 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// InsertInterface adds an interface to the index.
 func (idx *Index) InsertInterface(location extract.Location, ifc types.Interface) {
 	idx.results = append(idx.results, &Result{
 		Name:     ifc.Name,

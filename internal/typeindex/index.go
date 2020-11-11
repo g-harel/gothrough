@@ -20,6 +20,7 @@ const (
 	confidenceLow  = 20
 )
 
+// Result represents a matched value from the index.
 type Result struct {
 	Confidence float64
 	Name       string
@@ -27,12 +28,14 @@ type Result struct {
 	Value      types.Type
 }
 
+// Index stores types and enables them to be searched.
 type Index struct {
-	textIndex         *stringindex.Index
-	results           []*Result
-	computed_packages *[][]string
+	textIndex        *stringindex.Index
+	results          []*Result
+	computedPackages *[][]string
 }
 
+// NewIndex creates a new empty index.
 func NewIndex() *Index {
 	return &Index{
 		textIndex: stringindex.NewIndex(),
@@ -121,7 +124,6 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 		results = filter(results, func(result *Result) bool {
 			bools := []bool{}
 			for _, tag := range packageTags {
-				// TODO partial match?
 				bools = append(bools, result.Location.PackageName == tag || result.Location.PackageImportPath == tag)
 			}
 			return or(bools)
@@ -165,9 +167,12 @@ func (idx *Index) Search(query string) ([]*Result, error) {
 	return results, nil
 }
 
+// Packages returns a list of all packages in the index.
+// The first item will contain the standard library packages.
+// Subsequent hosted packages are grouped by the host domain.
 func (idx *Index) Packages() [][]string {
-	if idx.computed_packages != nil {
-		return *idx.computed_packages
+	if idx.computedPackages != nil {
+		return *idx.computedPackages
 	}
 
 	// Collect list of unique packages, separating the standard library vs. hosted ones.
@@ -214,6 +219,6 @@ func (idx *Index) Packages() [][]string {
 		sort.Strings(packages[i])
 	}
 
-	idx.computed_packages = &packages
+	idx.computedPackages = &packages
 	return packages
 }

@@ -20,19 +20,23 @@ const (
 	kindWhitespace      = "whitespace"
 )
 
+// Token is a block of formatted code.
 type Token struct {
 	Text string
 	Kind string
 }
 
+// Snippet represents a collection of tokens.
 type Snippet struct {
 	tokens []Token
 }
 
+// NewSnippet creates a new empty snippet.
 func NewSnippet() *Snippet {
 	return &Snippet{[]Token{}}
 }
 
+// Dump renders the snippet to a series of tokens.
 func (snippet *Snippet) Dump() []Token {
 	return snippet.tokens
 }

@@ -9,18 +9,21 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// Location is a generic representation of where a type was found.
 type Location struct {
 	PackageName       string
 	PackageImportPath string
 	SourceFile        string
 }
 
+// TypeHandlers is a collection of functions that accept all type types.
 type TypeHandlers struct {
 	Value     func(Location, types.Value)
 	Function  func(Location, types.Function)
 	Interface func(Location, types.Interface)
 }
 
+// Types walks the given directory to extract all the types and pass them on to the handlers.
 func Types(srcDir string, handlers TypeHandlers) error {
 	// Collect all types in the provided directory.
 	err := filepath.Walk(srcDir, func(pathname string, info os.FileInfo, err error) error {

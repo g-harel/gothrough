@@ -6,6 +6,7 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// InsertValue adds a value to the index.
 func (idx *Index) InsertValue(location extract.Location, val types.Value) {
 	idx.results = append(idx.results, &Result{
 		Name:     val.Name,

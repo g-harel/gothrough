@@ -7,6 +7,7 @@ import (
 	"github.com/g-harel/gothrough/internal/types"
 )
 
+// String prints a value to a string.
 func String(value types.Type) (string, error) {
 	snippet, err := Format(value)
 	if err != nil {
@@ -20,6 +21,7 @@ func String(value types.Type) (string, error) {
 	return output, nil
 }
 
+// Format produces a snippet representation of the value.
 func Format(value interface{}) (*Snippet, error) {
 	if v, ok := value.(*types.Docs); ok {
 		return formatDocs(v), nil
