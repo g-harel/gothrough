@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine AS build
+FROM golang:1.20-alpine AS build
 
 # Required to fetch go modules.
 RUN apk add git
