@@ -2,6 +2,11 @@
 
 ## Development
 
+
+```bash
+$ go run ./scripts/index/*.go -dest=".index" "$GOPATH" "/usr/local/go"
+```
+
 ```bash
 $ go run main.go
 ```
