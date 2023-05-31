@@ -14,7 +14,7 @@ jobs:
       uses: cedrickring/golang-action@1.6.0
 
       # Setup gcloud command.
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@main
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@v1
       with:
           version: '307.0.0'
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
