@@ -13,6 +13,11 @@ jobs:
     - name: go test
       uses: cedrickring/golang-action@1.6.0
 
+      # Install Python for `gcloud builds`
+    - run: |
+        sudo apt-get install python2.7
+        export CLOUDSDK_PYTHON="/usr/bin/python2"
+
       # Setup gcloud command.
     - uses: google-github-actions/setup-gcloud@v1
       with:
