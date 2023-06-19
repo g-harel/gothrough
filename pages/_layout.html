@@ -1,3 +1,9 @@
+<!--
+type Context struct {
+    GoVersion string
+}
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +79,7 @@
         }
 
         header * {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             font-weight: 600;
         }
 
@@ -85,6 +91,12 @@
 
         header h1 .dark {
             color: #032f62;
+        }
+
+        header h1 .version {
+            color: #6a737d;
+            font-size: 1rem;
+            text-align: right;
         }
 
         header form {
@@ -155,6 +167,7 @@
 <body style="opacity: 0;" onload="document.body.style.opacity = 1;">
     <header>
         <h1>
+            <div class="version">{{.GoVersion}}</div>
             <a href="/" aria-label="home">
                 Go<span class="dark">Through</span>
             </a>

@@ -3,6 +3,7 @@ package pages
 import (
 	"log"
 	"net/http"
+	"runtime"
 
 	"github.com/g-harel/gothrough/internal/templates"
 	"github.com/g-harel/gothrough/internal/typeindex"
@@ -40,9 +41,11 @@ func formatAll(results []*typeindex.Result) []PrettyResult {
 // Home returns a baked handler for the homepage.
 func Home(packages [][]string) http.HandlerFunc {
 	context := struct {
-		Packages [][]string
+		GoVersion string
+		Packages  [][]string
 	}{
-		Packages: packages,
+		GoVersion: runtime.Version(),
+		Packages:  packages,
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/home.html").Handler
 }
@@ -50,11 +53,13 @@ func Home(packages [][]string) http.HandlerFunc {
 // Results returns a baked handler for the results page.
 func Results(query string, results []*typeindex.Result) http.HandlerFunc {
 	context := struct {
-		Query   string
-		Results []PrettyResult
+		GoVersion string
+		Query     string
+		Results   []PrettyResult
 	}{
-		Query:   query,
-		Results: formatAll(results),
+		GoVersion: runtime.Version(),
+		Query:     query,
+		Results:   formatAll(results),
 	}
 	return templates.NewRenderer(context, "pages/_layout.html", "pages/results.html").Handler
 }
