@@ -2,9 +2,10 @@
 
 ## Development
 
-
 ```bash
-$ go run ./scripts/index/*.go -dest=".index" "$GOPATH" "/usr/local/go"
+$ git clone https://go.googlesource.com/go          # Clone source
+$ cd go && git checkout go1.20 && cd ..             # Checkout specific version
+$ go run ./scripts/index/*.go -dest=".index" "./go" # Build index
 ```
 
 ```bash
