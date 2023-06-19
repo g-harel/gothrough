@@ -4,8 +4,10 @@ FROM golang:1.20-alpine AS build
 RUN apk add git
 
 # Add non-standard-library packages.
+ENV GO111MODULE=off
 COPY packages.txt .
 RUN xargs -a packages.txt go get -u
+ENV GO111MODULE=on
 
 WORKDIR /gothrough
 COPY . .
