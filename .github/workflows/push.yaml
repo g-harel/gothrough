@@ -14,8 +14,8 @@ jobs:
       uses: cedrickring/golang-action@1.6.0
 
       # Install Python for `gcloud builds`
-    - run: |
-        sudo apt-get install python2.7
+    # - run: |
+    #     sudo apt-get install python2.7
 
       # Setup gcloud command.
     - uses: google-github-actions/setup-gcloud@v1
@@ -27,7 +27,7 @@ jobs:
     - run: gcloud builds submit --tag gcr.io/gothrough/website
       env:
         CLOUDSDK_CORE_PROJECT: gothrough
-        CLOUDSDK_PYTHON: /usr/bin/python2
+        # CLOUDSDK_PYTHON: /usr/bin/python2
 
       # Deploy new image.
     - run: gcloud --quiet run deploy --image gcr.io/gothrough/website --allow-unauthenticated --region=us-central1 --timeout=32s website --platform=managed --memory=2Gi
