@@ -13,21 +13,20 @@ jobs:
     - name: go test
       uses: cedrickring/golang-action@1.6.0
 
-      # Install Python for `gcloud builds`
-    # - run: |
-    #     sudo apt-get install python2.7
+      # Auth for gcloud
+    - uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCLOUD_AUTH }}
 
       # Setup gcloud command.
     - uses: google-github-actions/setup-gcloud@v1
       with:
           version: '435.0.0'
-          service_account_key: ${{ secrets.GCLOUD_AUTH }}
 
       # Build new deployable image.
     - run: gcloud builds submit --tag gcr.io/gothrough/website
       env:
         CLOUDSDK_CORE_PROJECT: gothrough
-        # CLOUDSDK_PYTHON: /usr/bin/python2
 
       # Deploy new image.
     - run: gcloud --quiet run deploy --image gcr.io/gothrough/website --allow-unauthenticated --region=us-central1 --timeout=32s website --platform=managed --memory=2Gi
